@@ -9,7 +9,7 @@ const axios = require("axios")
 const CURRENT_VERSION = 1;
 
 const piNetworkApi = 'api.minepi.com/v2'
-const API_KEY = 't3rfmdht1odwawijsh0wwdozozqaislivnf4pioutezhj5rgbl2beymdehm4o5pc'
+const API_KEY = 'dgxxumldooihfvvtes576er2bhudyfmsmphbuax021iiolgl3sw2z9kdcomlp6tp'
 
 const port = process.env.PORT || 3005
 
