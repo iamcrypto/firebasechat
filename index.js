@@ -8,7 +8,7 @@ const axios = require("axios")
 
 const CURRENT_VERSION = 1;
 
-const piNetworkApi = 'socialchain.app/v2'
+const piNetworkApi = 'api.minepi.com/v2'
 const API_KEY = 't3rfmdht1odwawijsh0wwdozozqaislivnf4pioutezhj5rgbl2beymdehm4o5pc'
 
 const port = process.env.PORT || 3005
