@@ -22,13 +22,10 @@ const server = http.createServer(app)
 
 
 
-var serviceAccount = require("/root/firebasechat/nodejs.json");
 
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://live-chess-dede7-default-rtdb.asia-southeast1.firebasedatabase.app"
-});
+
+
 app.use(express.json());
 app.use(express.static(__dirname + "/"));
 
