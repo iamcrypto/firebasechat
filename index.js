@@ -11,7 +11,7 @@ const CURRENT_VERSION = 1;
 const piNetworkApi = 'api.minepi.com/v2'
 const API_KEY = 'dgxxumldooihfvvtes576er2bhudyfmsmphbuax021iiolgl3sw2z9kdcomlp6tp'
 
-const port = process.env.PORT || 3005
+const port = process.env.PORT || 80
 
 var app = express();
 const server = http.createServer(app)
