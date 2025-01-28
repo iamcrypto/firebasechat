@@ -18,7 +18,7 @@ const server = http.createServer(app)
 
 
 
-var serviceAccount = require("firebasechat/nodejs.json");
+var serviceAccount = require("/root/firebasechat/nodejs.json");
 
 
 admin.initializeApp({
