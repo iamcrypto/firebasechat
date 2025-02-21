@@ -625,7 +625,7 @@ function openGameBetDetails(index) {
 
 
 const Pi = window.Pi;
-Pi.init({ version: "2.0", sandbox: '<%=sandbox%>' });
+Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
 async function auth() {
   try {
       
