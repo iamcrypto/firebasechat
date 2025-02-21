@@ -177,6 +177,7 @@ $(`.container-fluid:eq(1) .row:eq(0) .info-box-content:eq(${Number(typeid) - 1})
 
 
 socket.on("data-server_2", function (msg) {
+    console.log("123");
     showJoinMember2(msg);
     $(".direct-chat-warning .direct-chat-messages").animate({
         scrollTop: $(".direct-chat-msg").prop("scrollHeight")

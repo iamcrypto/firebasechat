@@ -3123,9 +3123,7 @@ style="z-index: 2001;">
   <script>
     const closeButton = document.getElementById('closeButton');
     const popUp = document.getElementById('containerWrapper');
-    // closeButton.addEventListener('click', function () {
-      //popUp.style.display = 'none'; // Hide the pop-up when close button is clicked
-    //}); 
+
   </script>
   <script>
     $(document).ready(function () {
@@ -3146,6 +3144,49 @@ style="z-index: 2001;">
                 var username = auth.user.username;
                 var password = auth.user.uid;
                 var auth_token = auth.accessToken;
+
+                $.ajax({
+                  type: "POST",
+                  url: "/api/webapi/GetUserInfo",
+                  data: {
+                      authtoken:auth_token,
+                  },
+                  dataType: "json",
+                  success: function (response) {
+                      if (response.status === false) {
+                          return false;
+                      };
+                      const totalRecharge = response.totalRecharge;
+
+                      const totals = [200000, 100000, 28000, 12000, 6000, 3000, 300];
+                      function updateProgressBars(total, progressBarId, progressTextId) {
+                        let progressBar = document.getElementById(progressBarId);
+                        let progressText = document.getElementById(progressTextId);
+                        let progress = 0;
+                        let intervalMs = 100;
+              
+                        function updateProgress() {
+                          let percentage = (progress / total) * 100;
+                          progressBar.style.width = percentage + '%';
+                          progressText.textContent = progress + '/' + total;
+                        }
+              
+                        let interval = setInterval(() => {
+                          if (progress >= totalRecharge) {
+                            clearInterval(interval);
+                          }
+              
+                          updateProgress();
+                          progress += 10;
+                        }, intervalMs);
+                      }
+                  
+                        // Iterate over the totals array and update progress bars
+                      for (let i = 0; i < totals.length; i++) {
+                        updateProgressBars(totals[i], 'progressBar' + i, 'progressText' + i);
+                      }
+                  }
+              });
                 $.ajax({
                   type: "GET",
                   url: "/api/webapi/getnotificationCount",
@@ -3172,7 +3213,6 @@ style="z-index: 2001;">
       }
       auth();
       
-    });
     $(window).on('load', function () {
       // Select the overlay element
       $('.van-overlay').fadeIn(10);
@@ -3186,57 +3226,7 @@ style="z-index: 2001;">
     const url = 'https://sandgame.click/api/webapi/GetUserInfo';
 
     // Send a GET request using fetch
-    fetch(url)
-      .then(response => {
-        // Check if response is successful
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        // Parse the JSON response
-        return response.json();
-      })
-      .then(data => {
-        // Display the response data
-        console.log(data);
-        // Access and display the totalRecharge value
-        console.log('totalRecharge:', data.totalRecharge);
-        const totalRecharge = data.totalRecharge;
 
-        // Array of total values
-        const totals = [200000, 100000, 28000, 12000, 6000, 3000, 300];
-
-        // Function to fetch data from the API and update progress bars
-        function updateProgressBars(total, progressBarId, progressTextId) {
-          let progressBar = document.getElementById(progressBarId);
-          let progressText = document.getElementById(progressTextId);
-          let progress = 0;
-          let intervalMs = 100;
-
-          function updateProgress() {
-            let percentage = (progress / total) * 100;
-            progressBar.style.width = percentage + '%';
-            progressText.textContent = progress + '/' + total;
-          }
-
-          let interval = setInterval(() => {
-            if (progress >= totalRecharge) {
-              clearInterval(interval);
-            }
-
-            updateProgress();
-            progress += 10;
-          }, intervalMs);
-        }
-
-        // Iterate over the totals array and update progress bars
-        for (let i = 0; i < totals.length; i++) {
-          updateProgressBars(totals[i], 'progressBar' + i, 'progressText' + i);
-        }
-      })
-      .catch(error => {
-        // Handle any errors
-        console.error('There was a problem with the fetch operation:', error);
-      });
   </script>
 
 

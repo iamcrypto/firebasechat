@@ -255,7 +255,7 @@ const initWebRouter = (app) => {
     router.post('/api/webapi/admin/withdraw',  adminController.handlWithdraw); // get info account
     router.post('/api/webapi/admin/recharge',  adminController.recharge); // get info account
     router.post('/api/webapi/admin/tranfermode',  adminController.tranfermode); // store transfer mode
-    router.get('/api/webapi/admin/gettranfermode',  adminController.gettranfermode); // get transfer mode
+    router.post('/api/webapi/admin/gettranfermode',  adminController.gettranfermode); // get transfer mode
     
     router.post('/api/webapi/admin/rechargeDuyet',  adminController.rechargeDuyet); // get info account
     router.post('/api/webapi/admin/member/info',  adminController.userInfo); // get info account
