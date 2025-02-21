@@ -30,6 +30,20 @@
             padding: 0;
             margin: 0;
         }
+        .img
+        {
+            width: 40px;
+            height: 40px;
+        }
+        .active
+        {
+            display: block !important;
+        }
+
+        .icons
+        {
+            display: none;
+        }
 
         .block-click {
             pointer-events: none;
@@ -596,8 +610,22 @@
                                         <!---->
                                     </i>
                                 </div>
-                                <div data-v-25d9c352="" class="c-tc">BANK</div>
-                                <div data-v-25d9c352="" class="icons"><i data-v-25d9c352=""
+                                <div data-v-25d9c352="" class="c-tc" data-label="Bank">BANK</div>
+                                <div data-v-25d9c352="" class="icons active"><i data-v-25d9c352=""
+                                        class="van-icon van-icon-success"
+                                        style="color: rgb(255, 255, 255); font-size: 15px;">
+                                        <!---->
+                                    </i>
+                                </div>
+                            </li>
+
+                            <li data-v-25d9c352="" class="item">
+                                <div data-v-25d9c352="" class="icon c-row c-row-middle-center">
+                                    <img data-v-67caa467="" width="20px" height="20px" src="/images/recharge_TRANSFER4-.png"
+                                    class="img">
+                                </div>
+                                <div data-v-25d9c352="" class="c-tc" data-label="Pi">PI Pay</div>
+                                <div data-v-25d9c352="" class="icons" ><i data-v-25d9c352=""
                                         class="van-icon van-icon-success"
                                         style="color: rgb(255, 255, 255); font-size: 15px;">
                                         <!---->
@@ -611,7 +639,7 @@
                                         <!---->
                                     </i>
                                 </div>
-                                <div data-v-25d9c352="" class="c-tc">USDT </br>(COMING SOON)</div>
+                                <div data-v-25d9c352="" class="c-tc" data-label="USDT">USDT </br>(COMING SOON)</div>
                                 <div data-v-25d9c352="" class="icons"><i data-v-25d9c352=""
                                         class="van-icon van-icon-success"
                                         style="color: rgb(255, 255, 255); font-size: 15px;">
@@ -789,6 +817,15 @@
             setTimeout(() => {
                 $(this).removeClass('action block-click');
             }, 2500);
+        });
+        $('.c-row .item').click(function (e) {
+            if($(this).find(".c-tc").attr("data-label") != "USDT")
+            {
+                $('.c-row .item').removeClass("action");
+                $(this).addClass("action");
+                $('.c-row .item .icons').removeClass("active");
+                $(this).find(".icons").addClass("active");
+            }
         });
 
         function alertMess(text, sic) {

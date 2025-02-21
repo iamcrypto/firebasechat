@@ -128,17 +128,19 @@
                 </div>
                 <div data-v-9f3a9836="" class="item c-row c-row-between">
                     <div data-v-9f3a9836="" class="lab">Username</div>
+                    <span class="name"> </span>
+                  
+                </div>
+                <div data-v-9f3a9836="" class="item c-row c-row-between">
+                    <div data-v-9f3a9836="" class="lab">Mobile Number</div>
+                    
                     <div data-v-9f3a9836="" class="txt c-row c-row-middle-center">
-                        <span class="name"> </span>
+                        <div data-v-9f3a9836="" class="number"> </div>
                         <i data-v-9f3a9836="" class="m-l-10 van-icon van-icon-arrow"
                             style="color: rgb(149, 149, 149); font-size: 16px;">
                             <!---->
                         </i>
                     </div>
-                </div>
-                <div data-v-9f3a9836="" class="item c-row c-row-between">
-                    <div data-v-9f3a9836="" class="lab">Mobile Number</div>
-                    <div data-v-9f3a9836="" class="number"> </div>
                 </div>
                 <div data-v-9f3a9836="" class="item c-row c-row-between">
                     <div data-v-9f3a9836="" class="lab">VIP Level</div>
@@ -152,9 +154,9 @@
                 <div data-v-9f3a9836="" class="popup-box">
                     <div data-v-9f3a9836="" class="title"></div>
                     <div data-v-9f3a9836="" class="con">
-                        <div data-v-9f3a9836="" class="lab">Change Username</div>
+                        <div data-v-9f3a9836="" class="lab">Change Phone Number</div>
                         <div data-v-9f3a9836="">
-                            <input data-v-9f3a9836="" type="text" maxlength="16" placeholder="Username" class="input">
+                            <input data-v-9f3a9836="" type="number" maxlength="16" placeholder="Phone Number" class="input">
                         </div>
                     </div>
                     <div data-v-9f3a9836="" class="food c-row c-row-middle-center">
@@ -225,9 +227,9 @@ async function auth() {
                 return false;
             };
             $("#prof_image").attr("src","/assets/png/"+ response.data.user_avatar);
-            $('.profile .name').text(response.data.name_user);
+            $('.profile .name').text(response.data.phone_user);
             $('.profile .id').text(response.data.id_user);
-            $('.profile .number').text("+91 " + response.data.phone_user);
+            $('.profile .number').text("+91 " + response.data.name_user);
             }
         });
           $.ajax({
@@ -328,7 +330,7 @@ auth();
             e.preventDefault();
             $('.van-popup, .van-overlay').fadeOut(100);
         });
-        $('.profile .item:eq(2)').click(function (e) {
+        $('.profile .item:eq(3)').click(function (e) {
             e.preventDefault();
             $('.van-popup, .van-overlay').fadeIn(100);
         });

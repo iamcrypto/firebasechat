@@ -147,7 +147,7 @@ const register = async (req, res) => {
     let { username, pwd, invitecode, countrycode } = req.body;
     let id_user = randomNumber(10000, 99999);
     let otp2 = randomNumber(100000, 999999);
-    let name_user = "Member" + randomNumber(10000, 99999);
+    let name_user ="";
     let code = randomString(5) + randomNumber(10000, 99999);
     let ip = ipAddress(req);
     let time = timeCreate();
