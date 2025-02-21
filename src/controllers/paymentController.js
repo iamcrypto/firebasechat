@@ -203,7 +203,7 @@ const addPIPaymentRequest = async (req, res) => {
 
         res.status(500).json({
             status: false,
-            message: "Something went wrong!",
+            message:error,
             timestamp: timeNow
         })
     }
