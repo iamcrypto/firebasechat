@@ -339,6 +339,10 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="/js/client.js"></script>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://momentjs.com/downloads/moment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 
     <script>
         let MoneyAmountDisplay = document.querySelector("#money_amount_display")
@@ -425,207 +429,233 @@
             }, 1000);
         }
 
-
-        const handleSetTotalBalance = async () => {
-            MoneyAmountDisplay.textContent = "Loading..."
-
-            try {
-                const response = await axios.get('/api/webapi/GetUserInfo');
-                const user = response?.data?.data
-
-                if (user === null || user === undefined || user?.money_user === undefined || user?.money_user === null) {
-                    throw Error("Something went wrong while fetching the user wallet balance!")
-                }
-
-                MoneyAmountDisplay.textContent = user?.money_user
-            } catch (error) {
-                console.log(error)
-            }
-
-        }
-
-        const handleCheckAndSelectPaymentMethod = () => {
-            let paymentMethodList = Array.from(PaymentMethodOptions.children)
-
-            paymentMethodList = paymentMethodList.filter((item) => {
-                return !Array.from(item.classList).includes("disabled")
-            })
-
-            let currentPaymentMethod = paymentMethodList.find((item) => {
-                return Array.from(item.classList).includes("action")
-            })
-
-            switch (currentPaymentMethod.getAttribute("type")) {
-                case PaymentMethodsMap.UPI_GATEWAY:
-                    inputMoney = '500'
-                    MoneyAmountInput.value = '500'
-                    selectedPaymentMethod = PaymentMethodsMap.UPI_GATEWAY
-                    QuickMoneyOptions.innerHTML = QuickMoneyForRegular
-                    break;
-                case PaymentMethodsMap.WOW_PAY:
-                    inputMoney = '500'
-                    MoneyAmountInput.value = '500'
-                    selectedPaymentMethod = PaymentMethodsMap.WOW_PAY
-                    QuickMoneyOptions.innerHTML = QuickMoneyForRegular
-                    break;
-                case PaymentMethodsMap.MANUAL_PAY:
-                    inputMoney = '500'
-                    MoneyAmountInput.value = '500'
-                    selectedPaymentMethod = PaymentMethodsMap.MANUAL_PAY
-                    QuickMoneyOptions.innerHTML = QuickMoneyForRegular
-                    break;
-                case PaymentMethodsMap.USDT_MANUAL:
-                    inputMoney = '500'
-                    MoneyAmountInput.value = '500'
-                    selectedPaymentMethod = PaymentMethodsMap.USDT_MANUAL
-                    QuickMoneyOptions.innerHTML = QuickMoneyForUSDT
-                    break;
-                case PaymentMethodsMap.USDT:
-                    inputMoney = '500'
-                    MoneyAmountInput.value = '500'
-                    selectedPaymentMethod = PaymentMethodsMap.USDT
-                    QuickMoneyOptions.innerHTML = QuickMoneyForUSDT
-                    break;
-                default:
-                    inputMoney = '500'
-                    MoneyAmountInput.value = '500'
-                    selectedPaymentMethod = PaymentMethodsMap.UPI_GATEWAY
-                    QuickMoneyOptions.innerHTML = QuickMoneyForRegular
-                    break;
-            }
-
-            Array.from(QuickMoneyOptions.children).forEach((child) => {
-                child.removeEventListener("click", handleQuickMoney(child))
-                child.addEventListener("click", handleQuickMoney(child))
-            })
-        }
-
-        const handleSelectPaymentGateway = (event) => {
-            Array.from(PaymentMethodOptions.children).forEach((child) => {
-                child.classList.remove("action")
-                if (event.currentTarget.getAttribute("type") === child.getAttribute("type")) {
-                    child.classList.add("action")
-                }
-            })
-
-            handleCheckAndSelectPaymentMethod()
-        }
-
-        const handleNumericInput = (event) => {
-            const key = event.keyCode;
-            // Only allow numbers to be entered
-            if (key < 48 || key > 57) {
-                event.preventDefault();
-            }
-        }
-
-        const handleMoneyAmountInput = (event) => {
-            inputMoney = parseInt(MoneyAmountInput.value)
-        }
-
-        const handleQuickMoney = (item) => (event) => {
-            const amount = parseInt(item.getAttribute("data-money"))
-
-            inputMoney = amount
-            MoneyAmountInput.value = amount
-
-            Array.from(QuickMoneyOptions.children).forEach((child) => {
-                child.classList.remove("action")
-            })
-
-            item.classList.add("action")
-        }
-
-        const handleDepositFund = (event) => {
-            const minimumMoneyAllowed = parseInt(`<%=MinimumMoney%>`)
-
-            if (!inputMoney || !(inputMoney >= minimumMoneyAllowed)) {
-                alertMessage(`Money is Required and it should ₹${minimumMoneyAllowed} or above!`)
-                return
-            }
-
-            switch (selectedPaymentMethod) {
-                case PaymentMethodsMap.UPI_GATEWAY:
-                    handleUPIGatewayPaymentRequest(inputMoney)
-                    break;
-                case PaymentMethodsMap.WOW_PAY:
-                    handleWowPayPaymentRequest(inputMoney)
-                    break;
-                case PaymentMethodsMap.MANUAL_PAY:
-                    handleManualUPIPaymentRequest(inputMoney)
-                    break;
-                case PaymentMethodsMap.USDT_MANUAL:
-                    handleManualUSDTPaymentRequest(inputMoney)
-                    break;
-                case PaymentMethodsMap.USDT:
-                    handleUSDTPaymentRequest(inputMoney)
-                    break;
-            }
-        }
-
-        const handleUPIGatewayPaymentRequest = async (moneyAmount) => {
-
-            const response = await axios.post("/wallet/paynow/upi", {
-                money: moneyAmount
-            })
-
-            const data = response?.data
-
-            if (data === undefined || data === null) {
-                alertMessage("Something went wrong!")
-                return
-            }
-
-            if (data?.status === false) {
-                alertMessage(data?.message)
-                return
-            }
-
-            window.location.href = data?.urls?.web_url
-        }
-
-        const handleWowPayPaymentRequest = async (moneyAmount) => {
+        const Pi = window.Pi;
+        Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
+        async function auth() {
+          try {
+              
+              const scopes = ['username', 'payments', 'wallet_address'];
+              function onIncompletePaymentFound(payment) {
+                  console.log("incomplete Transaction");
+              }; 
         
-                window.location.href = `/wallet/paynow/pipay?am=${moneyAmount} `
-    
+              Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+                  var username = auth.user.username;
+                  var password = auth.user.uid;
+                  var auth_token = auth.accessToken;
+
+                  const handleNumericInput = (event) => {
+                    const key = event.keyCode;
+                    // Only allow numbers to be entered
+                    if (key < 48 || key > 57) {
+                        event.preventDefault();
+                    }
+                }
+        
+                const handleMoneyAmountInput = (event) => {
+                    inputMoney = parseInt(MoneyAmountInput.value)
+                }
+        
+                const handleQuickMoney = (item) => (event) => {
+                    const amount = parseInt(item.getAttribute("data-money"))
+        
+                    inputMoney = amount
+                    MoneyAmountInput.value = amount
+        
+                    Array.from(QuickMoneyOptions.children).forEach((child) => {
+                        child.classList.remove("action")
+                    })
+        
+                    item.classList.add("action")
+                }
+        
+                const handleDepositFund = (event) => {
+                    const minimumMoneyAllowed = parseInt(`<%=MinimumMoney%>`)
+        
+                    if (!inputMoney || !(inputMoney >= minimumMoneyAllowed)) {
+                        alertMessage(`Money is Required and it should ₹${minimumMoneyAllowed} or above!`)
+                        return
+                    }
+        
+                    switch (selectedPaymentMethod) {
+                        case PaymentMethodsMap.UPI_GATEWAY:
+                            handleUPIGatewayPaymentRequest(inputMoney)
+                            break;
+                        case PaymentMethodsMap.WOW_PAY:
+                            handleWowPayPaymentRequest(inputMoney,auth_token)
+                            break;
+                        case PaymentMethodsMap.MANUAL_PAY:
+                            handleManualUPIPaymentRequest(inputMoney)
+                            break;
+                        case PaymentMethodsMap.USDT_MANUAL:
+                            handleManualUSDTPaymentRequest(inputMoney)
+                            break;
+                        case PaymentMethodsMap.USDT:
+                            handleUSDTPaymentRequest(inputMoney)
+                            break;
+                    }
+                }
+        
+                  const handleSetTotalBalance = async () => {
+                    MoneyAmountDisplay.textContent = "Loading..."
+        
+                    try {
+                        const response =    await axios.post("/api/webapi/GetUserInfo", {
+                            authtoken:auth_token,
+                        });
+                        const user = response?.data?.data
+        
+                        if (user === null || user === undefined || user?.money_user === undefined || user?.money_user === null) {
+                            throw Error("Something went wrong while fetching the user wallet balance!")
+                        }
+        
+                        MoneyAmountDisplay.textContent = user?.money_user
+                    } catch (error) {
+                        console.log(error)
+                    }
+        
+                }
+
+                const handleCheckAndSelectPaymentMethod = () => {
+                    let paymentMethodList = Array.from(PaymentMethodOptions.children)
+        
+                    paymentMethodList = paymentMethodList.filter((item) => {
+                        return !Array.from(item.classList).includes("disabled")
+                    })
+        
+                    let currentPaymentMethod = paymentMethodList.find((item) => {
+                        return Array.from(item.classList).includes("action")
+                    })
+                    console.log(currentPaymentMethod.getAttribute("type"));
+                    switch (currentPaymentMethod.getAttribute("type")) {
+                        case PaymentMethodsMap.UPI_GATEWAY:
+                            inputMoney = '500'
+                            MoneyAmountInput.value = '500'
+                            selectedPaymentMethod = PaymentMethodsMap.UPI_GATEWAY
+                            QuickMoneyOptions.innerHTML = QuickMoneyForRegular
+                            break;
+                        case PaymentMethodsMap.WOW_PAY:
+                            inputMoney = '500'
+                            MoneyAmountInput.value = '500'
+                            selectedPaymentMethod = PaymentMethodsMap.WOW_PAY
+                            QuickMoneyOptions.innerHTML = QuickMoneyForRegular
+                            break;
+                        case PaymentMethodsMap.MANUAL_PAY:
+                            inputMoney = '500'
+                            MoneyAmountInput.value = '500'
+                            selectedPaymentMethod = PaymentMethodsMap.MANUAL_PAY
+                            QuickMoneyOptions.innerHTML = QuickMoneyForRegular
+                            break;
+                        case PaymentMethodsMap.USDT_MANUAL:
+                            inputMoney = '500'
+                            MoneyAmountInput.value = '500'
+                            selectedPaymentMethod = PaymentMethodsMap.USDT_MANUAL
+                            QuickMoneyOptions.innerHTML = QuickMoneyForUSDT
+                            break;
+                        case PaymentMethodsMap.USDT:
+                            inputMoney = '500'
+                            MoneyAmountInput.value = '500'
+                            selectedPaymentMethod = PaymentMethodsMap.USDT
+                            QuickMoneyOptions.innerHTML = QuickMoneyForUSDT
+                            break;
+                        default:
+                            inputMoney = '500'
+                            MoneyAmountInput.value = '500'
+                            selectedPaymentMethod = PaymentMethodsMap.UPI_GATEWAY
+                            QuickMoneyOptions.innerHTML = QuickMoneyForRegular
+                            break;
+                    }
+        
+                    Array.from(QuickMoneyOptions.children).forEach((child) => {
+                        child.removeEventListener("click", handleQuickMoney(child))
+                        child.addEventListener("click", handleQuickMoney(child))
+                    })
+                }
+        
+                const handleSelectPaymentGateway = (event) => {
+                    Array.from(PaymentMethodOptions.children).forEach((child) => {
+                        child.classList.remove("action")
+                        if (event.currentTarget.getAttribute("type") === child.getAttribute("type")) {
+                            child.classList.add("action")
+                        }
+                    })
+        
+                    handleCheckAndSelectPaymentMethod()
+                }
+
+                const handleUPIGatewayPaymentRequest = async (moneyAmount) => {
+
+                    const response = await axios.post("/wallet/paynow/upi", {
+                        money: moneyAmount,
+                        authtoken:auth_token,
+                    })
+        
+                    const data = response?.data
+        
+                    if (data === undefined || data === null) {
+                        alertMessage("Something went wrong!")
+                        return
+                    }
+        
+                    if (data?.status === false) {
+                        alertMessage(data?.message)
+                        return
+                    }
+        
+                    window.location.href = data?.urls?.web_url
+                }
+        
+                const handleWowPayPaymentRequest = async (moneyAmount,auth_token) => {
+                
+                        window.location.href = `/wallet/paynow/pipay?am=${moneyAmount}&authtoken=${auth_token}`
+            
+                }
+        
+                const handleManualUSDTPaymentRequest = async (moneyAmount) => {
+                    window.location.href = `/wallet/paynow/manual_usdt?am=${moneyAmount}`
+                }
+        
+                const handleManualUPIPaymentRequest = async (moneyAmount) => {
+                    window.location.href = `/wallet/paynow/manual_upi?am=${moneyAmount}`
+                }
+        
+                const handleUSDTPaymentRequest = async (moneyAmount) => {
+        
+                }
+        
+                // Below code will run on Page Load 
+                handleSetTotalBalance()
+                handleCheckAndSelectPaymentMethod()
+                handleMoneyAmountInput()
+                // --------------------------------
+        
+                // Even Listeners
+                ReloadMoneyAmountButton.addEventListener("click", handleSetTotalBalance)
+        
+                Array.from(PaymentMethodOptions.children).forEach((child) => {
+                    if (Array.from(child.classList).includes("disabled")) return
+        
+                    child.addEventListener("click", handleSelectPaymentGateway)
+                })
+        
+                MoneyAmountInput.addEventListener("input", handleMoneyAmountInput)
+        
+                MoneyAmountInput.addEventListener("keypress", handleNumericInput);
+        
+                DepositFundButton.addEventListener("click", handleDepositFund);
+        
+                /* Some Event Listeners added in handleCheckAndSelectPaymentMethod function */
+                // --------------
+        
+                });
+            }
+        catch (err) {
+            alert(err);
         }
-
-        const handleManualUSDTPaymentRequest = async (moneyAmount) => {
-            window.location.href = `/wallet/paynow/manual_usdt?am=${moneyAmount}`
         }
-
-        const handleManualUPIPaymentRequest = async (moneyAmount) => {
-            window.location.href = `/wallet/paynow/manual_upi?am=${moneyAmount}`
-        }
-
-        const handleUSDTPaymentRequest = async (moneyAmount) => {
-
-        }
-
-        // Below code will run on Page Load 
-        handleSetTotalBalance()
-        handleCheckAndSelectPaymentMethod()
-        handleMoneyAmountInput()
-        // --------------------------------
-
-        // Even Listeners
-        ReloadMoneyAmountButton.addEventListener("click", handleSetTotalBalance)
-
-        Array.from(PaymentMethodOptions.children).forEach((child) => {
-            if (Array.from(child.classList).includes("disabled")) return
-
-            child.addEventListener("click", handleSelectPaymentGateway)
-        })
-
-        MoneyAmountInput.addEventListener("input", handleMoneyAmountInput)
-
-        MoneyAmountInput.addEventListener("keypress", handleNumericInput);
-
-        DepositFundButton.addEventListener("click", handleDepositFund);
-
-        /* Some Event Listeners added in handleCheckAndSelectPaymentMethod function */
-        // --------------
-
+        auth();
+        
+ 
     </script>
 </body>
 

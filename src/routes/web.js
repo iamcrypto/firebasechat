@@ -63,6 +63,7 @@ const initWebRouter = (app) => {
     router.get('/wallet/paynow/manual_usdt', paymentController.initiateManualUSDTPayment);
     router.post('/wallet/paynow/manual_upi_request', paymentController.addManualUPIPaymentRequest);
     router.post('/wallet/paynow/manual_usdt_request', paymentController.addManualUSDTPaymentRequest);
+    router.post('/wallet/paynow/pi_payment_request', paymentController.addPIPaymentRequest);
     router.get('/wallet/paynow/pipay', paymentController.initiatePiPayment);
     router.post('/wallet/verify/pipay', paymentController.verifyPiPayment);
     router.get('/wallet/verify/pipay', paymentController.verifyPiPayment);

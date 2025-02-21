@@ -5,6 +5,8 @@ import crypto from "crypto";
 import querystring from "querystring";
 import "dotenv/config";
 import md5 from "md5";
+const path = require('path');
+
 
 let timeNow = Date.now();
 
@@ -120,12 +122,78 @@ const addManualUPIPaymentRequest = async (req, res) => {
             today: rechargeTable.getCurrentTimeForTodayField(),
             url: "NULL",
             time: timeNow,
+            wallet_address:""
         }
 
         const recharge = await rechargeTable.create(newRecharge)
 
         return res.status(200).json({
             message: 'Payment Requested successfully Your Balance will update shortly!',
+            recharge: recharge,
+            status: true,
+            timeStamp: timeNow,
+        });
+    } catch (error) {
+        console.log(error)
+
+        res.status(500).json({
+            status: false,
+            message: "Something went wrong!",
+            timestamp: timeNow
+        })
+    }
+}
+
+
+const addPIPaymentRequest = async (req, res) => {
+    try {
+        const data = req.body
+        let auth = req.body.authtoken;
+        let money = parseInt(data.money);
+        let utr = (data.utr);
+        let trx = (data.trxId);
+        let wallet = (data.userwallet);
+
+        const user = await getUserDataByAuthToken(md5(auth))
+
+        const pendingRechargeList = await rechargeTable.getRecordByPhoneAndStatus({ phone: user.phone, status: PaymentStatusMap.PENDING, type: PaymentMethodsMap.WOW_PAY })
+
+        if (pendingRechargeList.length !== 0) {
+            const deleteRechargeQueries = pendingRechargeList.map(recharge => {
+                return rechargeTable.cancelById(recharge.id)
+            });
+
+            await Promise.all(deleteRechargeQueries)
+        }
+
+        const orderId = getRechargeOrderId()
+
+        const newRecharge = {
+            orderId: orderId,
+            transactionId: trx,
+            utr: utr,
+            phone: user.phone,
+            money: money,
+            type: PaymentMethodsMap.WOW_PAY,
+            status: 1,
+            today: rechargeTable.getCurrentTimeForTodayField(),
+            url: "NULL",
+            time: timeNow,
+            wallet_address:wallet
+        }
+
+        const recharge = await rechargeTable.create(newRecharge)
+        await connection.execute(
+            "UPDATE users SET  money = money + ?, total_money = total_money + ? WHERE phone = ?",
+            [
+                money,
+                money,
+                user.phone
+            ],
+          );
+
+        return res.status(200).json({
+            message: 'Payment Approved, Your Balance will update shortly!',
             recharge: recharge,
             status: true,
             timeStamp: timeNow,
@@ -191,6 +259,7 @@ const addManualUSDTPaymentRequest = async (req, res) => {
             today: rechargeTable.getCurrentTimeForTodayField(),
             url: "NULL",
             time: timeNow,
+            wallet_address:""
         }
 
         const recharge = await rechargeTable.create(newRecharge)
@@ -271,6 +340,7 @@ const initiateUPIPayment = async (req, res) => {
             today: rechargeTable.getCurrentTimeForTodayField(),
             url: ekqrData.data.payment_url,
             time: timeNow,
+            wallet_address:""
         }
 
         const recharge = await rechargeTable.create(newRecharge)
@@ -391,18 +461,8 @@ const verifyUPIPayment = async (req, res) => {
 
 const initiatePiPayment = async (req, res) => {
     const type = PaymentMethodsMap.WOW_PAY
-    let auth = req.body.authtoken;
-    let money = parseInt(req.query.money);
-
-    // const minimumMoneyAllowed = parseInt(process.env.MINIMUM_MONEY)
-
-    // if (!money || !(money >= minimumMoneyAllowed)) {
-    //     return res.status(400).json({
-    //         message: `Money is Required and it must be ₹${minimumMoneyAllowed} or above!`,
-    //         status: false,
-    //         timeStamp: timeNow,
-    //     })
-    // }
+    let auth = req.query.authtoken;
+    let money = parseInt(req.query.am);
 
     try {
         const user = await getUserDataByAuthToken(md5(auth))
@@ -422,12 +482,12 @@ const initiatePiPayment = async (req, res) => {
             usdt_wallet_address: bank_recharge_momo_data?.qr_code_image || "",
         }
         var sandbox = process.env.SANDBOX_MODE;
+        var apikey = process.env.PIAPI_KEY;
         return res.render("wallet/pipay.ejs", {
             Amount: query?.am,
-            UsdtWalletAddress: momo.usdt_wallet_address,sandbox
+            UsdtWalletAddress: momo.usdt_wallet_address,sandbox,pi_api_key: apikey
         });
-    
-       
+
     } catch (error) {
        
         console.log(error)
@@ -504,6 +564,8 @@ const verifyPiPayment = async (req, res) => {
             today: rechargeTable.getCurrentTimeForTodayField(),
             url: 'NULL',
             time: timeNow,
+            wallet_address:""
+            
         }
 
 
@@ -672,8 +734,8 @@ const rechargeTable = {
         }
 
         await connection.query(
-            `INSERT INTO recharge SET id_order = ?, transaction_id = ?, phone = ?, money = ?, type = ?, status = ?, today = ?, url = ?, time = ?, utr = ?`,
-            [newRecharge.orderId, newRecharge.transactionId, newRecharge.phone, newRecharge.money, newRecharge.type, newRecharge.status, newRecharge.today, newRecharge.url, newRecharge.time, newRecharge?.utr || "NULL"]
+            `INSERT INTO recharge SET id_order = ?, transaction_id = ?, phone = ?, money = ?, type = ?, status = ?, today = ?, url = ?, time = ?, utr = ?, wallet_address = ?`,
+            [newRecharge.orderId, newRecharge.transactionId, newRecharge.phone, newRecharge.money, newRecharge.type, newRecharge.status, newRecharge.today, newRecharge.url, newRecharge.time, newRecharge?.utr || "NULL", newRecharge?.wallet_address || ""]
         );
         
 
@@ -699,6 +761,7 @@ module.exports = {
     verifyPiPayment,
     initiateManualUPIPayment,
     addManualUPIPaymentRequest,
+    addPIPaymentRequest,
     addManualUSDTPaymentRequest,
     initiateManualUSDTPayment,
 }

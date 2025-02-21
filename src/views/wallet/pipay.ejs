@@ -6,10 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PI PAY</title>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"
-        integrity="sha512-NQfB/bDaB8kaSXF8E77JjhHG5PM6XVRxvHzkZiwl3ddWCEPBa23T76MuWSwAJdMGJnmQqM0VeY9kFszsrBEFrQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer">
-        </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/js/client.js"></script>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://momentjs.com/downloads/moment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 </head>
 
 <body>
@@ -212,9 +214,7 @@
             </button>
         </div>
 
-        <form class="verification_form__root" action="submit.php" method="post">
-            <label for="ref_no">Reference No.</label>
-            <input type="text" id="ref_no" name="ref_no" required placeholder="Enter Your Reference No here..." />
+        <form class="verification_form__root">
             <button id="submit_button" type="submit">Submit</button>
         </form>
 
@@ -289,41 +289,150 @@
 
         copyUpiId.addEventListener("click", function () {
             let upi_id = document.getElementById("wallet_address_field").innerText;
-            console.log(upi_id);
             navigator.clipboard.writeText(upi_id);
         });
-
-        const submitButton = document.getElementById("submit_button");
-        submitButton.addEventListener("click", async (event) => {
-            try {
-                event.preventDefault();
-                const refNo = document.getElementById("ref_no").value;
-                const amount = '<%=Amount%>';
-                console.log(amount)
-                const response = await axios.post("/wallet/paynow/manual_usdt_request", {
-                    money: amount,
-                    utr: refNo,
-                })
-
-                if (!response?.data) {
-                    alertMessage("Something went Wrong!")
-                    return
-                }
-
-                if (response?.data?.status === false) {
-                    alertMessage(response?.data?.message)
-                    return
-                }
-
-                alertMessage(response?.data?.message)
-
-                window.location.href = "/wallet/rechargerecord"
-            } catch (error) {
-                console.log(error);
-                alertMessage("Something went Wrong!")
-            }
-        });
+        
     </script>
+
+    <script  type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getDatabase, ref, set, remove, onChildAdded, onChildRemoved } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+      
+        
+        $( document ).ready(function() {
+            const Pi = window.Pi;
+            Pi.init({ version: "2.0", sandbox: true });
+      
+            const firebaseConfig = {
+              apiKey: "AIzaSyDXiVMk3XgvOtgqwl_ERe6ODnDlDYiV5gM",
+              authDomain: "example-firebase-db-21b0b.firebaseapp.com",
+              projectId: "example-firebase-db-21b0b",
+              storageBucket: "example-firebase-db-21b0b.firebasestorage.app",
+              messagingSenderId: "512258180846",
+              appId: "1:512258180846:web:9c20193809838ec7cbd5ff",
+              measurementId: "G-K6WE9VHDY7"
+            };
+            const app = initializeApp(firebaseConfig);
+            const db1 = getDatabase(app);
+            //alert(PiNetworkClient);
+            async function auth() {
+                try {
+                    // Identify the user with their username / unique network-wide ID, and get permission to request payments from them.
+                    const scopes = ['username', 'payments', 'wallet_address'];
+                    function onIncompletePaymentFound(payment) {
+                        console.log("incomplete Transaction");
+                    }; // Read more about this in the SDK reference
+      
+                    Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+                        var username = auth.user.username;
+                var password = auth.user.uid;
+                var auth_token = auth.accessToken;
+                      $( "#submit_button" ).click(function() {
+                        const amount = '<%=Amount%>';
+                        $("#submit_button").prop( "disabled", true );
+                        transfer(amount,auth_token);
+                        });
+                    }).catch(function(error) {
+                      console.error(error);
+                    });
+                } catch (err) {
+                    alert(err);
+                    // Not able to fetch the user
+                }
+            }
+      
+            async function transfer(amount,token) {
+                try {
+                    const payment = Pi.createPayment({
+                      amount: parseFloat(amount),
+                      memo: "Registration towards Chessboard Live tournament", // e.g: "Digital kitten #1234",
+                      // An arbitrary developer-provided metadata object - for your own usage:
+                      metadata: { paymentType: "donation" /* ... */ }, // e.g: { kittenId: 1234 }
+                    }, {
+                      // Callbacks you need to implement - read more about those in the detailed docs linked below:
+                      onReadyForServerApproval: function(paymentId) {
+                          var data = {
+                                    'action': 'approve',
+                                    'paymentId': paymentId,
+                                    'txid': '',
+                                    'app_client': 'livetelecast'
+                                };
+                          return axios.post('/approve', {
+                            paymentId: paymentId,
+                          }).then((response) => {
+                            $("#submit_button").prop( "disabled", false );
+                          }, (error) => {
+                            console.log(error);
+                            $("#submit_button").prop( "disabled", false );
+                          });
+                      },
+                      onReadyForServerCompletion: function(paymentId, txid) {
+                            var data = {
+                                'action': 'complete',
+                                'paymentId': paymentId,
+                                "txid": txid,
+                                'app_client': 'livetelecast'
+                            };
+                            return axios.post('/complete', {
+                              paymentId: paymentId,
+                              txid:txid,
+                          }).then((response) => {   
+                          let accessToken = '<%=pi_api_key%>';
+                          return axios.get('https://api.minepi.com/v2/payments/'+ paymentId.trim(), {
+                            headers: {
+                              'Authorization': "Key " + accessToken, 
+                              "Content-Type": "application/json"
+                            }     
+                        }).then((response1) => {
+                            var timestamp = new Date().getTime();
+                            set(ref(db1,"pi_transactions/"+timestamp),{
+                                payment_id : paymentId,
+                                trax_id : txid,
+                                user_id : response1.data.user_uid,
+                                amount: response1.data.amount,
+                                sender: response1.data.from_address,
+                                receiver: response1.data.to_address,
+                                paid_for:"recharge",
+                                date:moment().format('DD/MM/YYYY'),
+                                time:moment().format("h:mm:ss a"),
+                            });
+                            $.ajax({
+                                type: "POST",
+                                url: "/wallet/paynow/pi_payment_request",
+                                data: {
+                                    authtoken:token,
+                                    money:response1.data.amount,
+                                    utr:paymentId,
+                                    trxId:txid,
+                                    userwallet:response1.data.from_address,
+                                },
+                                dataType: "json",
+                                success: function (response5) {
+                                    alertMessage(response5?.data?.message);
+                                    window.location.href = "/wallet/rechargerecord";
+                                }
+                            });
+                          $("#submit_button").prop( "disabled", false );
+                          }) }, (error) => {
+                            console.log(error);
+                            $("#submit_button").prop( "disabled", false );
+                          });
+                      },
+                      onCancel: function(paymentId) { 
+                        $("#submit_button").prop( "disabled", false );
+                       },
+                      onError: function(error, payment) { $("#submit_button").prop( "disabled", false ); /* ... */ },
+                    });
+                } catch(err) {
+                    $("#submit_button").prop( "disabled", false );
+                    alert(err);
+                    // Technical problem (eg network failure). Please try again
+                }
+            }
+      
+            auth();
+        });
+      </script>
 </body>
 
 </html>

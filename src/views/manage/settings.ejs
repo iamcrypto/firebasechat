@@ -285,7 +285,8 @@ async function auth() {
                     username,
                     upi_id,
                     usdt_wallet_address,
-                    typer: 'momo'
+                    typer: 'momo',
+                    authtoken:auth_token,
                 })
 
                 if (response?.data?.status === true) {

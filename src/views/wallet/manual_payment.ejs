@@ -5,10 +5,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manual UPI</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"
-        integrity="sha512-NQfB/bDaB8kaSXF8E77JjhHG5PM6XVRxvHzkZiwl3ddWCEPBa23T76MuWSwAJdMGJnmQqM0VeY9kFszsrBEFrQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer">
-        </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/js/client.js"></script>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://momentjs.com/downloads/moment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 </head>
 
 <body>
@@ -308,40 +310,62 @@
                 }, 100);
             }, 1000);
         }
-
-
-        const submitButton = document.getElementById("submit_button");
-        submitButton.addEventListener("click", async (event) => {
-            try {
-
-
-                event.preventDefault();
-                const upiRefNo = document.getElementById("upi_ref_no").value;
-                const amount = '<%=Amount%>';
-
-                const response = await axios.post("/wallet/paynow/manual_upi_request", {
-                    money: amount,
-                    utr: upiRefNo,
-                })
-
-                if (!response?.data) {
-                    alertMessage("Something went Wrong!")
-                    return
-                }
-
-                if (response?.data?.status === false) {
-                    alertMessage(response?.data?.message)
-                    return
-                }
-
-                alertMessage(response?.data?.message)
-
-                window.location.href = "/wallet/rechargerecord"
-            } catch (error) {
-                console.log(error);
-                alertMessage("Something went Wrong!")
+        const Pi = window.Pi;
+        Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
+        async function auth() {
+          try {
+              
+              const scopes = ['username', 'payments', 'wallet_address'];
+              function onIncompletePaymentFound(payment) {
+                  console.log("incomplete Transaction");
+              }; 
+        
+              Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+                  var username = auth.user.username;
+                  var password = auth.user.uid;
+                  var auth_token = auth.accessToken;
+                  const submitButton = document.getElementById("submit_button");
+                  submitButton.addEventListener("click", async (event) => {
+                      try {
+          
+          
+                          event.preventDefault();
+                          const upiRefNo = document.getElementById("upi_ref_no").value;
+                          const amount = '<%=Amount%>';
+          
+                          const response = await axios.post("/wallet/paynow/manual_upi_request", {
+                              money: amount,
+                              utr: upiRefNo,
+                              authtoken:auth_token,
+                          })
+          
+                          if (!response?.data) {
+                              alertMessage("Something went Wrong!")
+                              return
+                          }
+          
+                          if (response?.data?.status === false) {
+                              alertMessage(response?.data?.message)
+                              return
+                          }
+          
+                          alertMessage(response?.data?.message)
+          
+                          window.location.href = "/wallet/rechargerecord"
+                      } catch (error) {
+                          console.log(error);
+                          alertMessage("Something went Wrong!")
+                      }
+                  });
+                });
             }
-        });
+        catch (err) {
+            alert(err);
+        }
+        }
+        auth();
+
+       
     </script>
 </body>
 
