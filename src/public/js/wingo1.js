@@ -1088,7 +1088,7 @@ $(`.game-betting .box .item .img .van-image img`).attr('src', '/images/icon_cloc
 $(`.game-betting .box .item:eq(${selectPageTime - 1}) .img .van-image img`).attr('src', '/images/icon_clock-red.svg');
 
 const Pi = window.Pi;
-Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
+Pi.init({ version: "2.0", sandbox:true });
 async function auth() {
   try {
       

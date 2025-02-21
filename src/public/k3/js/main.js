@@ -1148,7 +1148,7 @@ function tdOnclick(e) {
 
 
 const Pi = window.Pi;
-Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
+Pi.init({ version: "2.0", sandbox:true });
 async function auth() {
   try {
       

@@ -149,7 +149,7 @@ function showListOrder3(list_orders, x) {
 
 
 const Pi = window.Pi;
-Pi.init({ version: "2.0", sandbox:  $(`#sandbox_hiddn`).val() });
+Pi.init({ version: "2.0", sandbox:true });
 async function auth() {
   try {
       
@@ -162,7 +162,6 @@ async function auth() {
           var username = auth.user.username;
           var password = auth.user.uid;
           var auth_token = auth.accessToken;
-          alert($(`#sandbox_hiddn`).val());
           var socket = io();
           $('.admin_name').text(username);
 let typeid = $('html').attr('data-change');
