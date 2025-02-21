@@ -283,6 +283,11 @@
                 var username = auth.user.username;
                 var password = auth.user.uid;
                 var auth_token = auth.accessToken;
+                var url = new URL(window.location.href);
+                var c = url.searchParams.get("r_code");
+                if (c) {
+                    $('#invite').val(c);
+                }
                 $('#submit').click(async (e) => {
                     e.preventDefault();
                     let invite = $('#invite').val().trim();

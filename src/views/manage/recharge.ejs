@@ -204,7 +204,7 @@ async function auth() {
                 },
                 dataType: "json",
                 success: function (response) {
-                  Swal.fire(
+                  new Swal.fire(
                     'Good job!',
                     'You Accepted The Recharge!',
                     'success'
@@ -231,7 +231,7 @@ async function auth() {
                   setTimeout(() => {
                     location.reload();
                   }, 100);
-                  Swal.fire(
+                  new Swal.fire(
                     'Good job!',
                     'You Rejected The Recharge!',
                     'success'
