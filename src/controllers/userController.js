@@ -2043,6 +2043,7 @@ const xpgain_value = async (req, res) => {
     let auth = req.body.authtoken;
     let xp_gain_val = 0;
     let [user] = await connection.query('SELECT * FROM users WHERE `token` = ?', [md5(auth)]);
+    const [trx_xp] = await connection.query(`SELECT SUM(money) as total FROM trx_wingo_bets WHERE phone = ? `, user[0].phone);
     const [wingo_xp] = await connection.query(`SELECT SUM(money) as total FROM minutes_1 WHERE phone = ? `, user[0].phone);
     const [k3_xp] = await connection.query(`SELECT SUM(money) as total FROM result_k3 WHERE phone = ? `, user[0].phone);
     const [d5_xp] = await connection.query(`SELECT SUM(money) as total FROM result_5d WHERE phone = ? `, user[0].phone);
@@ -2058,9 +2059,13 @@ const xpgain_value = async (req, res) => {
     {
         d5_xp[0].total = 0;
     }
+    if(trx_xp[0].total == null)
+    {
+        trx_xp[0].total = 0;
+    }
     let level = user[0].level;
 
-    xp_gain_val = parseInt(wingo_xp[0].total) + parseInt(k3_xp[0].total) + parseInt(d5_xp[0].total);
+    xp_gain_val = parseInt(wingo_xp[0].total) + parseInt(k3_xp[0].total) + parseInt(d5_xp[0].total) + parseInt(trx_xp[0].total);
 
     return res.status(200).json({
         message: 'Successful',//Register Sucess
