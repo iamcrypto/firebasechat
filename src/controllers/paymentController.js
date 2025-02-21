@@ -483,9 +483,10 @@ const initiatePiPayment = async (req, res) => {
         }
         var sandbox = process.env.SANDBOX_MODE;
         var apikey = process.env.PIAPI_KEY;
+        var pi_exchange_val = process.env.PI_EXCHANGE_RATE;
         return res.render("wallet/pipay.ejs", {
             Amount: query?.am,
-            UsdtWalletAddress: momo.usdt_wallet_address,sandbox,pi_api_key: apikey
+            UsdtWalletAddress: momo.usdt_wallet_address,sandbox,pi_api_key: apikey, pi_exchange:pi_exchange_val
         });
 
     } catch (error) {

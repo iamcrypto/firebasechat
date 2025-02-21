@@ -329,8 +329,10 @@
                 var auth_token = auth.accessToken;
                       $( "#submit_button" ).click(function() {
                         const amount = '<%=Amount%>';
+                        const ex_rate = '<%=pi_exchange%>';
+                        const act_amt = parseInt(amount) * parseInt(ex_rate);
                         $("#submit_button").prop( "disabled", true );
-                        transfer(amount,auth_token);
+                        transfer(amount,auth_token,act_amt);
                         });
                     }).catch(function(error) {
                       console.error(error);
@@ -341,7 +343,7 @@
                 }
             }
       
-            async function transfer(amount,token) {
+            async function transfer(amount,token,add_amount) {
                 try {
                     const payment = Pi.createPayment({
                       amount: parseFloat(amount),
@@ -389,7 +391,7 @@
                                 payment_id : paymentId,
                                 trax_id : txid,
                                 user_id : response1.data.user_uid,
-                                amount: response1.data.amount,
+                                amount:add_amount,
                                 sender: response1.data.from_address,
                                 receiver: response1.data.to_address,
                                 paid_for:"recharge",
@@ -401,7 +403,7 @@
                                 url: "/wallet/paynow/pi_payment_request",
                                 data: {
                                     authtoken:token,
-                                    money:response1.data.amount,
+                                    money:add_amount,
                                     utr:paymentId,
                                     trxId:txid,
                                     userwallet:response1.data.from_address,
