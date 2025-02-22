@@ -1033,7 +1033,7 @@ async function auth() {
                             $('.infoName .name').text(response.data.name_user);
                             $('.infoName .id').text(`UID   |    ${response.data.id_user}`);
                             $('.infoName .id').attr('data-clipboard-text', '');
-                            $('.infoName .number').text(`Mobile Number: +91 ${response.data.name_user.slice(0, 2)}****${response.data.name_user.slice(-4)}`);
+                            $('.infoName .number').text(`Mobile Number:${response.data.country_code }  ${response.data.name_user.slice(0, 2)}****${response.data.name_user.slice(-4)}`);
                             $('.money .txt').text(` ₹ ${response.data.money_user} `);
                         }
                     });

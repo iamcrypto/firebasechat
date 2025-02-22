@@ -138,7 +138,9 @@ const rechargerecordPage = async (req, res) => {
 
 const withdrawalPage = async (req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
-    return res.render("wallet/withdrawal.ejs" , {sandbox});
+    var whatsapp1 = process.env.WHATSAPP_LOCAL_KEY;
+    var whatsapp2 = process.env.WHATSAPP_INTERNATIONAL_KEY;
+    return res.render("wallet/withdrawal.ejs" , {sandbox,whatsapp1, whatsapp2});
 }
 
 const withdrawalrecordPage = async (req, res) => {

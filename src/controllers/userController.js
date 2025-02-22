@@ -96,6 +96,7 @@ const userInfo = async (req, res) => {
             phone_user: others.phone,
             money_user: others.money,
             user_avatar: others.avatar,
+            country_code: others.dial_code,
         },
         totalRecharge: totalRecharge,
         totalWithdraw: totalWithdraw,
@@ -107,6 +108,7 @@ const userInfo = async (req, res) => {
 const changeUser = async (req, res) => {
     let auth = req.body.authtoken;
     let name = req.body.name;
+    let country_code = req.body.country_code;
     let type = req.body.type;
 
     const [rows] = await connection.query('SELECT * FROM users WHERE `token` = ? ', [md5(auth)]);
@@ -117,7 +119,7 @@ const changeUser = async (req, res) => {
     });;
     switch (type) {
         case 'editname':
-            await connection.query('UPDATE users SET name_user = ? WHERE `token` = ? ', [name, md5(auth)]);
+            await connection.query('UPDATE users SET name_user = ?, dial_code = ? WHERE `token` = ? ', [name,country_code, md5(auth)]);
             return res.status(200).json({
                 message: 'Username modification successful',
                 status: true,
@@ -1127,39 +1129,73 @@ const withdrawal3 = async (req, res) => {
     let money = req.body.money;
     let password = req.body.password;
     let with_type = req.body.pay_type;
-    if (!auth || !money || !password || money < 299) {
+    let otp_val1 = req.body.otp_val;
+    let otp_active1 = req.body.otp_active;
+    if (!auth || !money || money < 299) {
         return res.status(200).json({
-            message: 'Failed',
+            message: 'Minimum Amount Should be 300',
             status: false,
             timeStamp: timeNow,
         })
     }
-    const [user] = await connection.query('SELECT `phone`, `code`,`invite`, `money`,`name_user` FROM users WHERE `token` = ?', [md5(auth)]);
-
-if(with_type == "Bank")
-{
-    const [user_bank2] = await connection.query('SELECT * FROM user_bank WHERE phone = ? ', [user[0].phone]);
-    if ( user_bank2.length == 0) {
-        return res.status(200).json({
-            message: 'Add Bank Details',
-            status: false,
-            timeStamp: timeNow,
-        });
-    }
+    const [user] = await connection.query('SELECT `phone`, `code`,`invite`, `money`,`name_user`,`dial_code` FROM users WHERE `token` = ?', [md5(auth)]);
+    if(with_type == "Bank")
+        {
+            const [user_bank2] = await connection.query('SELECT * FROM user_bank WHERE phone = ? ', [user[0].phone]);
+            if ( user_bank2.length == 0) {
+                return res.status(200).json({
+                    message: 'Add Bank Details',
+                    status: false,
+                    timeStamp: timeNow,
+                });
+            }
+            else{
+                var message2 = await widthProcess(user[0].phone,user[0].money, money,'bank');
+                res.status(200).json({
+                    message: message2,
+                    status: false,
+                    timeStamp: timeNow,
+                });
+            }
+        }
+        else if(with_type == "Pi")
+            {
+                if (user[0].name_user.length == 0) {
+                    return res.status(200).json({
+                        message: 'Update Profile with Phone Number',
+                        status: false,
+                        timeStamp: timeNow,
+                    });
+                }
+                else{
+                    if(otp_active1 == 1)
+                    {
+                        var message1 = await widthProcess(user[0].phone,user[0].money, money,'pi');
+                        res.status(200).json({
+                        message: message1,
+                        pi_sucess:"sucess",
+                        status: false,
+                        timeStamp: timeNow,
+                        });
+                    }
+                    else{
+                    return res.status(200).json({
+                        message: 'Please enter OTP.',
+                        phone: user[0].name_user,
+                        c_code: user[0].dial_code,
+                        status: false,
+                        timeStamp: timeNow,
+                    });  
+                }
+                }
+            }
 }
-else if(with_type == "Pi")
-{
-    if (user[0].name_user.length == 0) {
-        return res.status(200).json({
-            message: 'Update Profile with Phone Number',
-            status: false,
-            timeStamp: timeNow,
-        });
-    };
-}
-else{
 
-    let userInfo = user[0];
+
+
+const widthProcess = async (phone,us_money, add_money,w_type) =>
+{
+    var message = "";
     const date = new Date();
     let id_time = date.getUTCFullYear() + '' + date.getUTCMonth() + 1 + '' + date.getUTCDate();
     let id_order = Math.floor(Math.random() * (99999999999999 - 10000000000000 + 1)) + 10000000000000;
@@ -1194,10 +1230,10 @@ else{
     }
     let dates = new Date().getTime();
     let checkTime = timerJoin(dates);
-    const [recharge] = await connection.query('SELECT * FROM recharge WHERE phone = ? AND status = 1', [userInfo.phone]);
-    const [minutes_1] = await connection.query('SELECT * FROM minutes_1 WHERE phone = ?', [userInfo.phone]);
-    const [k3_bet_money] = await connection.query('SELECT * FROM result_k3 WHERE phone = ?', [userInfo.phone]);
-    const [d5_bet_money] = await connection.query('SELECT * FROM result_5d WHERE phone = ?', [userInfo.phone]);
+    const [recharge] = await connection.query('SELECT * FROM recharge WHERE phone = ? AND status = 1', [phone]);
+    const [minutes_1] = await connection.query('SELECT * FROM minutes_1 WHERE phone = ?', [phone]);
+    const [k3_bet_money] = await connection.query('SELECT * FROM result_k3 WHERE phone = ?', [phone]);
+    const [d5_bet_money] = await connection.query('SELECT * FROM result_5d WHERE phone = ?', [phone]);
     let total = 0;
     recharge.forEach((data) => {
         total += parseFloat(data.money);
@@ -1220,22 +1256,20 @@ else{
     if (total - total2 > 0) result = total - total2;
     result = Math.max(result, 0);
     let result2 = parseInt ((parseInt(total) * 80)/100);
-    const [user_bank] = await connection.query('SELECT * FROM user_bank WHERE `phone` = ?', [userInfo.phone]);
-    const [withdraw] = await connection.query('SELECT * FROM withdraw WHERE `phone` = ? AND today = ?', [userInfo.phone, checkTime]);
+    const [user_bank] = await connection.query('SELECT * FROM user_bank WHERE `phone` = ?', [phone]);
+    const [withdraw] = await connection.query('SELECT * FROM withdraw WHERE `phone` = ? AND today = ?', [phone, checkTime]);
     if (user_bank.length != 0) {
         if (withdraw.length < 3) {
-            if (userInfo.money - money >= 0) {
+            if (parseInt(us_money) - parseInt(add_money) >= 0) {
                 if (total2 >= result2) {
                     if (total - total2 >= 0) {
                         if (total2 >= result2) {
-                            return res.status(200).json({
-                                message: 'The total bet is not enough to fulfill the request',
-                                status: false,
-                                timeStamp: timeNow,
-                            });
+                            message = 'The total bet is not enough to fulfill the request';
                         }
                     } else {
                         let infoBank = user_bank[0];
+                        if(w_type == 'bank')
+                        {
                         const sql = `INSERT INTO withdraw SET 
                     id_order = ?,
                     phone = ?,
@@ -1249,45 +1283,44 @@ else{
                     time = ?,
                     type = ?,
                     with_type = ?`;
-                        await connection.execute(sql, [id_time + '' + id_order, userInfo.phone, money, infoBank.stk, infoBank.name_bank, infoBank.email, infoBank.name_user, 0, checkTime, dates,'manual','bank']);
-                        await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [money, userInfo.phone]);
-                        return res.status(200).json({
-                            message: 'Withdrawal successful',
-                            status: true,
-                            money: userInfo.money - money,
-                            timeStamp: timeNow,
-                        });
+                        await connection.execute(sql, [id_time + '' + id_order, phone, add_money, infoBank.stk, infoBank.name_bank, infoBank.email, infoBank.name_user, 0, checkTime, dates,'manual',w_type]);
+                        //await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
+                        }
+                        else if(w_type == 'pi')
+                            {
+                                const sql = `INSERT INTO withdraw SET 
+                    id_order = ?,
+                    phone = ?,
+                    money = ?,
+                    stk = ?,
+                    name_bank = ?,
+                    ifsc = ?,
+                    name_user = ?,
+                    status = ?,
+                    today = ?,
+                    time = ?,
+                    type = ?,
+                    with_type = ?`;
+                        await connection.execute(sql, [id_time + '' + id_order, phone, add_money, "", "", "", "", 0, checkTime, dates,'manual',w_type]);
+                        //await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
+                            }
+                        message = 'Withdrawal successful';
                     }
                 } else {
-                    return res.status(200).json({
-                        message: 'The total bet is not enough to fulfill the request',
-                        status: false,
-                        timeStamp: timeNow,
-                    });
+                    message = 'The total bet is not enough to fulfill the request';
                 }
             } else {
-                return res.status(200).json({
-                    message: 'The balance is not enough to fulfill the request',
-                    status: false,
-                    timeStamp: timeNow,
-                });
+                message = 'The balance is not enough to fulfill the request';
+             
             }
         } else {
-            return res.status(200).json({
-                message: 'You can only make 2 withdrawals per day',
-                status: false,
-                timeStamp: timeNow,
-            });
+            message =   'You can only make 2 withdrawals per day';
         }
     } else {
-        return res.status(200).json({
-            message: 'Please link your bank first',
-            status: false,
-            timeStamp: timeNow,
-        });
+        message =  'Please link your bank first';
+     
     }
-}
-
+    return message ;
 }
 const transfer = async (req, res) => {
     let auth = req.body.authtoken;

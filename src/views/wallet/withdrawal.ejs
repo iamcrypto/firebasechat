@@ -684,13 +684,14 @@
                         </div>
                     </div>
                 </div>
-                <div data-v-25d9c352="" class="requiredBox m-t-20">
+                <div data-v-25d9c352="" class="requiredBox m-t-20" id="otp_div">
                     <div data-v-25d9c352="" class="box c-row c-row-between c-row-middle p-l-10">
                         <img data-v-25d9c352="" height="13px" width="25px" src="/images/king (3).png">
                         <input data-v-d8986e5e="" data-v-25d9c352="" placeholder="Enter OTP"
-                            οnkeyup="value=value.replace(/[^\w\.\/]/ig,'')" class="pw-input input">
+                            οnkeyup="value=value.replace(/[^\w\.\/]/ig,'')" class="pw-input input" id="otp_input">
                     </div>
                 </div>
+                <div style="color:orange"> <span class="timer-txt" ></span> <span id="timer"></span></div>
                 <div data-v-25d9c352="" class="c-row c-row-center m-t-30 p-b-30 withdrawal-btn"><button
                         data-v-25d9c352=""
                         class="btn van-button van-button--default van-button--normal van-button--block van-button--round">
@@ -811,6 +812,43 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
     <script src="/js/client.js"></script>
     <script>
+        var seconds = 1000 * 60;
+        var timer;
+        var interval ;
+        var otp_active = 0;
+        function calltimer()
+        {
+
+                var timer2 = "2:59";
+                interval = setInterval(function() {
+              var timer = timer2.split(':');
+              //by parsing integer, I avoid all extra string processing
+              var minutes = parseInt(timer[0], 10);
+              var seconds = parseInt(timer[1], 10);
+              --seconds;
+              minutes = (seconds < 0) ? --minutes : minutes;
+              seconds = (seconds < 0) ? 59 : seconds;
+              seconds = (seconds < 10) ? '0' + seconds : seconds;
+              //minutes = (minutes < 10) ?  minutes : minutes;
+              $(".timer-txt").text("OTP will be valid for ");
+              $('#timer').html(minutes + ':' + seconds);
+              if ((seconds <= 0) && (minutes <= 0)) 
+              {
+                clearInterval(interval);
+                $(".timer-txt").text(" ");
+                $("#otp_div").hide();
+                $('button').removeClass("disable_pointer");
+                otp_active = 0;
+                $(".van-button__text").text("Send OTP"); 
+                $("#timer").html('');
+                alertMess("OTP expired, pllease try again.");  
+
+              };
+              timer2 = minutes + ':' + seconds;
+            }, 1000);
+            
+        }
+        $("#otp_div").hide();
         $('.txtBox .van-image').click(function (e) {
             e.preventDefault();
             $(this).addClass('action block-click');
@@ -825,6 +863,14 @@
                 $(this).addClass("action");
                 $('.c-row .item .icons').removeClass("active");
                 $(this).find(".icons").addClass("active");
+            }
+            if($(this).find(".c-tc").attr("data-label") == "Bank")
+            {
+                $(".van-button__text").text("Withdraw Money");
+            }
+            else if($(this).find(".c-tc").attr("data-label") == "Pi")
+            {
+                $(".van-button__text").text("Send OTP");  
             }
         });
 
@@ -860,6 +906,7 @@ async function auth() {
           var username = auth.user.username;
           var password = auth.user.uid;
           var auth_token = auth.accessToken;
+          
           $.ajax({
             type: "POST",
             url: "/api/webapi/check/Info",
@@ -890,11 +937,25 @@ async function auth() {
             }
         });
 
+        function generateOTP() { 
+
+            // Declare a digits variable 
+            // which stores all digits 
+            let digits = 
+        '0123456789'; 
+            let OTP = ''; 
+            let len = digits.length 
+            for (let i = 0; i < 6; i++) { 
+                OTP += digits[Math.floor(Math.random() * len)]; 
+            } 
+            return OTP; 
+        } 
+
         $('button').click(function (e) {
             e.preventDefault();
             let money = $('input:eq(0)').val().trim();
             let password1 = $('input:eq(1)').val().trim();
-            var pay_type = $(".c-row .item").find(".c-tc").attr("data-label");
+            var pay_type = $(".c-row .action").find(".c-tc").attr("data-label");
             if (money  && money <= 500900900000000 ) {
                 $.ajax({
                     type: "POST",
@@ -904,14 +965,54 @@ async function auth() {
                         password: password1,
                         access_token:auth_token,
                         pay_type:pay_type,
+                        otp_val:$("#otp_input").val().trim(),
+                        otp_active:otp_active,
                     },
                     dataType: "json",
                     success: function (response) {
                         $(this).addClass('block-click');
                         $('input:eq(1)').val('');
                         $('input:eq(0)').val('');
-                        if (response.status == true) {
-                            $('.money').text("₹" + response.money + '0');
+                        if(response.message == "Please enter OTP.")
+                        {
+                            var otp_code = generateOTP();
+                            var otpsent = false;
+                            $("#otp_input").val(otp_code);
+                            $(".van-button__text").text("Withdraw Money");
+                            var otpMessage = "OTP verification code is "+ otp_code +". Do not share this code";
+                            $("#otp_div").show();
+                            calltimer();
+                            var phone_val = response.c_code + response.phone;
+                            otp_active = 1;
+                            if(response.c_code == "+91")
+                            {
+                                //$.ajax({
+                                 //   type: "GET",
+                                  //  url: "https://api.bulkcampaigns.com/api/wapi/?json=true&apikey=<%=whatsapp1%>&mobile="+response.phone.trim()+"&msg="+otpMessage+"",
+                                  //  dataType: "json",
+                                  //  success: function (response) {
+                                   //     console.log(response);
+                                   // }
+                              //  });
+                            }
+                            else{
+                             //   $.ajax({
+                               //     type: "GET",
+                                //    url: "https://api.bulkcampaigns.com/api/wintapi/?apikey=<%=whatsapp2%>&mobile="+phone_val.trim()+"&msg="+otpMessage+"",
+                                 //   dataType: "json",
+                                 //   success: function (response) {
+                                   //     console.log(response);
+                                  //  }
+                               // });
+                            }
+                        }
+                        if(response.pi_sucess == "sucess")
+                        {
+                            clearInterval(interval);
+                            $(".timer-txt").text(" ");
+                            $("#otp_div").hide();
+                            otp_active = 0;
+                            $("#timer").html("");
                         }
                         alertMess(response.message, $(this));
                     }

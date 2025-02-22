@@ -1088,7 +1088,7 @@ $(`.game-betting .box .item .img .van-image img`).attr('src', '/images/icon_cloc
 $(`.game-betting .box .item:eq(${selectPageTime - 1}) .img .van-image img`).attr('src', '/images/icon_clock-red.svg');
 
 const Pi = window.Pi;
-Pi.init({ version: "2.0", sandbox:false });
+Pi.init({ version: "2.0", sandbox:true });
 async function auth() {
   try {
       
@@ -1101,7 +1101,6 @@ async function auth() {
           var username = auth.user.username;
           var password = auth.user.uid;
           var auth_token = auth.accessToken;
-          alert(username + "  " + auth_token);
           $.ajax({
             type: "POST",
             url: "/api/webapi/check_login",

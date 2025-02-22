@@ -150,7 +150,7 @@ function showListOrder3(list_orders, x) {
 
 const Pi = window.Pi;
 <<<<<<< HEAD
-Pi.init({ version: "2.0", sandbox:false });
+Pi.init({ version: "2.0", sandbox:true });
 =======
 >>>>>>> a292b53d71da91e8776febaa42692d798379211a
 async function auth() {
