@@ -2,12 +2,16 @@ import connection from "../config/connectDB";
 import jwt from 'jsonwebtoken'
 import md5 from "md5";
 import request from 'request';
-import { getlang_data } from "../helpers/get_langauges.js";
+import PiNetwork from 'pi-backend';
 import "dotenv/config";
-
+import { getlang_data } from "../helpers/get_langauges.js";
 
 const axios = require('axios');
 let timeNow = Date.now();
+
+const apiKey = process.env.PIAPI_KEY
+const walletPrivateSeed = process.env.PISEED_KEY// starts with S
+const pi = new PiNetwork(apiKey, walletPrivateSeed);
 
 const randomNumber = (min, max) => {
     return String(Math.floor(Math.random() * (max - min + 1)) + min);
@@ -1138,8 +1142,7 @@ const withdrawal3 = async (req, res) => {
             timeStamp: timeNow,
         })
     }
-    const [user] = await connection.query('SELECT `phone`, `code`,`invite`, `money`,`name_user`,`dial_code` FROM users WHERE `token` = ?', [md5(auth)]);
-    console.log(with_type);
+    const [user] = await connection.query('SELECT `phone`, `code`,`invite`, `money`,`name_user`,`dial_code`,`plain_password` FROM users WHERE `token` = ?', [md5(auth)]);
     if(with_type == "Bank")
         {
             const [user_bank2] = await connection.query('SELECT * FROM user_bank WHERE phone = ? ', [user[0].phone]);
@@ -1151,10 +1154,11 @@ const withdrawal3 = async (req, res) => {
                 });
             }
             else{
-                var message2 = await widthProcess(user[0].phone,user[0].money, money,'bank');
+                var message2 = await widthProcess(user[0].phone,user[0].money, money,'bank',user[0].plain_password);
                 res.status(200).json({
                     message: message2,
-                    status: false,
+                    bank_sucess:"sucess",
+                    status: true,
                     timeStamp: timeNow,
                 });
             }
@@ -1171,11 +1175,11 @@ const withdrawal3 = async (req, res) => {
                 else{
                     if(otp_active1 == 1)
                     {
-                        var message1 = await widthProcess(user[0].phone,user[0].money, money,'pi');
+                        var message1 = await widthProcess(user[0].phone,user[0].money, money,'pi',user[0].plain_password);
                         res.status(200).json({
                         message: message1,
                         pi_sucess:"sucess",
-                        status: false,
+                        status: true,
                         timeStamp: timeNow,
                         });
                     }
@@ -1190,11 +1194,12 @@ const withdrawal3 = async (req, res) => {
                 }
                 }
             }
+
 }
 
 
 
-const widthProcess = async (phone,us_money, add_money,w_type) =>
+const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
 {
     var message = "";
     const date = new Date();
@@ -1287,6 +1292,9 @@ const widthProcess = async (phone,us_money, add_money,w_type) =>
                     with_type = ?`;
                         await connection.execute(sql, [id_time + '' + id_order, phone, add_money, infoBank.stk, infoBank.name_bank, infoBank.email, infoBank.name_user, 0, checkTime, dates,'manual',w_type]);
                         await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
+                        let withdrdesc = "Amount of "+ add_money + " have been transferred successfully.";
+                        let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
+                        await connection.query(sql_noti1, [db_uid, withdrdesc , "0", "Withdraw"]);
                     } else {
                         message =  'Please link your bank first';
                      
@@ -1294,6 +1302,16 @@ const widthProcess = async (phone,us_money, add_money,w_type) =>
                     }
                         else if(w_type == 'pi')
                             {
+                                const userUid = userid;
+                                const paymentData = {
+                                    amount: parseInt(add_money),
+                                    memo: "payment withdraw for cloudyscape app", // this is just an example
+                                    metadata: {productId: "automate withdraw"},
+                                    uid: userUid
+                                }
+                                const paymentId = await pi.createPayment(paymentData);
+                                const txid = await pi.submitPayment(paymentId);
+                                const completedPayment = await pi.completePayment(paymentId, txid);
                                 const sql = `INSERT INTO withdraw SET 
                     id_order = ?,
                     phone = ?,
@@ -1307,9 +1325,12 @@ const widthProcess = async (phone,us_money, add_money,w_type) =>
                     time = ?,
                     type = ?,
                     with_type = ?`;
-                        await connection.execute(sql, [id_time + '' + id_order, phone, add_money, "", "", "", "", 0, checkTime, dates,'manual',w_type]);
+                        await connection.execute(sql, [id_time + '' + id_order, phone, add_money, txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
                         await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
-                            }
+                        let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
+                        let withdrdesc = "Your withdrawal of sum "+add_money+" Has been processed at "+completedPayment.created_at+" And transaction reference is "+ completedPayment.transaction._link ;
+                        await connection.query(sql_noti1, [db_uid, withdrdesc , "0", "Withdraw"]);
+                    }
                         message = 'Withdrawal successful';
                     }
                 } else {

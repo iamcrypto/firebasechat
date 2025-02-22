@@ -804,6 +804,28 @@
 
         </div>
     </div>
+
+    <div data-v-7692a079="" data-v-a9660e98="" class="Loading c-row c-row-middle-center">
+        <div data-v-7692a079="" class="van-loading van-loading--circular">
+          <span data-v-7692a079="" class="van-loading__spinner van-loading__spinner--circular"
+            style="-webkit-animation-duration: 1s; animation-duration: 1s;">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 200"
+              width="200" height="200" preserveAspectRatio="xMidYMid meet"
+              style="width: 100%;height: 100%;transform: translate3d(0px, 0px, 0px);content-visibility: visible;">
+              <g transform="matrix(-0.5984085202217102,0.8011911511421204,-0.8011911511421204,-0.5984085202217102,239.9599609375,79.72173309326172)"
+                style="display: block;">
+                <image width="200px" height="200px" preserveAspectRatio="xMidYMid slice"
+                  xlink:href="/index_files/loadingspinner.png"></image>
+              </g>
+              <g transform="matrix(0.9408400058746338,0,0,0.9408400058746338,20.969436645507812,79.30152130126953)"
+                style="display: block;">
+                <image width="168px" height="44px" preserveAspectRatio="xMidYMid slice"
+                  xlink:href="/index_files/h5setting_202401100608011fs2.png"></image>
+              </g>
+            </svg>
+          </span>
+        </div>
+      </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="/js/client.js"></script>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
@@ -856,6 +878,7 @@
                 $(this).removeClass('action block-click');
             }, 2500);
         });
+        $(".Loading").fadeOut(0);
         $('.c-row .item').click(function (e) {
             if($(this).find(".c-tc").attr("data-label") != "USDT")
             {
@@ -956,6 +979,7 @@ async function auth() {
             let money = $('input:eq(0)').val().trim();
             let password1 = $('input:eq(1)').val().trim();
             var pay_type = $(".c-row .action").find(".c-tc").attr("data-label");
+            $(".Loading").fadeIn(0);
             if (money  && money <= 500900900000000 ) {
                 $.ajax({
                     type: "POST",
@@ -970,11 +994,9 @@ async function auth() {
                     },
                     dataType: "json",
                     success: function (response) {
-                        $(this).addClass('block-click');
-                        $('input:eq(1)').val('');
-                        $('input:eq(0)').val('');
                         if(response.message == "Please enter OTP.")
                         {
+                            $(".Loading").fadeIn(0);
                             var otp_code = generateOTP();
                             var otpsent = false;
                             $("#otp_input").val(otp_code);
@@ -1006,14 +1028,19 @@ async function auth() {
                                // });
                             }
                         }
-                        if(response.pi_sucess == "sucess")
+                        if(response.pi_sucess == "sucess" || response.bank_sucess == "sucess")
                         {
                             clearInterval(interval);
+                            $(this).addClass('block-click');
+                            $('input:eq(1)').val('');
+                            $('input:eq(0)').val('');
                             $(".timer-txt").text(" ");
                             $("#otp_div").hide();
                             otp_active = 0;
                             $("#timer").html("");
+                            window.location.href = "/wallet/withdrawalrecord";
                         }
+                        $(".Loading").fadeOut(0);
                         alertMess(response.message, $(this));
                     }
                 });
