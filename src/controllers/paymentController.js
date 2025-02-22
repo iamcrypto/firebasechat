@@ -193,7 +193,7 @@ const addPIPaymentRequest = async (req, res) => {
           );
 
           let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
-          await connection.query(sql_noti, [user.phone, "Recharge of Amount "+money+" is Successfull. ", '0', "Recharge"]);
+          await connection.query(sql_noti, [user.id, "Recharge of Amount "+money+" is Successfull. ", '0', "Recharge"]);
 
         return res.status(200).json({
             message: 'Payment Approved, Your Balance will update shortly!',

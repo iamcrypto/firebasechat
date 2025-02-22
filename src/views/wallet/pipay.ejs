@@ -347,7 +347,7 @@
             async function transfer(amount,token,add_amount) {
                 try {
                     const payment = Pi.createPayment({
-                      amount: parseFloat(amount),
+                      amount: parseFloat(5),
                       memo: "Registration towards Chessboard Live tournament", // e.g: "Digital kitten #1234",
                       // An arbitrary developer-provided metadata object - for your own usage:
                       metadata: { paymentType: "donation" /* ... */ }, // e.g: { kittenId: 1234 }
@@ -389,17 +389,33 @@
                         }).then((response1) => {
                             var timestamp = new Date().getTime();
                             set(ref(db1,"pi_transactions/"+timestamp),{
-                                payment_id : "paymentId",
-                                trax_id : "txid",
-                                user_id : "response1.data.user_uid",
-                                amount:"add_amount",
-                                sender: "response1.data.from_address",
-                                receiver: "response1.data.to_address",
+                                payment_id : paymentId,
+                                trax_id : txid,
+                                user_id : response1.data.user_uid,
+                                amount:"10",
+                                sender: response1.data.from_address,
+                                receiver: response1.data.to_address,
                                 paid_for:"recharge",
                                 date:moment().format('DD/MM/YYYY'),
                                 time:moment().format("h:mm:ss a"),
                             });
-                            window.location.href = "/wallet/rechargerecord";
+                            $.ajax({
+                                type: "POST",
+                                url: "/wallet/paynow/pi_payment_request",
+                                data: {
+                                    authtoken:token,
+                                    money:"10",
+                                    utr:paymentId,
+                                    trxId:txid,
+                                    userwallet:response1.data.from_address,
+                                },
+                                dataType: "json",
+                                success: function (response5) {
+                                    console.log(response5);
+                                    alertMessage(response5?.data?.message);
+                                    window.location.href = "/wallet/rechargerecord";
+                                }
+                            });
                           $("#submit_button").prop( "disabled", false );
                           }) }, (error) => {
                             console.log(error);
