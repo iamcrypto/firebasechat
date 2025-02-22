@@ -389,12 +389,12 @@
                         }).then((response1) => {
                             var timestamp = new Date().getTime();
                             set(ref(db1,"pi_transactions/"+timestamp),{
-                                payment_id : paymentId,
-                                trax_id : txid,
-                                user_id : response1.data.user_uid,
-                                amount:add_amount,
-                                sender: response1.data.from_address,
-                                receiver: response1.data.to_address,
+                                payment_id : "paymentId",
+                                trax_id : "txid",
+                                user_id : "response1.data.user_uid",
+                                amount:"add_amount",
+                                sender: "response1.data.from_address",
+                                receiver: "response1.data.to_address",
                                 paid_for:"recharge",
                                 date:moment().format('DD/MM/YYYY'),
                                 time:moment().format("h:mm:ss a"),
