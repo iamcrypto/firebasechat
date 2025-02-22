@@ -155,10 +155,10 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://momentjs.com/downloads/moment.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
-      <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-      <script src="/dist/js/adminlte.min.js"></script>
-      <script src="/js/admin/admin.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.min.js"></script>
 
 </body>
 <script>
@@ -250,19 +250,20 @@
                         </td>
                         <td class="project-actions text-center" style="min-width: 160px;">
                           <!-- xác nhận -->
-                          <a class="btn btn-success btn-sm confirm-btn" href="" data="${data.id}"><i class="fa fa-check-circle"></i></a>
+                          <a class="confirm-btn btn btn-success btn-sm" data="${data.id}"><i class="fa fa-check-circle"></i></a>
                           <!-- ? -->
                           <!-- <a class="btn btn-info btn-sm" href="#"><i class="fas fa-pencil-alt"></i></a> -->
                           <!-- Xóa -->
-                          <a class="btn btn-danger btn-sm delete-btn" href="#" data="${data.id}"><i class="fas fa-times-circle"></i></a>
+                          <a class="delete-btn btn btn-danger btn-sm "  data="${data.id}"><i class="fas fa-times-circle"></i></a>
                         </td>
                       </tr>`;
                     })
                 $('tbody').html(html);
                 }
 
-                $('.btn-success').click(function (e) { 
+                $(document).on("click", '.confirm-btn', function(e){
                   e.preventDefault();
+                  console.log("clicked");
                   let id = $(this).attr('data');
                   $.ajax({
                     type: "POST",
@@ -284,10 +285,10 @@
                       }, 100);
                     }
                   });
+                 
                 });
-
-                
-                $('.btn-danger').click(function (e) { 
+              
+                  $(document).on("click", '.delete-btn', function(e){
                   e.preventDefault();
                   let id = $(this).attr('data');
                   $.ajax({

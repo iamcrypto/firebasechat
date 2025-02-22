@@ -1139,6 +1139,7 @@ const withdrawal3 = async (req, res) => {
         })
     }
     const [user] = await connection.query('SELECT `phone`, `code`,`invite`, `money`,`name_user`,`dial_code` FROM users WHERE `token` = ?', [md5(auth)]);
+    console.log(with_type);
     if(with_type == "Bank")
         {
             const [user_bank2] = await connection.query('SELECT * FROM user_bank WHERE phone = ? ', [user[0].phone]);
@@ -1258,7 +1259,7 @@ const widthProcess = async (phone,us_money, add_money,w_type) =>
     let result2 = parseInt ((parseInt(total) * 80)/100);
     const [user_bank] = await connection.query('SELECT * FROM user_bank WHERE `phone` = ?', [phone]);
     const [withdraw] = await connection.query('SELECT * FROM withdraw WHERE `phone` = ? AND today = ?', [phone, checkTime]);
-    if (user_bank.length != 0) {
+    
         if (withdraw.length < 3) {
             if (parseInt(us_money) - parseInt(add_money) >= 0) {
                 if (total2 >= result2) {
@@ -1270,6 +1271,7 @@ const widthProcess = async (phone,us_money, add_money,w_type) =>
                         let infoBank = user_bank[0];
                         if(w_type == 'bank')
                         {
+                            if (user_bank.length != 0) {
                         const sql = `INSERT INTO withdraw SET 
                     id_order = ?,
                     phone = ?,
@@ -1284,8 +1286,12 @@ const widthProcess = async (phone,us_money, add_money,w_type) =>
                     type = ?,
                     with_type = ?`;
                         await connection.execute(sql, [id_time + '' + id_order, phone, add_money, infoBank.stk, infoBank.name_bank, infoBank.email, infoBank.name_user, 0, checkTime, dates,'manual',w_type]);
-                        //await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
-                        }
+                        await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
+                    } else {
+                        message =  'Please link your bank first';
+                     
+                    }
+                    }
                         else if(w_type == 'pi')
                             {
                                 const sql = `INSERT INTO withdraw SET 
@@ -1302,7 +1308,7 @@ const widthProcess = async (phone,us_money, add_money,w_type) =>
                     type = ?,
                     with_type = ?`;
                         await connection.execute(sql, [id_time + '' + id_order, phone, add_money, "", "", "", "", 0, checkTime, dates,'manual',w_type]);
-                        //await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
+                        await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
                             }
                         message = 'Withdrawal successful';
                     }
@@ -1316,10 +1322,7 @@ const widthProcess = async (phone,us_money, add_money,w_type) =>
         } else {
             message =   'You can only make 2 withdrawals per day';
         }
-    } else {
-        message =  'Please link your bank first';
-     
-    }
+    
     return message ;
 }
 const transfer = async (req, res) => {

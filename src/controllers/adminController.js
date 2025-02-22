@@ -2079,7 +2079,6 @@ const getSalary = async (req, res) => {
 
 const gettranfermode = async (req, res) => {
     let auth = req.body.authtoken;
-    console.log(auth);
     const [rows] = await connection.query('SELECT transfer_mode FROM users WHERE `token` = ? ', [md5(auth)]);
 
     if (!rows) {
