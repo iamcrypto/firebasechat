@@ -1133,11 +1133,11 @@ const withdrawal3 = async (req, res) => {
             timeStamp: timeNow,
         })
     }
-    const [user] = await connection.query('SELECT `phone`, `code`,`invite`, `money` FROM users WHERE `token` = ? AND password = ?', [md5(auth), md5(password)]);
+    const [user] = await connection.query('SELECT `phone`, `code`,`invite`, `money`,`name_user` FROM users WHERE `token` = ?', [md5(auth)]);
 
-    if (user.length == 0) {
+    if (user[0].name_user.length == 0) {
         return res.status(200).json({
-            message: 'incorrect password',
+            message: 'Update Profile with Phone Number',
             status: false,
             timeStamp: timeNow,
         });

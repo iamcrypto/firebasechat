@@ -156,7 +156,7 @@
                     <div data-v-9f3a9836="" class="con">
                         <div data-v-9f3a9836="" class="lab">Change Phone Number</div>
                         <div data-v-9f3a9836="">
-                            <input data-v-9f3a9836="" type="number" maxlength="16" placeholder="Phone Number" class="input">
+                            <input data-v-9f3a9836="" type="number" maxlength="16" placeholder="Phone Number with contry code." class="input">
                         </div>
                     </div>
                     <div data-v-9f3a9836="" class="food c-row c-row-middle-center">
@@ -229,7 +229,7 @@ async function auth() {
             $("#prof_image").attr("src","/assets/png/"+ response.data.user_avatar);
             $('.profile .name').text(response.data.phone_user);
             $('.profile .id').text(response.data.id_user);
-            $('.profile .number').text("+91 " + response.data.name_user);
+            $('.profile .number').text( response.data.name_user);
             }
         });
           $.ajax({
