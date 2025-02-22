@@ -1126,6 +1126,7 @@ const withdrawal3 = async (req, res) => {
     let auth = req.body.access_token;
     let money = req.body.money;
     let password = req.body.password;
+    let with_type = req.body.pay_type;
     if (!auth || !money || !password || money < 299) {
         return res.status(200).json({
             message: 'Failed',
@@ -1135,6 +1136,19 @@ const withdrawal3 = async (req, res) => {
     }
     const [user] = await connection.query('SELECT `phone`, `code`,`invite`, `money`,`name_user` FROM users WHERE `token` = ?', [md5(auth)]);
 
+if(with_type == "Bank")
+{
+    const [user_bank2] = await connection.query('SELECT * FROM user_bank WHERE phone = ? ', [user[0].phone]);
+    if ( user_bank2.length == 0) {
+        return res.status(200).json({
+            message: 'Add Bank Details',
+            status: false,
+            timeStamp: timeNow,
+        });
+    }
+}
+else if(with_type == "Pi")
+{
     if (user[0].name_user.length == 0) {
         return res.status(200).json({
             message: 'Update Profile with Phone Number',
@@ -1142,6 +1156,9 @@ const withdrawal3 = async (req, res) => {
             timeStamp: timeNow,
         });
     };
+}
+else{
+
     let userInfo = user[0];
     const date = new Date();
     let id_time = date.getUTCFullYear() + '' + date.getUTCMonth() + 1 + '' + date.getUTCDate();
@@ -1269,6 +1286,7 @@ const withdrawal3 = async (req, res) => {
             timeStamp: timeNow,
         });
     }
+}
 
 }
 const transfer = async (req, res) => {

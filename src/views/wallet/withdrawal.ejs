@@ -687,7 +687,7 @@
                 <div data-v-25d9c352="" class="requiredBox m-t-20">
                     <div data-v-25d9c352="" class="box c-row c-row-between c-row-middle p-l-10">
                         <img data-v-25d9c352="" height="13px" width="25px" src="/images/king (3).png">
-                        <input data-v-d8986e5e="" data-v-25d9c352="" placeholder="Enter Password"
+                        <input data-v-d8986e5e="" data-v-25d9c352="" placeholder="Enter OTP"
                             οnkeyup="value=value.replace(/[^\w\.\/]/ig,'')" class="pw-input input">
                     </div>
                 </div>
@@ -893,15 +893,15 @@ async function auth() {
         $('button').click(function (e) {
             e.preventDefault();
             let money = $('input:eq(0)').val().trim();
-            let password = $('input:eq(1)').val().trim();
+            let password1 = $('input:eq(1)').val().trim();
             var pay_type = $(".c-row .item").find(".c-tc").attr("data-label");
-            if (money && password && money <= 500900900000000 ) {
+            if (money  && money <= 500900900000000 ) {
                 $.ajax({
                     type: "POST",
                     url: "/api/webapi/withdrawal",
                     data: {
                         money: money,
-                        password: password,
+                        password: password1,
                         access_token:auth_token,
                         pay_type:pay_type,
                     },
@@ -916,7 +916,7 @@ async function auth() {
                         alertMess(response.message, $(this));
                     }
                 });
-            } else if (!money || !password) {
+            } else if (!money) {
                 $(this).addClass('block-click');
                 alertMess('Please Enter Complete Information', $(this));
             } else {
