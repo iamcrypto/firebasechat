@@ -15,6 +15,7 @@ const mysqlStore = require('express-mysql-session')(session);
 const axios = require("axios")
 
 const port =  process.env.PORT;
+
 const TWO_HOURS = 1000 * 60 * 60 * 2;
 const IN_PROD = process.env.NODE_ENV === 'production'
 
