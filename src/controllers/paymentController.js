@@ -192,6 +192,9 @@ const addPIPaymentRequest = async (req, res) => {
             ],
           );
 
+          let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
+          await connection.query(sql_noti, [user.phone, "Recharge of Amount "+money+" is Successfull. ", '0', "Recharge"]);
+
         return res.status(200).json({
             message: 'Payment Approved, Your Balance will update shortly!',
             recharge: recharge,
@@ -484,9 +487,17 @@ const initiatePiPayment = async (req, res) => {
         var sandbox = process.env.SANDBOX_MODE;
         var apikey = process.env.PIAPI_KEY;
         var pi_exchange_val = process.env.PI_EXCHANGE_RATE;
+        var f_api= process.env.Firebase_Apikey;
+        var f_authdomain= process.env.Firebase_AuthDomain;
+        var f_dburl= process.env.Firebase_Dburl;
+        var f_projid= process.env.Firebase_ProjId;
+        var f_stobck= process.env.Firebase_StorageBucket;
+        var f_messId= process.env.Firebase_MessageSenId;
+        var f_appid= process.env.Firebase_AppId;
+        var f_mesuareId= process.env.Firebase_MeasurementId;
         return res.render("wallet/pipay.ejs", {
             Amount: query?.am,
-            UsdtWalletAddress: momo.usdt_wallet_address,sandbox,pi_api_key: apikey, pi_exchange:pi_exchange_val
+            UsdtWalletAddress: momo.usdt_wallet_address,sandbox,pi_api_key: apikey, pi_exchange:pi_exchange_val,d_f_api: f_api, d_f_authdomain :f_authdomain,d_f_dburl:f_dburl,d_f_projid:f_projid,d_f_stobck:f_stobck,d_f_messId:f_messId,d_f_appid:f_appid,d_f_mesuareId:f_mesuareId
         });
 
     } catch (error) {

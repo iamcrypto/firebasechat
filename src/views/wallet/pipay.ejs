@@ -301,17 +301,18 @@
         
         $( document ).ready(function() {
             const Pi = window.Pi;
-            Pi.init({ version: "2.0", sandbox: true });
+            Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
       
             const firebaseConfig = {
-              apiKey: "AIzaSyDXiVMk3XgvOtgqwl_ERe6ODnDlDYiV5gM",
-              authDomain: "example-firebase-db-21b0b.firebaseapp.com",
-              projectId: "example-firebase-db-21b0b",
-              storageBucket: "example-firebase-db-21b0b.firebasestorage.app",
-              messagingSenderId: "512258180846",
-              appId: "1:512258180846:web:9c20193809838ec7cbd5ff",
-              measurementId: "G-K6WE9VHDY7"
-            };
+                apiKey:  "<%=d_f_api%>",
+                authDomain:  "<%=d_f_authdomain%>",
+                databaseURL: "<%=d_f_dburl%>",
+                projectId:  "<%=d_f_projid%>",
+                storageBucket:  "<%=d_f_stobck%>",
+                messagingSenderId:  "<%=d_f_messId%>",
+                appId:  "<%=d_f_appid%>",
+                measurementId:  "<%=d_f_mesuareId%>"
+                };
             const app = initializeApp(firebaseConfig);
             const db1 = getDatabase(app);
             //alert(PiNetworkClient);
