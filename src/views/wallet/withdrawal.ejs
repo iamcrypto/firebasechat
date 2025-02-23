@@ -1038,7 +1038,7 @@ async function auth() {
                             $("#otp_div").hide();
                             otp_active = 0;
                             $("#timer").html("");
-                            //window.location.href = "/wallet/withdrawalrecord";
+                            window.location.href = "/wallet/withdrawalrecord";
                         }
                         $(".Loading").fadeOut(0);
                         alertMess(response.message, $(this));
