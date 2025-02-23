@@ -1155,7 +1155,7 @@ const withdrawal3 = async (req, res) => {
             }
             else{
                 var message2 = await widthProcess(user[0].phone,user[0].money, money,'bank',user[0].plain_password);
-                if( message1 == "Withdrawal successful")
+                if( message2 == "Withdrawal successful")
                 {
                 res.status(200).json({
                     message: message2,
@@ -1166,7 +1166,7 @@ const withdrawal3 = async (req, res) => {
             }
             else{
                 res.status(200).json({
-                    message: message1,
+                    message: message2,
                     status: false,
                     timeStamp: timeNow,
                 });
@@ -1313,7 +1313,6 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                     with_type = ?`;
                         await connection.execute(sql, [id_time + '' + id_order, phone, add_money, infoBank.stk, infoBank.name_bank, infoBank.email, infoBank.name_user, 0, checkTime, dates,'manual',w_type]);
                         await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
-                        
                         let withdrdesc = "Amount of "+ add_money + " have been transferred successfully.";
                         let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
                         await connection.query(sql_noti1, [db_uid, withdrdesc , "0", "Withdraw"]);
