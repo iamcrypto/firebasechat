@@ -59,7 +59,7 @@
                             <div class="col-md-12">
                                 <div style="padding: 10px 20px;">
                                     <div class="form-group money">
-                                        <label for="money" id="label_money">Total: <%=money%></label>
+                                        <label for="money" id="label_money"></label>
                                         <input type="text" oninput="value=value.replace(/\D/g,'')" class="form-control" id="money" placeholder="Enter the amount">
                                     </div>
                                     <div class="form-group result" style="display: none;">
@@ -83,7 +83,7 @@
                                         <div class="text-center">
                                             <label for="quantity">Increase | Discounts on member accounts.</label>
                                         </div>
-                                        <label for="" id="label_money2">Surplus: <%=money2%></label>
+                                        <label for="" id="label_money2"></label>
                                         <input type="text" class="form-control" oninput="value=value.replace(/\D/g,'')" id="buff-username" placeholder="Enter the ID number"><br>
                                         <select class="form-select mb-4" id="buff-select" aria-label="Default select example">
                                             <option selected value="">--------------- Select function ---------------</option>
@@ -137,7 +137,6 @@
             
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="/js/client.js"></script>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://momentjs.com/downloads/moment.js"></script>
@@ -226,6 +225,18 @@ async function auth() {
           var username = auth.user.username;
           var password = auth.user.uid;
           var auth_token = auth.accessToken;
+          $.ajax({
+            type: "POST",
+            url: "/manager/member/income",
+            data: {
+                authtoken:auth_token,
+            },
+            dataType: "json",
+            success: function (response) {
+                $("#label_money").text("Total: " + response.money1);
+                $("#label_money2").text("Surplus: " + response.money2);
+            }
+        });
 
           $.ajax({
             type: "POST",

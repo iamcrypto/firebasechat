@@ -179,6 +179,7 @@ const initWebRouter = (app) => {
     router.get('/manager/support',  dailyController.support);
     router.get('/manager/member/info/:phone',  dailyController.pageInfo);
 
+    router.post('/manager/member/income',  dailyController.incomeInfo);
     router.post('/manager/member/info/:phone',  dailyController.userInfo);
     router.post('/manager/member/listRecharge/:phone',  dailyController.listRechargeMem);
     router.post('/manager/member/listWithdraw/:phone',  dailyController.listWithdrawMem);

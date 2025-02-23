@@ -43,16 +43,7 @@ const pageInfo = async(req, res) => {
 
 const giftPage = async(req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
-    let auth = req.body.authtoken;
-    const [rows] = await connection.execute('SELECT `phone` FROM `users` WHERE `token` = ? AND veri = 1', [md5(auth)]);
-    let money = 0;
-    let money2 = 0;
-    if(rows.length != 0) {
-        const [point_list] = await connection.execute('SELECT `money`, `money_us` FROM `point_list` WHERE `phone` = ?', [rows[0].phone]);
-        money = point_list[0].money;
-        money2 = point_list[0].money_us;
-    }
-    return res.render("daily/giftPage.ejs", {money, money2, sandbox}); 
+    return res.render("daily/giftPage.ejs", { sandbox}); 
 }
 
 const support = async(req, res) => {
@@ -116,6 +107,24 @@ const middlewareDailyController = async(req, res, next) => {
     } catch (error) {
         return res.redirect("/login");
     }
+}
+
+const incomeInfo = async(req, res) => {
+    const auth = req.body.authtoken;
+    const [rows] = await connection.execute('SELECT `phone` FROM `users` WHERE `token` = ? AND veri = 1', [md5(auth)]);
+    let money = 0;
+    let money2 = 0;
+    if(rows.length != 0) {
+        const [point_list] = await connection.execute('SELECT `money`, `money_us` FROM `point_list` WHERE `phone` = ?', [rows[0].phone]);
+        money = point_list[0].money;
+        money2 = point_list[0].money_us;
+    }
+    return res.status(200).json({
+        message: 'Success',
+        status: true,
+        money1: money,
+        money2: money2,
+    });
 }
 
 const statistical = async(req, res) => {
@@ -1307,5 +1316,6 @@ module.exports = {
     listRechargeMem,
     listWithdrawMem,
     listRedenvelope,
-    listBet
+    listBet,
+    incomeInfo
 }
