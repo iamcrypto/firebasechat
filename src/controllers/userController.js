@@ -1292,9 +1292,11 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                     with_type = ?`;
                         await connection.execute(sql, [id_time + '' + id_order, phone, add_money, infoBank.stk, infoBank.name_bank, infoBank.email, infoBank.name_user, 0, checkTime, dates,'manual',w_type]);
                         await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
+                        
                         let withdrdesc = "Amount of "+ add_money + " have been transferred successfully.";
                         let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
                         await connection.query(sql_noti1, [db_uid, withdrdesc , "0", "Withdraw"]);
+                        message = 'Withdrawal successful';
                     } else {
                         message =  'Please link your bank first';
                      
@@ -1330,8 +1332,9 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                         let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
                         let withdrdesc = "Your withdrawal of sum "+add_money+" Has been processed at "+completedPayment.created_at+" And transaction reference is "+ completedPayment.transaction._link ;
                         await connection.query(sql_noti1, [db_uid, withdrdesc , "0", "Withdraw"]);
-                    }
                         message = 'Withdrawal successful';
+                    }
+                    
                     }
                 } else {
                     message = 'The total bet is not enough to fulfill the request';
