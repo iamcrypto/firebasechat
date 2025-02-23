@@ -249,6 +249,19 @@ async function auth() {
                         if(response.status == true) {
                             $('#money_result').val(response.id);
                             $('.result').show();
+                            $('#money').val('');
+                            $('#user').val('');
+                            $.ajax({
+                                type: "POST",
+                                url: "/admin/manager/listRedenvelops",
+                                data: {
+                                    authtoken:auth_token,
+                                },
+                                dataType: "json",
+                                success: function (response) {
+                                    RenderMemberNews(response.redenvelopes);
+                                }
+                            });
                         }
                     }
                 });
