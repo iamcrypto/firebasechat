@@ -1137,7 +1137,7 @@ const timeCreate = () => {
 
 
 const register = async (req, res) => {
-    let { username, password, invitecode, countrycode } = req.body;
+    let { username, password, invitecode } = req.body;
     let id_user = randomNumber(10000, 99999);
     let name_user = "Member" + randomNumber(10000, 99999);
     let code = randomString(5) + randomNumber(10000, 99999);
@@ -1180,9 +1180,8 @@ const register = async (req, res) => {
             veri = ?,
             ip_address = ?,
             status = ?,
-            time = ?,
-            dial_code = ?`;
-            await connection.execute(sql, [id_user, username, name_user, md5(password), 0, 2, code, invitecode, 1, ip, 1, time, countrycode]);
+            time = ?`;
+            await connection.execute(sql, [id_user, username, name_user, md5(password), 0, 2, code, invitecode, 1, ip, 1, time]);
             await connection.execute('INSERT INTO point_list SET phone = ?, level = 2', [username]);
             return res.status(200).json({
                 message: 'registration success',//Register Sucess

@@ -1056,10 +1056,14 @@ async function auth() {
                             $("#level1_div").css("display","flex");
                             $("#level2_div").css("display","none");
                         }
-                        else 
+                        else if(u_level == 2)
                         {
                             $("#level1_div").css("display","none");
                             $("#level2_div").css("display","flex");
+                        }
+                        else{
+                            $("#level1_div").css("display","none");
+                            $("#level2_div").css("display","none");
                         }
                         var vip_array = [3000,30000,200000,2000000,20000000,50000000,100000000,1000000000,5000000000];
                         var img_ind = 0;

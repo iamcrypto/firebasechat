@@ -466,15 +466,15 @@ async function auth() {
 
         $('.create_ctv').click(function (e) { 
             e.preventDefault();
-            let username = $('#username').val().trim(); 
-            let password = $('#password').val().trim();
+            let cusername = $('#username').val().trim(); 
+            let cpassword = $('#password').val().trim();
             if (username && password) {
                 $.ajax({
                     type: "POST",
                     url: "/admin/manager/create/ctv",
                     data: {
-                        username: username,
-                        password: password,
+                        username: cusername,
+                        password: cpassword,
                         authtoken:auth_token,
                     },
                     dataType: "json",
