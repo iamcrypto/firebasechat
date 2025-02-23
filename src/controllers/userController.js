@@ -1155,12 +1155,22 @@ const withdrawal3 = async (req, res) => {
             }
             else{
                 var message2 = await widthProcess(user[0].phone,user[0].money, money,'bank',user[0].plain_password);
+                if( message1 == "Withdrawal successful")
+                {
                 res.status(200).json({
                     message: message2,
                     bank_sucess:"sucess",
                     status: true,
                     timeStamp: timeNow,
                 });
+            }
+            else{
+                res.status(200).json({
+                    message: message1,
+                    status: false,
+                    timeStamp: timeNow,
+                });
+            }
             }
         }
         else if(with_type == "Pi")
@@ -1176,12 +1186,23 @@ const withdrawal3 = async (req, res) => {
                     if(otp_active1 == 1)
                     {
                         var message1 = await widthProcess(user[0].phone,user[0].money, money,'pi',user[0].plain_password);
-                        res.status(200).json({
-                        message: message1,
-                        pi_sucess:"sucess",
-                        status: true,
-                        timeStamp: timeNow,
-                        });
+                        
+                        if( message1 == "Withdrawal successful")
+                        {
+                            res.status(200).json({
+                                message: message1,
+                                pi_sucess:"sucess",
+                                status: true,
+                                timeStamp: timeNow,
+                                });
+                        }
+                        else{
+                            res.status(200).json({
+                                message: message1,
+                                status: false,
+                                timeStamp: timeNow,
+                            });
+                        }     
                     }
                     else{
                     return res.status(200).json({
