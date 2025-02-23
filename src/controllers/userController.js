@@ -1261,6 +1261,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
     const [minutes_1] = await connection.query('SELECT * FROM minutes_1 WHERE phone = ?', [phone]);
     const [k3_bet_money] = await connection.query('SELECT * FROM result_k3 WHERE phone = ?', [phone]);
     const [d5_bet_money] = await connection.query('SELECT * FROM result_5d WHERE phone = ?', [phone]);
+    const [trx_bet_money] = await connection.query('SELECT * FROM trx_wingo_bets WHERE phone = ?', [phone]);
     let total = 0;
     recharge.forEach((data) => {
         total += parseFloat(data.money);
@@ -1269,6 +1270,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
     let total_w = 0;
     let total_k3 = 0;
     let total_5d = 0;
+    let total_trx = 0;
     minutes_1.forEach((data) => {
         total_w += parseFloat(data.money);
     });
@@ -1278,7 +1280,10 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
     d5_bet_money.forEach((data) => {
         total_5d += parseFloat(data.money);
     });
-    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d) ;
+    trx_bet_money.forEach((data) => {
+        total_trx += parseFloat(data.money);
+    });
+    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d)+ parseInt(total_trx);
     let result = 0;
     if (total - total2 > 0) result = total - total2;
     result = Math.max(result, 0);
@@ -1426,6 +1431,7 @@ const transfer = async (req, res) => {
     const [minutes_1] = await connection.query('SELECT * FROM minutes_1 WHERE phone = ? ', [userInfo.phone]);
     const [k3_bet_money] = await connection.query('SELECT * FROM result_k3 WHERE phone = ?', [userInfo.phone]);
     const [d5_bet_money] = await connection.query('SELECT * FROM result_5d WHERE phone = ?', [userInfo.phone]);
+    const [trx_bet_money] = await connection.query('SELECT * FROM trx_wingo_bets WHERE phone = ?', [userInfo.phone]);
     let total = 0;
     recharge.forEach((data) => {
         total += parseFloat(data.money);
@@ -1434,6 +1440,7 @@ const transfer = async (req, res) => {
     let total_w = 0;
     let total_k3 = 0;
     let total_5d = 0;
+    let total_trx = 0;
     minutes_1.forEach((data) => {
         total_w += parseFloat(data.money);
     });
@@ -1443,7 +1450,10 @@ const transfer = async (req, res) => {
     d5_bet_money.forEach((data) => {
         total_5d += parseFloat(data.money);
     });
-    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d) ;
+    trx_bet_money.forEach((data) => {
+        total_trx += parseFloat(data.money);
+    });
+    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d)+ parseInt(total_trx);
 
     let result = 0;
     if (total - total2 > 0) result = total - total2;
@@ -2234,6 +2244,8 @@ const username_transfer = async (req, res) => {
     const [minutes_1] = await connection.query('SELECT * FROM minutes_1 WHERE phone = ? ', [userInfo.phone]);
     const [k3_bet_money] = await connection.query('SELECT * FROM result_k3 WHERE phone = ?', [userInfo.phone]);
     const [d5_bet_money] = await connection.query('SELECT * FROM result_5d WHERE phone = ?', [userInfo.phone]);
+    const [trx_bet_money] = await connection.query('SELECT * FROM trx_wingo_bets WHERE phone = ?', [userInfo.phone]);
+
     let total = 0;
     recharge.forEach((data) => {
         total += parseFloat(data.money);
@@ -2242,6 +2254,7 @@ const username_transfer = async (req, res) => {
     let total_w = 0;
     let total_k3 = 0;
     let total_5d = 0;
+    let total_trx = 0;
     minutes_1.forEach((data) => {
         total_w += parseFloat(data.money);
     });
@@ -2251,7 +2264,10 @@ const username_transfer = async (req, res) => {
     d5_bet_money.forEach((data) => {
         total_5d += parseFloat(data.money);
     });
-    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d) ;
+    trx_bet_money.forEach((data) => {
+        total_trx += parseFloat(data.money);
+    });
+    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d)+ parseInt(total_trx);
 
     let result = 0;
     if (total - total2 > 0) result = total - total2;
@@ -2362,6 +2378,7 @@ const phone_transfer = async (req, res) => {
     const [minutes_1] = await connection.query('SELECT * FROM minutes_1 WHERE phone = ? ', [userInfo.phone]);
     const [k3_bet_money] = await connection.query('SELECT * FROM result_k3 WHERE phone = ?', [userInfo.phone]);
     const [d5_bet_money] = await connection.query('SELECT * FROM result_5d WHERE phone = ?', [userInfo.phone]);
+    const [trx_bet_money] = await connection.query('SELECT * FROM trx_wingo_bets WHERE phone = ?', [userInfo.phone]);
     let total = 0;
     recharge.forEach((data) => {
         total += parseFloat(data.money);
@@ -2370,6 +2387,7 @@ const phone_transfer = async (req, res) => {
     let total_w = 0;
     let total_k3 = 0;
     let total_5d = 0;
+    let total_trx = 0;
     minutes_1.forEach((data) => {
         total_w += parseFloat(data.money);
     });
@@ -2379,7 +2397,10 @@ const phone_transfer = async (req, res) => {
     d5_bet_money.forEach((data) => {
         total_5d += parseFloat(data.money);
     });
-    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d) ;
+    trx_bet_money.forEach((data) => {
+        total_trx += parseFloat(data.money);
+    });
+    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d)+ parseInt(total_trx);
 
     let result = 0;
     if (total - total2 > 0) result = total - total2;
@@ -2489,6 +2510,7 @@ const user_id_transfer = async (req, res) => {
     const [minutes_1] = await connection.query('SELECT * FROM minutes_1 WHERE phone = ? ', [userInfo.phone]);
     const [k3_bet_money] = await connection.query('SELECT * FROM result_k3 WHERE phone = ?', [userInfo.phone]);
     const [d5_bet_money] = await connection.query('SELECT * FROM result_5d WHERE phone = ?', [userInfo.phone]);
+    const [trx_bet_money] = await connection.query('SELECT * FROM trx_wingo_bets WHERE phone = ?', [userInfo.phone]);
     let total = 0;
     recharge.forEach((data) => {
         total += parseFloat(data.money);
@@ -2497,6 +2519,7 @@ const user_id_transfer = async (req, res) => {
     let total_w = 0;
     let total_k3 = 0;
     let total_5d = 0;
+    let total_trx = 0;
     minutes_1.forEach((data) => {
         total_w += parseFloat(data.money);
     });
@@ -2506,7 +2529,12 @@ const user_id_transfer = async (req, res) => {
     d5_bet_money.forEach((data) => {
         total_5d += parseFloat(data.money);
     });
-    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d) ;
+
+    trx_bet_money.forEach((data) => {
+        total_trx += parseFloat(data.money);
+    });
+
+    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d)+ parseInt(total_trx);
 
     let result = 0;
     if (total - total2 > 0) result = total - total2;
