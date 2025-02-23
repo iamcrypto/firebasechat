@@ -28,9 +28,7 @@ const rebatePage = async (req, res) => {
 const vipPage = async (req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
     let auth = req.body.authtoken;
-    const [userinfo] = await connection.query('SELECT `name_user` FROM users WHERE `token` = ? ', [md5(auth)]);
-    let userid = userinfo[0].name_user;
-    return res.render("checkIn/vip.ejs", {  UserName : userid , sandbox});
+    return res.render("checkIn/vip.ejs", {  sandbox});
 }
 
 const jackpotPage = async (req, res) => {

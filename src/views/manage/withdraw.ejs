@@ -16,31 +16,84 @@
 <body class="hold-transition sidebar-mini">
 
   <style>
-    .switch {
+    .three
+    {
+      display: flex;
+      padding-left: 5%;
+    }
+
+    .toggle {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      display: block;
+      height: auto;
+      width: 3.5rem;
+      margin: auto;
+      cursor: pointer;
+    }
+    .toggle-input {
+      display: none;
+      margin: 0;
+    }
+    .toggle-off,
+    .toggle-on {
+      height: 1.8125rem;
+      width: 1.8125rem;
+      color: rgba(46, 45, 44, 0.1);
+      vertical-align: top;
+      text-align: center;
+      line-height: 1.8125rem !important;
+    }
+    .toggle-input:checked + .toggle-controller.default-success {
+      border: 0.125rem solid rgba(108, 211, 61, 0.75);
+      background: rgba(108, 211, 61, 0.375);
+    }
+    .toggle-input:checked + .toggle-controller.default-success:after {
+      left: 1.5625rem;
+    }
+    .toggle-controller.default-success {
       position: relative;
       display: inline-block;
-      width: 60px;
-      height: 25px;
-      margin-left: .5rem;
+      height: 1.5625rem;
+      width: 3.125rem;
+      border: 0.125rem solid rgba(46, 45, 44, 0.05);
+      -webkit-border-radius: 1.5625rem;
+      -moz-border-radius: 1.5625rem;
+      border-radius: 1.5625rem;
+      -webkit-box-shadow: inset 0 0 0.1875rem rgba(46, 45, 44, 0.25);
+      -moz-box-shadow: inset 0 0 0.1875rem rgba(46, 45, 44, 0.25);
+      box-shadow: inset 0 0 0.1875rem rgba(46, 45, 44, 0.25);
+      background: rgba(46, 45, 44, 0.025);
+      -webkit-transition: all 0.25s ease;
+      -moz-transition: all 0.25s ease;
+      -o-transition: all 0.25s ease;
+      transition: all 0.25s ease;
     }
-    
-    .switch input { 
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    
-    .slider {
+    .toggle-controller.default-success:after {
       position: absolute;
-      cursor: pointer;
       top: 0;
       left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      -webkit-transition: .4s;
-      transition: .4s;
+      content: '';
+      display: block;
+      height: 1.5625rem;
+      width: 1.5625rem;
+      -webkit-border-radius: 1.5625rem;
+      -moz-border-radius: 1.5625rem;
+      border-radius: 1.5625rem;
+      -webkit-box-shadow: 0 0.0625rem 0.125rem rgba(46, 45, 44, 0.2);
+      -moz-box-shadow: 0 0.0625rem 0.125rem rgba(46, 45, 44, 0.2);
+      box-shadow: 0 0.0625rem 0.125rem rgba(46, 45, 44, 0.2);
+      background: white;
+      -webkit-transition: all 0.25s ease;
+      -moz-transition: all 0.25s ease;
+      -o-transition: all 0.25s ease;
+      transition: all 0.25s ease;
     }
+    .toggle-off.active {color:red;}
+    .toggle-on.active {color:green;}
+    
+   
     .card-tools h3
     {
       padding-top: 1%;
@@ -106,12 +159,14 @@
               <div style="position: relative;float: left;">
                 <span style="position: absolute;width: 100%;padding-top: 15%;font-size: 8px;text-align: left;/* padding-right: 8px; */margin-left: -55%;color: red;">if you turned this feature off you will go manual transfered mode</span>
               <h3 class="card-title">Transfer Mode</h3>
-              <label class="switch" onclick="switchOnclick(this);">
-                <input type="checkbox">
-                <span class="slider round"></span>
-                
-              </label>
-              
+
+              <div class="three columns">	
+                <label class="toggle">
+                  <input type="checkbox" class="toggle-input">
+                  <div class="toggle-controller default-success"></div>
+                </label><!-- END .toggle -->
+              </div>
+
             </div>
                        
               <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
@@ -159,7 +214,6 @@
     <script src="/dist/js/adminlte.min.js"></script>
     <script src="/js/admin/admin.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.min.js"></script>
-
 </body>
 <script>
   function formateT(params) {
@@ -205,7 +259,7 @@
           var username = auth.user.username;
           var password = auth.user.uid;
           var auth_token = auth.accessToken;
-          $('.admin_name').text(username);
+          $('.admin_name').text(username); 
           function show(params) {
             if (params.length == 0) {
               $('tbody').html(`
@@ -214,56 +268,54 @@
                   </tr>
                 `);
               return;
-            }
-            let html = '';
-            let show = params.map((data) => {
-              html += `<tr class="text-center">
-                        <td id="${data.id}">
-                          ${data.id}
-                        </td>
-                        <td>
-                          <b>${data.phone}</b>
-                        </td>
-                        <td>
-                          <b>${data.name_bank}</b>
-                        </td>
-                        <td style="min-width: 190px;">
-                          <b>${data.stk}</b>
-                        </td>
-                        <td style="min-width: 190px;">
-                          <b>${data.name_user}</b>
-                        </td>
-                        <td style="min-width: 190px;">
-                          <b>${data.ifsc}</b>
-                        </td>
-                        <td style="min-width: 190px;">
-                          <b>${data.sdt}</b>
-                        </td>
-                        <td>
-                          <b>${data.money}</b>
-                        </td>
-                        <td style="min-width: 190px;">
-                          <b>${timerJoin(data.time)}</b>
-                        </td>
-                        <td class="project-state">
-                          <span class="badge badge-warning">Waiting...</span>
-                        </td>
-                        <td class="project-actions text-center" style="min-width: 160px;">
-                          <!-- xác nhận -->
-                          <a class="confirm-btn btn btn-success btn-sm" data="${data.id}"><i class="fa fa-check-circle"></i></a>
-                          <!-- ? -->
-                          <!-- <a class="btn btn-info btn-sm" href="#"><i class="fas fa-pencil-alt"></i></a> -->
-                          <!-- Xóa -->
-                          <a class="delete-btn btn btn-danger btn-sm "  data="${data.id}"><i class="fas fa-times-circle"></i></a>
-                        </td>
-                      </tr>`;
-                    })
-                $('tbody').html(html);
+            }   
+          let html = '';
+          let show = params.map((data) => {
+            html += `<tr class="text-center">
+                      <td id="${data.id}">
+                        ${data.id}
+                      </td>
+                      <td>
+                        <b>${data.phone}</b>
+                      </td>
+                      <td>
+                        <b>${data.name_bank}</b>
+                      </td>
+                      <td style="min-width: 190px;">
+                        <b>${data.stk}</b>
+                      </td>
+                      <td style="min-width: 190px;">
+                        <b>${data.name_user}</b>
+                      </td>
+                      <td style="min-width: 190px;">
+                        <b>${data.ifsc}</b>
+                      </td>
+                      <td style="min-width: 190px;">
+                        <b>${data.sdt}</b>
+                      </td>
+                      <td>
+                        <b>${data.money}</b>
+                      </td>
+                      <td style="min-width: 190px;">
+                        <b>${timerJoin(data.time)}</b>
+                      </td>
+                      <td class="project-state">
+                        <span class="badge badge-warning">Waiting...</span>
+                      </td>
+                      <td class="project-actions text-center" style="min-width: 160px;">
+                        <!-- xác nhận -->
+                        <a class="confirm-btn btn btn-success btn-sm" data="${data.id}"><i class="fa fa-check-circle"></i></a>
+                        <!-- ? -->
+                        <!-- <a class="btn btn-info btn-sm" href="#"><i class="fas fa-pencil-alt"></i></a> -->
+                        <!-- Xóa -->
+                        <a class="delete-btn btn btn-danger btn-sm "  data="${data.id}"><i class="fas fa-times-circle"></i></a>
+                      </td>
+                    </tr>`;
+                  })
+              $('tbody').html(html);
                 }
-
                 $(document).on("click", '.confirm-btn', function(e){
                   e.preventDefault();
-                  console.log("clicked");
                   let id = $(this).attr('data');
                   $.ajax({
                     type: "POST",
@@ -288,7 +340,7 @@
                  
                 });
               
-                  $(document).on("click", '.delete-btn', function(e){
+                $(document).on("click", '.delete-btn', function(e){
                   e.preventDefault();
                   let id = $(this).attr('data');
                   $.ajax({
@@ -312,7 +364,6 @@
                     }
                   });
                 });
-
                 $.ajax({
                   type: "POST",
                   url: "/api/webapi/admin/recharge",
@@ -324,7 +375,6 @@
                     show(response.datas3)
                   }
                 });
-
                 $.ajax({
                   type: "POST",
                   url: "/api/webapi/admin/gettranfermode",
@@ -335,25 +385,30 @@
                   success: function (response) {
                     if(response.rows[0].transfer_mode.trim() == 'instant')
                     {
-                      $('.switch input[type="checkbox"]').prop('checked', true);
+                      $('.toggle-input').prop("checked",true);
+                      $('.toggle-off').removeClass('active');
+                      $('.toggle-on').addClass('active');
                     }
                     else{
-                      $('.switch input[type="checkbox"]').prop('checked', false);
+                      $('.toggle-input').prop("checked",false);
+                      $('.toggle-off').addClass('active');
+                      $('.toggle-on').removeClass('active');
                     }
                   }
                 });
 
-                function switchOnclick(e)
-          {
-            var transfer_mode = '';
-            if($(e).find('input[type="checkbox"]').is(':checked') == true)
-            {
-              transfer_mode = 'instant';
-            }
-            else{
-              transfer_mode = 'manual';
-            }
-            console.log(transfer_mode);
+              $('.toggle-input').change(function() {
+                var transfer_mode = '';
+                if($(this).is(':checked')) {
+                  transfer_mode = 'instant';
+                    $('.toggle-off').removeClass('active');
+                    $('.toggle-on').addClass('active');
+                } 
+                else {
+                  transfer_mode = 'manual';
+                $('.toggle-off').addClass('active');
+                $('.toggle-on').removeClass('active');
+              }
             $.ajax({
               type: "POST",
               url: "/api/webapi/admin/tranfermode",
@@ -366,13 +421,14 @@
                 console.log(response)
               }
             });
-          }
-        });
-      }
+            });
+     });
+    }
   catch (err) {
       alert(err);
+  
   }
-  }
+}
   auth();
   
 </script>
