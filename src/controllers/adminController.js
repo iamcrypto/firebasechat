@@ -2017,13 +2017,13 @@ const CreatedSalary = async (req, res) => {
             hour12: true
         });
 
-        // Check if the phone number is a 10-digit number
-        if (!/^\d{10}$/.test(phone)) {
-            return res.status(400).json({
-                message: 'ERROR!!! Invalid phone number. Please provide a 10-digit phone number.',
-                status: false
-            });
-        }
+        // // Check if the phone number is a 10-digit number
+        // if (!/^\d{10}$/.test(phone)) {
+        //     return res.status(400).json({
+        //         message: 'ERROR!!! Invalid phone number. Please provide a 10-digit phone number.',
+        //         status: false
+        //     });
+        // }
 
         // Check if user with the given phone number exists
         const checkUserQuery = 'SELECT * FROM `users` WHERE phone = ?';
@@ -2043,8 +2043,10 @@ const CreatedSalary = async (req, res) => {
 
 
         // Insert record into 'salary' table
+        console.log("before insert");
         const insertSalaryQuery = 'INSERT INTO salary (phone, amount, type, time) VALUES (?, ?, ?, ?)';
         await connection.execute(insertSalaryQuery, [phone, amount, type, formattedTime]);
+        console.log("after insert");
 
         res.status(200).json({ message: 'Salary record created successfully' });
     } catch (error) {
