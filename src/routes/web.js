@@ -21,6 +21,7 @@ const initWebRouter = (app) => {
     router.get('/register', accountController.registerPage);
     router.get('/forgot', accountController.forgotPage);
     router.post('/api/sent/otp/verify', accountController.verifyCode);
+    router.post('/api/getkefudata', accountController.kePageInfo);
     router.post('/api/sent/otp/verify/reset', accountController.verifyCodePass);
     router.post('/api/resetPasword', accountController.forGotPassword);
 
@@ -164,6 +165,10 @@ const initWebRouter = (app) => {
     router.post('/api/webapi/transfer_history', userController.transferHistory); //
     router.post('/api/webapi/confirm_recharge_usdt', userController.confirmUSDTRecharge); //
     router.post('/api/webapi/confirm_recharge_usdt', userController.confirmUSDTRecharge); //
+
+    router.post('/api/webapi/user_transfer', userController.username_transfer);
+    router.post('/api/webapi/phone_transfer', userController.phone_transfer);
+    router.post('/api/webapi/user_id_transfer', userController.user_id_transfer);
 
     router.post('/api/webapi/search', userController.search); // register
 

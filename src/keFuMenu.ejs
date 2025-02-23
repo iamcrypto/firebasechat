@@ -3,8 +3,6 @@
   
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js">
-    </script>
     <link rel="shortcut icon" href="/images/bitbug_favicon.ico" type="image/x-icon">
     <meta name="google" content="notranslate">
     <meta name="robots" content="noindex,nofollow">
@@ -1917,7 +1915,7 @@
               style="color: rgb(168, 168, 168); font-size: 18px;">
               </i>
             </div>
-            <div data-v-6a5413fb="" class="content-item" onclick="location.href='<%=telegram%>'">
+            <div data-v-6a5413fb="" class="content-item" id="telegram_link" >
               <div data-v-6a5413fb="" class="content-item-title">
                 <img data-v-6a5413fb="" alt="" class="" data-origin="https://www.bigdaddygame2.com/assets/png/CStype3-7588d980.png"
                 src="/images/icon_Telegram.webp">
@@ -1959,10 +1957,50 @@
         </div>
       </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://momentjs.com/downloads/moment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
     <script>
       $(document).ready(function() {
         // Select the overlay element
         $('.van-overlay').fadeIn(10);
+
+        const Pi = window.Pi;
+Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
+async function auth() {
+  try {
+      
+      const scopes = ['username', 'payments', 'wallet_address'];
+      function onIncompletePaymentFound(payment) {
+          console.log("incomplete Transaction");
+      }; 
+
+      Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+          var username = auth.user.username;
+          var password = auth.user.uid;
+          var auth_token = auth.accessToken;
+          $.ajax({
+            type: "POST",
+            url: "/api/getkefudata",
+            data: {
+                authtoken:auth_token,
+            },
+            dataType: "json",
+            success: function (response) {
+              console.log("response");
+			  console.log(response);
+            }
+          });
+        });
+      }
+  catch (err) {
+      alert(err);
+  }
+  }
+  auth();
       });
       $(window).on('load',
       function() {

@@ -2204,6 +2204,390 @@ const get_lang_data = async (req, res) => {
     });
 }
 
+
+const username_transfer = async (req, res) => {
+    let auth = req.body.authtoken;
+    let amount = req.body.amount;
+    let receiver_phone = req.body.phone;
+    const date = new Date();
+    // let id_time = date.getUTCFullYear() + '' + (date.getUTCMonth() + 1) + '' + date.getUTCDate();
+    let id_order = Math.floor(Math.random() * (99999999999999 - 10000000000000 + 1)) + 10000000000000;
+    let time = new Date().getTime();
+    let client_transaction_id = id_order;
+
+    const [user] = await connection.query('SELECT `id`,`phone`,`money`, `code`,`invite` FROM users WHERE `token` = ? ', [md5(auth)]);
+    let userInfo = user[0];
+    let sender_phone = userInfo.phone;
+    let sender_money = parseInt(userInfo.money);
+    if (!user) {
+        return res.status(200).json({
+            message: 'Failed',
+            status: false,
+            timeStamp: timeNow,
+        });
+    };
+
+
+    let dates = new Date().getTime();
+    let checkTime = timerJoin(dates);
+    const [recharge] = await connection.query('SELECT * FROM recharge WHERE phone = ? AND status = 1 ', [userInfo.phone]);
+    const [minutes_1] = await connection.query('SELECT * FROM minutes_1 WHERE phone = ? ', [userInfo.phone]);
+    const [k3_bet_money] = await connection.query('SELECT * FROM result_k3 WHERE phone = ?', [userInfo.phone]);
+    const [d5_bet_money] = await connection.query('SELECT * FROM result_5d WHERE phone = ?', [userInfo.phone]);
+    let total = 0;
+    recharge.forEach((data) => {
+        total += parseFloat(data.money);
+    });
+    let total2 = 0;
+    let total_w = 0;
+    let total_k3 = 0;
+    let total_5d = 0;
+    minutes_1.forEach((data) => {
+        total_w += parseFloat(data.money);
+    });
+    k3_bet_money.forEach((data) => {
+        total_k3 += parseFloat(data.money);
+    });
+    d5_bet_money.forEach((data) => {
+        total_5d += parseFloat(data.money);
+    });
+    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d) ;
+
+    let result = 0;
+    if (total - total2 > 0) result = total - total2;
+    let result2 = parseInt ((parseInt(total) * 80)/100)
+    if (total2 >= result2) {
+        if (sender_money >= amount) {
+            let [receiver] = await connection.query('SELECT * FROM users WHERE `phone` = ?', [receiver_phone]);
+            if (receiver.length === 1 && sender_phone !== receiver_phone) {
+                let money = sender_money - amount;
+                let total_money = amount + receiver[0].total_money;
+                let trans_mode = '';
+                const [admin_user] = await connection.query('SELECT * FROM users WHERE level = ? ', [1]);
+                let adminInfo = admin_user[0];
+                trans_mode = adminInfo.transfer_mode; 
+                if(trans_mode == 'instant')
+                {
+                    await connection.query('UPDATE users SET money = ? WHERE phone = ?', [money, sender_phone]);
+                    await connection.query(`UPDATE users SET money = money + ? WHERE phone = ?`, [amount, receiver_phone]);
+                    const sql = "INSERT INTO balance_transfer (sender_phone, receiver_phone, amount) VALUES (?, ?, ?)";
+                    await connection.execute(sql, [sender_phone, receiver_phone, amount]);
+                    const sql_recharge = "INSERT INTO recharge (id_order, transaction_id, phone, money, type, status, today, url, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    await connection.execute(sql_recharge, [client_transaction_id, 0, receiver_phone, amount, 'wallet', 1, checkTime, 0, time]);
+                    const sql_recharge_with = "INSERT INTO withdraw (id_order, phone, money, stk, name_bank, name_user, ifsc, sdt, tp, status, today, time, type,with_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
+                    await connection.execute(sql_recharge_with, [client_transaction_id, sender_phone, amount,0,0,0,0,0,0, 1, checkTime, time,trans_mode,'transfer']);
+                    let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
+                    await connection.query(sql_noti, [receiver[0]?.id, "Congrates! you received an reward of "+amount+" from your friend " + userInfo.code +".", '0', "Recharge"]);
+                    let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
+                    let withdrdesc = "Amount of "+ amount + " have been transferred successfully.";
+                    await connection.query(sql_noti1, [userInfo.id, withdrdesc , "0", "Withdraw"]);
+                    return res.status(200).json({
+                        message: `Requested ${amount} sent successfully`,
+                        curr_user_m:money,
+                        transfer_mode:trans_mode,
+                        status: true,
+                        timeStamp: timeNow,
+                    });
+                    
+                }
+                else{
+                    const sql_recharge_with = "INSERT INTO withdraw (id_order, phone, money, stk, name_bank, name_user, ifsc, sdt, tp, status, today, time, type,with_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
+                    await connection.execute(sql_recharge_with, [client_transaction_id, sender_phone, amount,0,0,0,0,0,0, 0, checkTime, time,trans_mode,'transfer']);
+                    const sql = "INSERT INTO balance_transfer (sender_phone, receiver_phone, amount) VALUES (?, ?, ?)";
+                    await connection.execute(sql, [sender_phone, receiver_phone, amount]);
+                    const sql_recharge = "INSERT INTO recharge (id_order, transaction_id, phone, money, type, status, today, url, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    await connection.execute(sql_recharge, [client_transaction_id, 0, receiver_phone, amount, 'wallet', 0, checkTime, 0, time]);
+                    let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
+                    await connection.query(sql_noti, [userInfo.id, "Balance Transfer of Amount "+amount+" Initiated Successfully.", '0', "Transfer"]);
+                    return res.status(200).json({
+                        message: `Waiting for admin approval`,
+                        curr_user_m:money,
+                        transfer_mode:trans_mode,
+                        status: true,
+                        timeStamp: timeNow,
+                    });
+                }
+            } else {
+                return res.status(200).json({
+                    message: `${receiver_phone} is not a valid username`,
+                    status: false,
+                    timeStamp: timeNow,
+                });
+            }
+        } else {
+            return res.status(200).json({
+                message: 'Your balance is not enough',
+                status: false,
+                timeStamp: timeNow,
+            });
+        }
+    }
+    else {
+        return res.status(200).json({
+            message: 'The total bet is not enough to fulfill the request',
+            status: false,
+            timeStamp: timeNow,
+        });
+    }
+}
+
+
+const phone_transfer = async (req, res) => {
+    let auth = req.body.authtoken;
+    let amount = req.body.amount;
+    let receiver_phone = req.body.phone;
+    let country_code = req.body.c_code;
+    const date = new Date();
+    // let id_time = date.getUTCFullYear() + '' + (date.getUTCMonth() + 1) + '' + date.getUTCDate();
+    let id_order = Math.floor(Math.random() * (99999999999999 - 10000000000000 + 1)) + 10000000000000;
+    let time = new Date().getTime();
+    let client_transaction_id = id_order;
+
+    const [user] = await connection.query('SELECT `id`,`phone`,`money`, `code`,`invite` FROM users WHERE `token` = ? ', [md5(auth)]);
+    let userInfo = user[0];
+    let sender_phone = userInfo.phone;
+    let sender_money = parseInt(userInfo.money);
+    if (!user) {
+        return res.status(200).json({
+            message: 'Failed',
+            status: false,
+            timeStamp: timeNow,
+        });
+    };
+
+
+    let dates = new Date().getTime();
+    let checkTime = timerJoin(dates);
+    const [recharge] = await connection.query('SELECT * FROM recharge WHERE phone = ? AND status = 1 ', [userInfo.phone]);
+    const [minutes_1] = await connection.query('SELECT * FROM minutes_1 WHERE phone = ? ', [userInfo.phone]);
+    const [k3_bet_money] = await connection.query('SELECT * FROM result_k3 WHERE phone = ?', [userInfo.phone]);
+    const [d5_bet_money] = await connection.query('SELECT * FROM result_5d WHERE phone = ?', [userInfo.phone]);
+    let total = 0;
+    recharge.forEach((data) => {
+        total += parseFloat(data.money);
+    });
+    let total2 = 0;
+    let total_w = 0;
+    let total_k3 = 0;
+    let total_5d = 0;
+    minutes_1.forEach((data) => {
+        total_w += parseFloat(data.money);
+    });
+    k3_bet_money.forEach((data) => {
+        total_k3 += parseFloat(data.money);
+    });
+    d5_bet_money.forEach((data) => {
+        total_5d += parseFloat(data.money);
+    });
+    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d) ;
+
+    let result = 0;
+    if (total - total2 > 0) result = total - total2;
+    let result2 = parseInt ((parseInt(total) * 80)/100)
+    if (total2 >= result2) {
+        if (sender_money >= amount) {
+            let [receiver] = await connection.query('SELECT * FROM users WHERE `name_user` = ? AND `dial_code` = ?', [receiver_phone,country_code]);
+            if (receiver.length === 1 && userInfo.name_user !== receiver_phone && userInfo.dial_code !== country_code) {
+                let money = sender_money - amount;
+                let total_money = amount + receiver[0].total_money;
+                let trans_mode = '';
+                const [admin_user] = await connection.query('SELECT * FROM users WHERE level = ? ', [1]);
+                let adminInfo = admin_user[0];
+                trans_mode = adminInfo.transfer_mode; 
+                if(trans_mode == 'instant')
+                {
+                    await connection.query('UPDATE users SET money = ? WHERE phone = ?', [money, sender_phone]);
+                    await connection.query(`UPDATE users SET money = money + ? WHERE phone = ?`, [amount, receiver_phone]);
+                    const sql = "INSERT INTO balance_transfer (sender_phone, receiver_phone, amount) VALUES (?, ?, ?)";
+                    await connection.execute(sql, [userInfo.phone, receiver[0].phone, amount]);
+                    const sql_recharge = "INSERT INTO recharge (id_order, transaction_id, phone, money, type, status, today, url, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    await connection.execute(sql_recharge, [client_transaction_id, 0, receiver_phone, amount, 'wallet', 1, checkTime, 0, time]);
+                    const sql_recharge_with = "INSERT INTO withdraw (id_order, phone, money, stk, name_bank, name_user, ifsc, sdt, tp, status, today, time, type,with_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
+                    await connection.execute(sql_recharge_with, [client_transaction_id, sender_phone, amount,0,0,0,0,0,0, 1, checkTime, time,trans_mode,'transfer']);
+                    let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
+                    await connection.query(sql_noti, [receiver[0]?.id, "Congrates! you received an reward of "+amount+" from your friend " + userInfo.code +".", '0', "Recharge"]);
+                    let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
+                    let withdrdesc = "Amount of "+ amount + " have been transferred successfully.";
+                    await connection.query(sql_noti1, [userInfo.id, withdrdesc , "0", "Withdraw"]);
+                    return res.status(200).json({
+                        message: `Requested ${amount} sent successfully`,
+                        curr_user_m:money,
+                        transfer_mode:trans_mode,
+                        status: true,
+                        timeStamp: timeNow,
+                    });
+                    
+                }
+                else{
+                    const sql_recharge_with = "INSERT INTO withdraw (id_order, phone, money, stk, name_bank, name_user, ifsc, sdt, tp, status, today, time, type,with_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
+                    await connection.execute(sql_recharge_with, [client_transaction_id, sender_phone, amount,0,0,0,0,0,0, 0, checkTime, time,trans_mode,'transfer']);
+                    const sql = "INSERT INTO balance_transfer (sender_phone, receiver_phone, amount) VALUES (?, ?, ?)";
+                    await connection.execute(sql, [userInfo.phone, receiver[0].phone, amount]);
+                    const sql_recharge = "INSERT INTO recharge (id_order, transaction_id, phone, money, type, status, today, url, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    await connection.execute(sql_recharge, [client_transaction_id, 0, receiver_phone, amount, 'wallet', 0, checkTime, 0, time]);
+                    let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
+                    await connection.query(sql_noti, [userInfo.id, "Balance Transfer of Amount "+amount+" Initiated Successfully.", '0', "Transfer"]);
+                    return res.status(200).json({
+                        message: `Waiting for admin approval`,
+                        curr_user_m:money,
+                        transfer_mode:trans_mode,
+                        status: true,
+                        timeStamp: timeNow,
+                    });
+                }
+            } else {
+                return res.status(200).json({
+                    message: `${country_code}  ${receiver_phone} is not a valid user mobile number`,
+                    status: false,
+                    timeStamp: timeNow,
+                });
+            }
+        } else {
+            return res.status(200).json({
+                message: 'Your balance is not enough',
+                status: false,
+                timeStamp: timeNow,
+            });
+        }
+    }
+    else {
+        return res.status(200).json({
+            message: 'The total bet is not enough to fulfill the request',
+            status: false,
+            timeStamp: timeNow,
+        });
+    }
+}
+
+
+const user_id_transfer = async (req, res) => {
+    let auth = req.body.authtoken;
+    let amount = req.body.amount;
+    let receiver_phone = req.body.phone;
+    const date = new Date();
+    // let id_time = date.getUTCFullYear() + '' + (date.getUTCMonth() + 1) + '' + date.getUTCDate();
+    let id_order = Math.floor(Math.random() * (99999999999999 - 10000000000000 + 1)) + 10000000000000;
+    let time = new Date().getTime();
+    let client_transaction_id = id_order;
+
+    const [user] = await connection.query('SELECT `id`,`phone`,`money`, `code`,`invite` FROM users WHERE `token` = ? ', [md5(auth)]);
+    let userInfo = user[0];
+    let sender_phone = userInfo.phone;
+    let sender_money = parseInt(userInfo.money);
+    if (!user) {
+        return res.status(200).json({
+            message: 'Failed',
+            status: false,
+            timeStamp: timeNow,
+        });
+    };
+
+
+    let dates = new Date().getTime();
+    let checkTime = timerJoin(dates);
+    const [recharge] = await connection.query('SELECT * FROM recharge WHERE phone = ? AND status = 1 ', [userInfo.phone]);
+    const [minutes_1] = await connection.query('SELECT * FROM minutes_1 WHERE phone = ? ', [userInfo.phone]);
+    const [k3_bet_money] = await connection.query('SELECT * FROM result_k3 WHERE phone = ?', [userInfo.phone]);
+    const [d5_bet_money] = await connection.query('SELECT * FROM result_5d WHERE phone = ?', [userInfo.phone]);
+    let total = 0;
+    recharge.forEach((data) => {
+        total += parseFloat(data.money);
+    });
+    let total2 = 0;
+    let total_w = 0;
+    let total_k3 = 0;
+    let total_5d = 0;
+    minutes_1.forEach((data) => {
+        total_w += parseFloat(data.money);
+    });
+    k3_bet_money.forEach((data) => {
+        total_k3 += parseFloat(data.money);
+    });
+    d5_bet_money.forEach((data) => {
+        total_5d += parseFloat(data.money);
+    });
+    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d) ;
+
+    let result = 0;
+    if (total - total2 > 0) result = total - total2;
+    let result2 = parseInt ((parseInt(total) * 80)/100)
+    if (total2 >= result2) {
+        if (sender_money >= amount) {
+            let [receiver] = await connection.query('SELECT * FROM users WHERE `id_user` = ?', [receiver_phone]);
+            if (receiver.length === 1 && userInfo.id_user !== receiver_phone) {
+                let money = sender_money - amount;
+                let total_money = amount + receiver[0].total_money;
+                let trans_mode = '';
+                const [admin_user] = await connection.query('SELECT * FROM users WHERE level = ? ', [1]);
+                let adminInfo = admin_user[0];
+                trans_mode = adminInfo.transfer_mode; 
+                if(trans_mode == 'instant')
+                {
+                    await connection.query('UPDATE users SET money = ? WHERE phone = ?', [money, sender_phone]);
+                    await connection.query(`UPDATE users SET money = money + ? WHERE phone = ?`, [amount, receiver_phone]);
+                    const sql = "INSERT INTO balance_transfer (sender_phone, receiver_phone, amount) VALUES (?, ?, ?)";
+                    await connection.execute(sql, [userInfo.phone, receiver[0].phone, amount]);
+                    const sql_recharge = "INSERT INTO recharge (id_order, transaction_id, phone, money, type, status, today, url, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    await connection.execute(sql_recharge, [client_transaction_id, 0, receiver_phone, amount, 'wallet', 1, checkTime, 0, time]);
+                    const sql_recharge_with = "INSERT INTO withdraw (id_order, phone, money, stk, name_bank, name_user, ifsc, sdt, tp, status, today, time, type,with_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
+                    await connection.execute(sql_recharge_with, [client_transaction_id, sender_phone, amount,0,0,0,0,0,0, 1, checkTime, time,trans_mode,'transfer']);
+                    let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
+                    await connection.query(sql_noti, [receiver[0]?.id, "Congrates! you received an reward of "+amount+" from your friend " + userInfo.code +".", '0', "Recharge"]);
+                    let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
+                    let withdrdesc = "Amount of "+ amount + " have been transferred successfully.";
+                    await connection.query(sql_noti1, [userInfo.id, withdrdesc , "0", "Withdraw"]);
+                    return res.status(200).json({
+                        message: `Requested ${amount} sent successfully`,
+                        curr_user_m:money,
+                        transfer_mode:trans_mode,
+                        status: true,
+                        timeStamp: timeNow,
+                    });
+                    
+                }
+                else{
+                    const sql_recharge_with = "INSERT INTO withdraw (id_order, phone, money, stk, name_bank, name_user, ifsc, sdt, tp, status, today, time, type,with_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)";
+                    await connection.execute(sql_recharge_with, [client_transaction_id, sender_phone, amount,0,0,0,0,0,0, 0, checkTime, time,trans_mode,'transfer']);
+                    const sql = "INSERT INTO balance_transfer (sender_phone, receiver_phone, amount) VALUES (?, ?, ?)";
+                    await connection.execute(sql, [userInfo.phone, receiver[0].phone, amount]);
+                    const sql_recharge = "INSERT INTO recharge (id_order, transaction_id, phone, money, type, status, today, url, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    await connection.execute(sql_recharge, [client_transaction_id, 0, receiver_phone, amount, 'wallet', 0, checkTime, 0, time]);
+                    let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
+                    await connection.query(sql_noti, [userInfo.id, "Balance Transfer of Amount "+amount+" Initiated Successfully.", '0', "Transfer"]);
+                    return res.status(200).json({
+                        message: `Waiting for admin approval`,
+                        curr_user_m:money,
+                        transfer_mode:trans_mode,
+                        status: true,
+                        timeStamp: timeNow,
+                    });
+                }
+            } else {
+                return res.status(200).json({
+                    message: `${receiver_phone} is not a valid user-id`,
+                    status: false,
+                    timeStamp: timeNow,
+                });
+            }
+        } else {
+            return res.status(200).json({
+                message: 'Your balance is not enough',
+                status: false,
+                timeStamp: timeNow,
+            });
+        }
+    }
+    else {
+        return res.status(200).json({
+            message: 'The total bet is not enough to fulfill the request',
+            status: false,
+            timeStamp: timeNow,
+        });
+    }
+}
+
+        
+ 
 module.exports = {
     get_lang_data,
     set_lang_data,
@@ -2238,5 +2622,8 @@ module.exports = {
     getnotificationCount,
     getnotifications,
     updatenotifications,
-    xpgain_value
+    xpgain_value,
+    username_transfer,
+    phone_transfer,
+    user_id_transfer,
 }

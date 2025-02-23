@@ -554,8 +554,13 @@ const forGotPassword = async (req, res) => {
 }
 
 const keFuMenu = async(req, res) => {
-    let auth = req.body.authtoken;
+    var sandbox = process.env.SANDBOX_MODE;
+    return res.render("keFuMenu.ejs", { sandbox}); 
+}
 
+const kePageInfo = async (req, res) => {
+    let auth = req.body.authtoken;
+    
     const [users] = await connection.query('SELECT `level`, `ctv` FROM users WHERE token = ?', [md5(auth)]);
 
     let telegram = '';
@@ -565,6 +570,7 @@ const keFuMenu = async(req, res) => {
     } else {
         if (users[0].level != 0) {
             var [settings] = await connection.query('SELECT * FROM admin');
+
         } else {
             var [check] = await connection.query('SELECT `telegram` FROM point_list WHERE phone = ?', [users[0].ctv]);
             if (check.length == 0) {
@@ -575,8 +581,14 @@ const keFuMenu = async(req, res) => {
         }
         telegram = settings[0].telegram;
     }
-    var sandbox = process.env.SANDBOX_MODE;
-    return res.render("keFuMenu.ejs", {telegram, sandbox}); 
+    return res.status(200).json({
+        message: 'Success',
+        status: true,
+        data: {
+
+        },
+        telegram_data: telegram
+    })
 }
 
 
@@ -610,6 +622,7 @@ const updateAvatarAPI = async (req, res) => {
   };
 
 module.exports = {
+    kePageInfo,
     pi_register_con,
     pi_admin_register,
     login,
