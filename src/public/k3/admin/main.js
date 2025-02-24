@@ -412,7 +412,7 @@ async function auth() {
               },
               dataType: "json",
               success: function (response) {
-                Swal.fire(
+                alert(
                     'Good job!',
                     `${response.message}`,
                     'success'

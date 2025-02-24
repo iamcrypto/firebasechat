@@ -5,11 +5,7 @@ $(window).on('load', function () {
         $('#preloader').fadeOut(0);
     }, 100);
 })
-$(document).ready(function () {
-    $(`a[href="${window.location.pathname}"]`).addClass('active');
-    $(`a[href="${window.location.pathname}"]`).css('pointerEvents', 'none');
-    $('#manage .col-12:eq(0)').click();
-});
+
  
 $('.back-to-tops').click(function() {
     $('html, body').animate({
@@ -215,7 +211,6 @@ function messNewJoin5(data) {
 }
 
 
-
 const Pi = window.Pi;
 Pi.init({ version: "2.0", sandbox:false });
 async function auth() {
@@ -232,31 +227,37 @@ async function auth() {
           var auth_token = auth.accessToken;
           const socket = io();
           $('.admin_name').text(username);
+          $(document).ready(function () {
+            $(`a[href="${window.location.pathname}"]`).addClass('active');
+            $(`a[href="${window.location.pathname}"]`).css('pointerEvents', 'none');
+            $('#manage .col-12:eq(0)').click();
+        });
+
           $('#manage .col-12').click(function(e) {
-            var hasClass = $(e).attr('class');
+            var hasClass = $(this).attr('class');
             if(hasClass.indexOf('active-game') != -1){
-                $(e).removeClass('active-game');
+                $(this).removeClass('active-game');
                 var clicked_m = $(e).find('.info-box-icon').text().match(/\d+/g).join(", ");
                 $('#manage .col-12').removeClass('display_none');
                 $("#manage_2").find('.col-sm').removeClass('sub-menu-color');
             }
             else{
                 $('#manage .col-12').removeClass('active-game');
-                $(e).addClass('active-game');
-                let game = $(e).attr('data');
-                var clicked_m = $(e).find('.info-box-icon').text().match(/\d+/g).join(", ");
+                $(this).addClass('active-game');
+                let game = $(this).attr('data');
+                var clicked_m = $(this).find('.info-box-icon').text().match(/\d+/g).join(", ");
                 $('#manage .col-12').addClass('display_none');
-                $(e).removeClass('display_none');
+                $(this).removeClass('display_none');
                 $('html').attr('data-change', game);
                 $('#manage_2 .col-sm:eq(0)').click();
             }
           });
+
           $('#manage_2 .col-sm').click(function(e) {
             $("#manage_2").find('.col-sm').removeClass('sub-menu-color');
-            $(e).addClass('sub-menu-color');
+            $(this).addClass('sub-menu-color');
             callListOrder();
           });
-          
 function callListOrder(e) {
     let game = $('html').attr('data-change');
     var internalb= $("#manage_2").find('.sub-menu-color').attr('data').trim();
@@ -284,18 +285,6 @@ function callListOrder(e) {
     });
 }
 //callListOrder();
-socket.on("data-server-5d", function (msg) {
-    if (msg) {
-
-        callListOrder();
-        $('.direct-chat-msg').html('');
-    }
-});
-
-socket.on("data-server-5", function (msg) {
-    messNewJoin(msg);
-    messNewJoin5(msg);
-});
 
 $(".start-order").click(function (e) { 
     e.preventDefault();
@@ -319,7 +308,7 @@ $(".start-order").click(function (e) {
       },
       dataType: "json",
       success: function (response) {
-        Swal.fire(
+        alert(
             'Good job!',
             `${response.message}`,
             'success'
@@ -328,6 +317,20 @@ $(".start-order").click(function (e) {
       }
     });
   });
+
+  socket.on("data-server-5d", function (msg) {
+    if (msg) {
+
+        callListOrder();
+        $('.direct-chat-msg').html('');
+    }
+});
+
+socket.on("data-server-5", function (msg) {
+    messNewJoin(msg);
+    messNewJoin5(msg);
+});
+  
 		});
     }
 catch (err) {
