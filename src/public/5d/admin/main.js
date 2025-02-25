@@ -237,7 +237,7 @@ async function auth() {
             var hasClass = $(this).attr('class');
             if(hasClass.indexOf('active-game') != -1){
                 $(this).removeClass('active-game');
-                var clicked_m = $(e).find('.info-box-icon').text().match(/\d+/g).join(", ");
+                var clicked_m = $(this).find('.info-box-icon').text().match(/\d+/g).join(", ");
                 $('#manage .col-12').removeClass('display_none');
                 $("#manage_2").find('.col-sm').removeClass('sub-menu-color');
             }
