@@ -144,7 +144,7 @@
                         <i class="fa-light fa-angle-left fa-fade fa-xl center" style="color: #FFF"></i>
                     </div>
                 </div>
-                <div data-v-106b99c8="" class="navbar-title">Withdrawal History</div>
+                <div data-v-106b99c8="" class="navbar-title">Minning Pool</div>
                 <div data-v-106b99c8="" class="navbar-right"></div>
             </div>
             <div data-v-3966082f="" class="box">
@@ -221,16 +221,7 @@
                     return years + '-' + months + '-' + days + ' ' + hours + '-' + minutes + '-' + seconds;
                 }
                 function loads(datas) {
-                    var bank_name = "";
                     let html = datas.map((data) => {
-                        console.log(data.with_type.trim());
-                        if(data.with_type.trim() == "bank")
-                        {
-                            bank_name = "BankCard";
-                        }
-                        else if(data.with_type.trim() == "pi"){
-                            bank_name = "Pi"; 
-                        }
                         return `
                         <div data-v-4e585e69="" class="item">
                             <div data-v-4e585e69="">
@@ -239,7 +230,7 @@
                                         <span data-v-4e585e69="" class="c-row c-row-between c-row-middle">
                                             <div data-v-4e585e69="" class="m-r-5 van-image" style="width: 24px; height: 20px;">
                                                 <img src="/images/king (10).png" class="van-image__img">
-                                            </div>`+bank_name+` </span>
+                                            </div>BankCard</span>
                                         </div>
                                         <div data-v-4e585e69="" data-clipboard-text="${data.id_order}" class="tag-read"> ${data.id_order} 
                                             <img data-v-4e585e69="" width="18px" height="15px" src="/images/copy.png" class="m-l-5">
@@ -306,19 +297,7 @@ async function auth() {
           var username = auth.user.username;
           var password = auth.user.uid;
           var auth_token = auth.accessToken;
-          $.ajax({
-            type: "POST",
-            url: "/api/webapi/withdraw/list",
-            data: {
-                access_token:auth_token,
-            },
-            dataType: "json",
-            success: function (response) {
-                console.log(response.datas);
-                if (response.datas.length == 0) return;
-                loads(response.datas);
-            }
-        });
+        
 		        });
     }
 catch (err) {

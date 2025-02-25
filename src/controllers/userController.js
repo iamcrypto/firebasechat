@@ -1052,6 +1052,7 @@ const addBank = async (req, res) => {
 
 const infoUserBank = async (req, res) => {
     let auth = req.body.access_token;
+    let b_type = req.body.bank_type;
     if (!auth) {
         return res.status(200).json({
             message: 'Failed',
@@ -1117,7 +1118,15 @@ const infoUserBank = async (req, res) => {
     let result = 0;
     if (total - total2 > 0) result = total - total2 - fee;
 
-    const [userBank] = await connection.query('SELECT * FROM user_bank WHERE phone = ? ', [userInfo.phone]);
+    var [userBank] = '';
+    if(b_type == "Bank")
+    {
+        [userBank] = await connection.query('SELECT * FROM user_bank WHERE phone = ?', [userInfo.phone]);
+    }
+    else if(b_type == "Pi")
+    {
+        [userBank] = await connection.query('SELECT * FROM user_bank WHERE phone = ? AND `name_bank` = ?', [userInfo.phone,'Pi_pay']);
+    }
     return res.status(200).json({
         message: 'Received successfully',
         datas: userBank,
@@ -1142,7 +1151,7 @@ const withdrawal3 = async (req, res) => {
             timeStamp: timeNow,
         })
     }
-    const [user] = await connection.query('SELECT `phone`, `code`,`invite`, `money`,`name_user`,`dial_code`,`plain_password` FROM users WHERE `token` = ?', [md5(auth)]);
+    const [user] = await connection.query('SELECT `id`,`phone`, `code`,`invite`, `money`,`name_user`,`dial_code`,`plain_password` FROM users WHERE `token` = ?', [md5(auth)]);
     if(with_type == "Bank")
         {
             const [user_bank2] = await connection.query('SELECT * FROM user_bank WHERE phone = ? ', [user[0].phone]);
@@ -1154,7 +1163,7 @@ const withdrawal3 = async (req, res) => {
                 });
             }
             else{
-                var message2 = await widthProcess(user[0].phone,user[0].money, money,'bank',user[0].plain_password);
+                var message2 = await widthProcess(user[0].phone,user[0].money, money,'bank',user[0].plain_password,user[0].id);
                 if( message2 == "Withdrawal successful")
                 {
                 res.status(200).json({
@@ -1185,7 +1194,7 @@ const withdrawal3 = async (req, res) => {
                 else{
                     if(otp_active1 == 1)
                     {
-                        var message1 = await widthProcess(user[0].phone,user[0].money, money,'pi',user[0].plain_password);
+                        var message1 = await widthProcess(user[0].phone,user[0].money, money,'pi',user[0].plain_password,user[0].id);
                         
                         if( message1 == "Withdrawal successful")
                         {
@@ -1320,7 +1329,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                         await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
                         let withdrdesc = "Amount of "+ add_money + " have been transferred successfully.";
                         let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
-                        await connection.query(sql_noti1, [db_uid, withdrdesc , "0", "Withdraw"]);
+                        await connection.query(sql_noti1, [parseInt(db_uid), withdrdesc , "0", "Withdraw"]);
                         message = 'Withdrawal successful';
                     } else {
                         message =  'Please link your bank first';
@@ -1329,13 +1338,17 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                     }
                         else if(w_type == 'pi')
                             {
+                                try{
+                                var pi_amount = parseInt(add_money) / parseInt(process.env.PI_EXCHANGE_RATE);
+                            
                                 const userUid = userid;
                                 const paymentData = {
-                                    amount: parseInt(add_money),
+                                    amount: parseInt(pi_amount),
                                     memo: "payment withdraw for cloudyscape app", // this is just an example
                                     metadata: {productId: "automate withdraw"},
                                     uid: userUid
                                 }
+                                //const canId = await pi.cancelPayment("wSXCxk8lWJwn914Vel0WOGRAbpYL");
                                 const paymentId = await pi.createPayment(paymentData);
                                 const txid = await pi.submitPayment(paymentId);
                                 const completedPayment = await pi.completePayment(paymentId, txid);
@@ -1352,14 +1365,33 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                     time = ?,
                     type = ?,
                     with_type = ?`;
-                        await connection.execute(sql, [id_time + '' + id_order, phone, add_money, txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
-                        await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
+                        await connection.execute(sql, [id_time + '' + id_order, phone, pi_amount, txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
+                        await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [pi_amount, phone]);
                         let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
-                        let withdrdesc = "Your withdrawal of sum "+add_money+" Has been processed at "+completedPayment.created_at+" And transaction reference is "+ completedPayment.transaction._link ;
-                        await connection.query(sql_noti1, [db_uid, withdrdesc , "0", "Withdraw"]);
-                        message = 'Withdrawal successful';
-                    }
-                    
+                        let withdrdesc = "Your withdrawal of sum "+pi_amount+" Has been processed at "+completedPayment.created_at.toString()+" And transaction reference is "+ completedPayment.transaction._link.toString() ;
+                        await connection.query(sql_noti1, [parseInt(db_uid), withdrdesc , "0", "Withdraw"]);
+                            const [user_bank_pi] = await connection.query('SELECT * FROM user_bank WHERE phone = ?  AND name_bank = ? ', [phone, 'Pi_pay' ]);
+                                if ( user_bank_pi.length == 0) {
+                                    const sql = `INSERT INTO user_bank SET 
+                                    phone = ?,
+                                    name_bank = ?,
+                                    name_user = ?,
+                                    stk = ?,
+                                    email = ?,
+                                    sdt = ?,
+                                    tinh = ?,
+                                    
+                                    time = ?`;
+                                    await connection.execute(sql, [phone, 'Pi_pay' , "", completedPayment.to_address.toString(), "", completedPayment.user_uid.toString(), "", checkTime]);
+                                }
+                                message = 'Withdrawal successful';
+                            }
+                            catch(e)
+                            {
+                                //message = 'Too Many Payments. Please try again later'; 
+                                message = e.toString();
+                            }
+                    }           
                     }
                 } else {
                     message = 'The total bet is not enough to fulfill the request';

@@ -462,7 +462,7 @@
                 
 
 
-                <div data-v-4ac977f5="" class="financialServices__container-footer" onclick="location.href='/wallet/transfer'">
+                <div data-v-4ac977f5="" class="financialServices__container-footer" onclick="location.href='/mian/safe'">
                     <div data-v-4ac977f5="">
                       <img data-v-4ac977f5="" src="/assets/png/vault-a933a89f.png" alt="">
                       <div data-v-4ac977f5="">
@@ -1030,7 +1030,7 @@ async function auth() {
                                 return false;
                             };
                             $("#prof_image").attr("src","/assets/png/"+ response.data.user_avatar);
-                            $('.infoName .name').text(response.data.name_user);
+                            $('.infoName .name').text(username);
                             $('.infoName .id').text(`UID   |    ${response.data.id_user}`);
                             $('.infoName .id').attr('data-clipboard-text', '');
                             $('.infoName .number').text(`Mobile Number:${response.data.country_code }  ${response.data.name_user.slice(0, 2)}****${response.data.name_user.slice(-4)}`);

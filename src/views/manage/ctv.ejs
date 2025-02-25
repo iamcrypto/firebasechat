@@ -220,13 +220,13 @@ auth();
             <b>${data.money}</b>
           </td>
           <td class="project-state">
-            ${(data.status == 1) ? '<span class="badge badge-success">Online</span>' : '<span class="badge badge-warning">Banned</span>'}
+            ${(data.status == 1) ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-warning">Banned</span>'}
           </td>
           <!--<td class="project-state">
             <span class="badge badge-warning">Offline</span>
           </td>
           <td class="project-state">
-            <span class="badge badge-success">Online</span>
+            <span class="badge badge-success">Active</span>
           </td> -->
           <td class="project-actions text-center" style="min-width: 100px">
             <a class="btn btn-primary btn-sm confirm-btn" href="/admin/manager/ctv/profile/${data.phone}">

@@ -553,6 +553,7 @@ const userInfo = async (req, res) => {
 
 const recharge = async (req, res) => {
     let auth = req.body.authtoken;
+    let type = req.body.type;
     if (!auth) {
         return res.status(200).json({
             message: 'Failed',
@@ -563,8 +564,17 @@ const recharge = async (req, res) => {
 
     const [recharge] = await connection.query('SELECT * FROM recharge WHERE status = 0 ');
     const [recharge2] = await connection.query('SELECT * FROM recharge WHERE status != 0 ');
-    const [withdraw] = await connection.query('SELECT * FROM withdraw WHERE status = 0 ');
-    const [withdraw2] = await connection.query('SELECT * FROM withdraw WHERE status != 0 ');
+    var [withdraw] = '';
+    var [withdraw2] = '';
+    if(type == "Bank")
+    {
+        [withdraw] = await connection.query("SELECT * FROM withdraw WHERE status = 0 AND with_type = 'bank'");
+        [withdraw2] = await connection.query("SELECT * FROM withdraw WHERE status != 0 AND with_type = 'bank'");
+    }
+    else if(type == "Pi"){
+        [withdraw] = await connection.query("SELECT * FROM withdraw WHERE status = 0 AND with_type = 'pi'");
+        [withdraw2] = await connection.query("SELECT * FROM withdraw WHERE status != 0 AND with_type = 'pi'");
+    }
     return res.status(200).json({
         message: 'Success',
         status: true,
@@ -1025,6 +1035,7 @@ const createBonus = async (req, res) => {
     }
 
     if (type == 'three') {
+        console.log("fired");
         let select = req.body.select;
         let phone = req.body.phone;
         const [user] = await connection.query('SELECT * FROM point_list WHERE phone = ? ', [phone]);

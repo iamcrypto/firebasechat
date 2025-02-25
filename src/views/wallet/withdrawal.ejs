@@ -879,24 +879,7 @@
             }, 2500);
         });
         $(".Loading").fadeOut(0);
-        $('.c-row .item').click(function (e) {
-            if($(this).find(".c-tc").attr("data-label") != "USDT")
-            {
-                $('.c-row .item').removeClass("action");
-                $(this).addClass("action");
-                $('.c-row .item .icons').removeClass("active");
-                $(this).find(".icons").addClass("active");
-            }
-            if($(this).find(".c-tc").attr("data-label") == "Bank")
-            {
-                $(".van-button__text").text("Withdraw Money");
-            }
-            else if($(this).find(".c-tc").attr("data-label") == "Pi")
-            {
-                $(".van-button__text").text("Send OTP");  
-            }
-        });
-
+        
         function alertMess(text, sic) {
             $('body').append(
                 `
@@ -929,12 +912,12 @@ async function auth() {
           var username = auth.user.username;
           var password = auth.user.uid;
           var auth_token = auth.accessToken;
-          
           $.ajax({
             type: "POST",
             url: "/api/webapi/check/Info",
             data: {
                 access_token:auth_token,
+                bank_type:"Bank"
             },
             dataType: "json",
             success: function (response) {
@@ -959,7 +942,54 @@ async function auth() {
                 );
             }
         });
-
+          $('.c-row .item').click(function (e) {
+            if($(this).find(".c-tc").attr("data-label") != "USDT")
+            {
+                $('.c-row .item').removeClass("action");
+                $(this).addClass("action");
+                $('.c-row .item .icons').removeClass("active");
+                $(this).find(".icons").addClass("active");
+            }
+            if($(this).find(".c-tc").attr("data-label") == "Bank")
+            {
+                $(".van-button__text").text("Withdraw Money");
+            }
+            else if($(this).find(".c-tc").attr("data-label") == "Pi")
+            {
+                $(".van-button__text").text("Send OTP");  
+            }
+            $('.conBox .list').html("");
+            $.ajax({
+                type: "POST",
+                url: "/api/webapi/check/Info",
+                data: {
+                    access_token:auth_token,
+                    bank_type:$(this).find(".c-tc").attr("data-label")
+                },
+                dataType: "json",
+                success: function (response) {
+                    let user = response.userInfo[0];
+                    $('.money').text("₹" + user.money);
+                    $('.bankBox .box .item:eq(1) div:eq(1)').html(`2. Remaining Betting Amount<br>For Withdrawal: ₹ ${response.result}`);
+                    if (!response.datas[0]) return;
+                    let data = response.datas[0];
+                    $('.conBox .list').append(
+                        `
+                        <div data-v-25d9c352="" class="item c-row c-row-between c-row-middle-center">
+                            <div data-v-25d9c352="" class="name van-ellipsis">
+                                <span data-v-25d9c352="">${data.stk}</span>
+                            </div>
+                            <div data-v-25d9c352="" class="icon action c-row c-row-middle-center">
+                                <i data-v-25d9c352="" class="van-icon van-icon-success" style="color: #2aaaf3; font-size: 16px;">
+                                    <!---->
+                                </i>
+                            </div>
+                        </div>
+                        `
+                    );
+                }
+            });
+        });
         function generateOTP() { 
 
             // Declare a digits variable 
