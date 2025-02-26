@@ -214,8 +214,6 @@ async function auth() {
                 $(document).on("click", '.withdraw_tab_button', function(e){
                   e.preventDefault();
                   var b_type = '';
-                  $(".withdraw_tab_button").removeClass("active");
-                  $(this).addClass("active");
                   if($(this).attr("type").trim() == "BANK_CARD")
                   {
                     b_type = "Bank";
@@ -223,6 +221,8 @@ async function auth() {
                   else if($(this).attr("type").trim() == "PI_ADDRESS"){
                     b_type = "Pi";
                   }
+                  $(".withdraw_tab_button").removeClass("active");
+                  $(this).addClass("active");
                   $.ajax({
                     type: "POST",
                     url: "/api/webapi/admin/recharge_get",
