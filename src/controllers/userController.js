@@ -1292,7 +1292,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
     trx_bet_money.forEach((data) => {
         total_trx += parseFloat(data.money);
     });
-    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d)+ parseInt(total_trx);
+    total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d) + parseInt(total_trx);
     let result = 0;
     if (total - total2 > 0) result = total - total2;
     result = Math.max(result, 0);
@@ -1350,8 +1350,9 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                                 }
                                 //const canId = await pi.cancelPayment("wSXCxk8lWJwn914Vel0WOGRAbpYL");
                                 const paymentId = await pi.createPayment(paymentData);
-                                const txid = await pi.submitPayment(paymentId);
-                                const completedPayment = await pi.completePayment(paymentId, txid);
+                                console.log(paymentId);
+                                //const txid = await pi.submitPayment(paymentId);
+                                //const completedPayment = await pi.completePayment(paymentId, txid);
                                 const sql = `INSERT INTO withdraw SET 
                     id_order = ?,
                     phone = ?,
