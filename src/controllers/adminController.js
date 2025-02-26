@@ -564,17 +564,47 @@ const recharge = async (req, res) => {
 
     const [recharge] = await connection.query('SELECT * FROM recharge WHERE status = 0 ');
     const [recharge2] = await connection.query('SELECT * FROM recharge WHERE status != 0 ');
-    var [withdraw] = '';
-    var [withdraw2] = '';
+    const [withdraw] = await connection.query("SELECT * FROM withdraw WHERE status = 0");
+    const [withdraw2] = await connection.query("SELECT * FROM withdraw WHERE status != 0");
+
+    return res.status(200).json({
+        message: 'Success',
+        status: true,
+        datas: recharge,
+        datas2: recharge2,
+        datas3: withdraw,
+        datas4: withdraw2,
+    });
+}
+
+const get_recharge = async (req, res) => {
+    let auth = req.body.authtoken;
+    let type = req.body.type;
+    if (!auth) {
+        return res.status(200).json({
+            message: 'Failed',
+            status: false,
+            timeStamp: timeNow,
+        });
+    }
+
+    const [recharge] = await connection.query('SELECT * FROM recharge WHERE status = 0 ');
+    const [recharge2] = await connection.query('SELECT * FROM recharge WHERE status != 0 ');
+
+    var [withdraw] = "";
+    var [withdraw2] = "";
+
     if(type == "Bank")
     {
-        [withdraw] = await connection.query("SELECT * FROM withdraw WHERE status = 0 AND with_type = 'bank'");
-        [withdraw2] = await connection.query("SELECT * FROM withdraw WHERE status != 0 AND with_type = 'bank'");
+        [withdraw] = await connection.query("SELECT * FROM withdraw WHERE status = 0 AND with_type='bank'");
+        [withdraw2] = await connection.query("SELECT * FROM withdraw WHERE status != 0 AND with_type='bank'");
     }
-    else if(type == "Pi"){
-        [withdraw] = await connection.query("SELECT * FROM withdraw WHERE status = 0 AND with_type = 'pi'");
-        [withdraw2] = await connection.query("SELECT * FROM withdraw WHERE status != 0 AND with_type = 'pi'");
+    else if(type == "Pi")
+    {
+        [withdraw] = await connection.query("SELECT * FROM withdraw WHERE status = 0 AND with_type='pi'");
+        [withdraw2] = await connection.query("SELECT * FROM withdraw WHERE status != 0 AND with_type='pi'");
     }
+
     return res.status(200).json({
         message: 'Success',
         status: true,
@@ -2169,4 +2199,5 @@ module.exports = {
     CreatedSalary,
     getSalary,
     gettranfermode,
+    get_recharge
 }

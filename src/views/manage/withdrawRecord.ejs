@@ -11,6 +11,24 @@
   <link href="//cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
   <link rel="stylesheet" href="/dist/css/adminlte.min.css">
   <link rel="stylesheet" href="/css/admin.css">
+  <style>
+    .withdraw_tab_button {
+      margin-left: 10px;
+      border: 1px solid #343a40;
+      border-radius: 6px;
+      background: #fff;
+      color: #343a40;
+  }
+
+  .withdraw_tab_button.active {
+    margin-left: 10px;
+    border: 1px solid #343a40;
+    border: 0px;
+    border-radius: 6px;
+    background: #343a40;
+    color: #fff;
+}
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -38,6 +56,12 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">Withdrawal list</h3>
+            <button class="withdraw_tab_button active" id="inr_w_tab" type="BANK_CARD">
+              BANK CARD
+            </button>
+            <button class="withdraw_tab_button" id="pi_w_tab" type="PI_ADDRESS">
+              Pi ADDRESS
+            </button>
             <div class="card-tools">
               <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                 <i class="fas fa-minus"></i>
@@ -148,6 +172,7 @@ async function auth() {
                 `);
               return;
             }
+            
             let html = '';
             params.map((data) => {
               html += `<tr class="text-center">
@@ -186,6 +211,31 @@ async function auth() {
                       </tr>`;
                     })
                 $('tbody').html(html);
+                $(document).on("click", '.withdraw_tab_button', function(e){
+                  e.preventDefault();
+                  var b_type = '';
+                  $(".withdraw_tab_button").removeClass("active");
+                  $(this).addClass("active");
+                  if($(this).attr("type").trim() == "BANK_CARD")
+                  {
+                    b_type = "Bank";
+                  }
+                  else if($(this).attr("type").trim() == "PI_ADDRESS"){
+                    b_type = "Pi";
+                  }
+                  $.ajax({
+                    type: "POST",
+                    url: "/api/webapi/admin/recharge_get",
+                    data: {
+                      authtoken:auth_token,
+                      type:b_type
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                      show(response.datas3)
+                    }
+                  });
+                });
                 $('.btn-success').click(function (e) { 
                   e.preventDefault();
                   let id = $(this).attr('data');
@@ -237,9 +287,10 @@ async function auth() {
           }
           $.ajax({
             type: "POST",
-            url: "/api/webapi/admin/recharge",
+            url: "/api/webapi/admin/recharge_get",
             data: {
               authtoken:auth_token,
+              type:"Bank"
             },
             dataType: "json",
             success: function (response) {

@@ -1299,9 +1299,6 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
     let result2 = parseInt ((parseInt(total) * 80)/100);
     const [user_bank] = await connection.query('SELECT * FROM user_bank WHERE `phone` = ?', [phone]);
     const [withdraw] = await connection.query('SELECT * FROM withdraw WHERE `phone` = ? AND today = ?', [phone, checkTime]);
-    console.log(result2);
-    console.log(parseInt(us_money));
-    console.log(parseInt(add_money));
         if (withdraw.length < 3) {
             if (parseInt(us_money) - parseInt(add_money) >= 0) {
                 console.log(1);

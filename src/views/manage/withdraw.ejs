@@ -171,12 +171,6 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">withdrawals Requests</h3>
-            <button class="withdraw_tab_button active" id="inr_w_tab" type="BANK_CARD">
-              BANK CARD
-            </button>
-            <button class="withdraw_tab_button" id="pi_w_tab" type="PI_ADDRESS">
-              Pi ADDRESS
-            </button>
 
             <div class="card-tools">
               <div style="position: relative;float: left;">
@@ -362,29 +356,6 @@
                   });
                  
                 });
-                $(document).on("click", '.withdraw_tab_button', function(e){
-                  e.preventDefault();
-                  var b_type = '';
-                  if($(this).attr("type").trim() == "BANK_CARD")
-                  {
-                    b_type = "Bank";
-                  }
-                  else if($(this).attr("type").trim() == "PI_ADDRESS"){
-                    b_type = "Pi";
-                  }
-                  $.ajax({
-                    type: "POST",
-                    url: "/api/webapi/admin/recharge",
-                    data: {
-                      authtoken:auth_token,
-                      type:b_type
-                    },
-                    dataType: "json",
-                    success: function (response) {
-                      show(response.datas3)
-                    }
-                  });
-                });
               
                 $(document).on("click", '.delete-btn', function(e){
                   e.preventDefault();
@@ -415,7 +386,6 @@
                   url: "/api/webapi/admin/recharge",
                   data: {
                     authtoken:auth_token,
-                    type:"Bank"
                   },
                   dataType: "json",
                   success: function (response) {
