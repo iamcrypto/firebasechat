@@ -3,6 +3,7 @@ import winGoController from "./winGoController";
 import k5Controller from "./k5Controller";
 import k3Controller from "./k3Controller";
 import vipController from "./vipController.js";
+import paymentController from "./paymentController.js";
 import md5 from "md5";
 import "dotenv/config";
 import trxWingoController, {
@@ -69,6 +70,7 @@ const cronJobGame1p = (io) => {
           [],
         );
         io.emit("data-server-trx-wingo", { data: trxWingo , 'game': '3' });
+       // paymentController.addPIPaymentRequest_time_check()
     });
 
     cron.schedule('*/5 * * * *', async() => {
