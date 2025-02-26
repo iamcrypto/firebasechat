@@ -30,6 +30,11 @@
             <link rel="stylesheet" href="/assets/css/page-vip-950774ab.css" />
             <link rel="shortcut icon" href="/images/bitbug_favicon.ico" type="image/x-icon">
             <style>
+                .vip-content-recordVsrule-con
+                {
+                    text-align: center;
+                    height: 300px;
+                }
                 .span_open_close
                 {
                     display: flex;
@@ -5312,7 +5317,7 @@
     </svg>
 
     <div id="app">
-
+        <div data-v-647954c7="" class="ar-loading-view" style="--f13b4d11-currentFontFamily: 'Roboto', 'Inter', sans-serif; display: none;">
         <div data-v-647954c7="" class="loading-wrapper">
             <!-- <VanLoading /> -->
             <div data-v-647954c7="" class="loading-animat">
@@ -5819,8 +5824,8 @@
 
     </div>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel='stylesheet' href='https://rawgit.com/OwlCarousel2/OwlCarousel2/develop/dist/assets/owl.carousel.min.css'>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"
     integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -5829,6 +5834,7 @@
     <!-- <script src="/js/client.js"></script> -->
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <script src="https://momentjs.com/downloads/moment.js"></script>
+<script src='https://rawgit.com/OwlCarousel2/OwlCarousel2/develop/dist/owl.carousel.min.js'></script>
 
 
     <script id="rendered-js">
@@ -5940,7 +5946,7 @@
         let isHistoryLoading = true;
               $("#UserName").text(username);
               $.ajax({
-                type: "GET",
+                type: "POST",
                 url: "/api/webapi/xpgain_value",
                 data: {
                     authtoken:auth_token,
@@ -5999,18 +6005,25 @@
                       });
                 }
             });
-            const initVIPHistory = async () => {
+            function initVIPHistory()
+            {
                 $(".ar-loading-view").fadeIn();
+                console.log(auth_token);
                 try {
-                    const response = await axios({
-                        method: "POST",
+                    $.ajax({
+                        type: "POST",
                         url: "/api/vip/history",
-                        authtoken:auth_token,
-                    });
-    
+                        data: {
+                            authtoken:auth_token,
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                   
                     const vipHistory = response.data?.status ? response?.data?.list : null;
-    
+                    console.log(vipHistory);
+                    $(".ar-loading-view").fadeOut();
                     if (!vipHistory) {
+                        $(".vip-content-recordVsrule-con").html("No Data"); 
                         return;
                     }
     
@@ -6082,12 +6095,17 @@
                     if (vipHistory?.length !== 0) {
                         $(".vip-content-recordVsrule-con").html(vipHistoryHtml);
                     }
+                    else{
+                        $(".vip-content-recordVsrule-con").html("No Data"); 
+                    }
     
                     $(".ar-loading-view").fadeOut();
                     isHistoryLoading = false;
                     if (isInfoLoading === false) {
                         $(".ar-loading-view").fadeOut();
                     }
+                }
+                });
                 } catch (error) {
                     console.log(error);
                 }
@@ -6097,6 +6115,7 @@
             $(".ar-loading-view").fadeOut();
         $("#history_tab_btn").on("click", function () {
                 $("#history_tab_btn").addClass("active");
+                $(".vip-content-recordVsrule-con").html("");
                 $("#rules_tab_btn").removeClass("active");
                 initVIPHistory();
             });
