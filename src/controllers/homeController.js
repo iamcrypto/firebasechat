@@ -27,7 +27,6 @@ const rebatePage = async (req, res) => {
 
 const vipPage = async (req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
-    let auth = req.body.authtoken;
     return res.render("checkIn/vip.ejs", {  sandbox});
 }
 

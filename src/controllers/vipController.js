@@ -1,5 +1,6 @@
 import moment from "moment";
 import connection from "../config/connectDB.js";
+import md5 from "md5";
 
 import {
   REWARD_STATUS_TYPES_MAP,
@@ -265,6 +266,7 @@ const getMyVIPLevelInfo = async (req, res) => {
 
 const getVIPHistory = async (req, res) => {
   try {
+
     const authToken = req.body.authtoken;
 
     if (!authToken) {
@@ -273,10 +275,9 @@ const getVIPHistory = async (req, res) => {
 
     const [users] = await connection.execute(
       "SELECT `phone` FROM `users` WHERE `token` = ?",
-      [authToken],
+      [md5(authToken)],
     );
     const phone = users[0].phone;
-
     const [claimedRewards] = await connection.execute(
       "SELECT * FROM `claimed_rewards` WHERE `phone` = ? AND (type = ? OR type = ?)",
       [

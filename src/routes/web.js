@@ -317,7 +317,6 @@ const initWebRouter = (app) => {
   ); 
       router.post(
       "/api/vip/history",
-      middlewareController,
       vipController.getVIPHistory,
     );
   router.post(
