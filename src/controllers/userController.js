@@ -1344,7 +1344,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                             else if(w_type == 'pi')
                                 {
                                     try{
-                                    var pi_amount = parseInt(add_money) / parseInt(process.env.PI_EXCHANGE_RATE);
+                                    var pi_amount = parseFloat(parseFloat(add_money).toFixed(2) / parseFloat( process.env.PI_EXCHANGE_RATE).toFixed(2)).toFixed(2);
                                 
                                     const userUid = userid;
                                     const paymentData = {
