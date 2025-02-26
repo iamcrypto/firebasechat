@@ -70,7 +70,6 @@ const cronJobGame1p = (io) => {
           [],
         );
         io.emit("data-server-trx-wingo", { data: trxWingo , 'game': '3' });
-       // paymentController.addPIPaymentRequest_time_check()
     });
 
     cron.schedule('*/5 * * * *', async() => {

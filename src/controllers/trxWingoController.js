@@ -768,6 +768,9 @@ const addTrxWingo = async (game) => {
           },
         });
         //console.log(response.data.data);
+        if (response.data.data === undefined) {
+          throw new Error("Data is undefined");
+        }
         const NextBlock = response.data.data.map((item) => {
             return {
               id: item.number,
@@ -835,6 +838,7 @@ const addTrxWingo = async (game) => {
       "INSERT INTO trx_wingo_game SET period = ?, result = 0, game = ?, status = 0, block_id = 0, block_time = '', hash = '', time = ?",
       [NewGamePeriod, join, timeNow],
     );
+    
     // console.log("TRX WINGO GAME INSERT SUCCESSFULLY")
   } catch (error) {
     if (error?.response?.status === 403) {

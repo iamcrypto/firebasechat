@@ -6,6 +6,7 @@ import querystring from "querystring";
 import "dotenv/config";
 import md5 from "md5";
 const path = require('path');
+const date23 = require('date-and-time') 
 
 
 let timeNow = Date.now();
@@ -144,96 +145,6 @@ const addManualUPIPaymentRequest = async (req, res) => {
     }
 }
 
-const addPIPaymentRequest_time_check = async (req,res) => {
-    try {
-
-        console.log("fired");
-        const data = "req.body"
-        let auth = "DIxI7ToP5hsVO1J3Mkx05F9g5lddgDE5xwOsnLDaxHc";
-        let money = parseInt(10);
-        let utr = ("abcdg");
-        let trx = ("dkajha");
-        let wallet = ("dvnfkldfng");
-
-        const user = await getUserDataByAuthToken(md5(auth))
-
-        const pendingRechargeList = await rechargeTable.getRecordByPhoneAndStatus({ phone: user.phone, status: PaymentStatusMap.PENDING, type: PaymentMethodsMap.WOW_PAY })
-
-        if (pendingRechargeList.length !== 0) {
-            const deleteRechargeQueries = pendingRechargeList.map(recharge => {
-                return rechargeTable.cancelById(recharge.id)
-            });
-
-            await Promise.all(deleteRechargeQueries)
-        }
-
-        function formateT(params) {
-            let result = (params < 10) ? "0" + params : params;
-            return result;
-        }
-        
-        function timerJoin(params = '', addHours = 0) {
-            let date = '';
-            if (params) {
-                date = new Date(Number(params));
-            } else {
-                date = new Date();
-            }
-        
-            date.setHours(date.getHours() + addHours);
-        
-            let years = formateT(date.getFullYear());
-            let months = formateT(date.getMonth() + 1);
-            let days = formateT(date.getDate());
-        
-            let hours = date.getHours() % 12;
-            hours = hours === 0 ? 12 : hours;
-            let ampm = date.getHours() < 12 ? "AM" : "PM";
-        
-            let minutes = formateT(date.getMinutes());
-            let seconds = formateT(date.getSeconds());
-        
-            return years + '-' + months + '-' + days + ' ' + hours + ':' + minutes + ':' + seconds + ' ' + ampm;
-        }
-        
-
-        const orderId = getRechargeOrderId()
-
-        let dates = new Date().getTime();
-        let checkTime = timerJoin(dates);
-        const newRecharge = {
-            orderId: orderId,
-            transactionId: trx,
-            utr: utr,
-            phone: user.phone,
-            money: money,
-            type: PaymentMethodsMap.WOW_PAY,
-            status: 1,
-            today: rechargeTable.getCurrentTimeForTodayField(),
-            url: "NULL",
-            time: timeNow,
-            wallet_address:wallet
-        }
-
-        const recharge = await rechargeTable.create(newRecharge)
-        await connection.execute(
-            "UPDATE users SET  money = money + ?, total_money = total_money + ? WHERE phone = ?",
-            [
-                money,
-                money,
-                user.phone
-            ],
-          );
-
-          let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
-          await connection.query(sql_noti, [user.id, "Recharge of Amount "+money+" is Successfull. ", '0', "Recharge"]);
-
-        return "sucess";
-    } catch (error) {
-        console.log(error)
-        return "error";
-    }
-}
 
 const addPIPaymentRequest = async (req, res) => {
     try {
@@ -261,6 +172,8 @@ const addPIPaymentRequest = async (req, res) => {
             return result;
         }
         
+        let time = new Date().getTime();
+
         function timerJoin(params = '', addHours = 0) {
             let date = '';
             if (params) {
@@ -284,12 +197,10 @@ const addPIPaymentRequest = async (req, res) => {
         
             return years + '-' + months + '-' + days + ' ' + hours + ':' + minutes + ':' + seconds + ' ' + ampm;
         }
-        
 
+        let timeNow234= Date.now();
         const orderId = getRechargeOrderId()
 
-        let dates = new Date().getTime();
-        let checkTime = timerJoin(dates);
         const newRecharge = {
             orderId: orderId,
             transactionId: trx,
@@ -300,7 +211,7 @@ const addPIPaymentRequest = async (req, res) => {
             status: 1,
             today: rechargeTable.getCurrentTimeForTodayField(),
             url: "NULL",
-            time: timeNow,
+            time: timeNow234,
             wallet_address:wallet
         }
 
@@ -897,5 +808,4 @@ module.exports = {
     addPIPaymentRequest,
     addManualUSDTPaymentRequest,
     initiateManualUSDTPayment,
-    addPIPaymentRequest_time_check,
 }

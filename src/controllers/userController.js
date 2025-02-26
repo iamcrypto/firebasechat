@@ -1299,12 +1299,20 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
     let result2 = parseInt ((parseInt(total) * 80)/100);
     const [user_bank] = await connection.query('SELECT * FROM user_bank WHERE `phone` = ?', [phone]);
     const [withdraw] = await connection.query('SELECT * FROM withdraw WHERE `phone` = ? AND today = ?', [phone, checkTime]);
-    
+    console.log(result2);
+    console.log(parseInt(us_money));
+    console.log(parseInt(add_money));
         if (withdraw.length < 3) {
             if (parseInt(us_money) - parseInt(add_money) >= 0) {
+                console.log(1);
+                console.log(total2);
+                console.log(result2);
                 if (total2 >= result2) {
+                    console.log(2);
                     if (total - total2 >= 0) {
+                        console.log(3);
                         if (result == 0) {
+                            console.log(4);
                             message = 'The total bet is not enough to fulfill the request';
                         }
                         else{
@@ -1365,6 +1373,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                         time = ?,
                         type = ?,
                         with_type = ?`;
+                        
                             await connection.execute(sql, [id_time + '' + id_order, phone, pi_amount, txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
                             await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [pi_amount, phone]);
                             let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
