@@ -753,13 +753,13 @@ const InvitationBonusList = [
     amountOfRechargePerPerson: 2111,
     bonusAmount: 299999,
   },
-  {
-    id: 13,
-    numberOfInvitedMembers: 10000,
-    numberOfDeposits: 10000,
-    amountOfRechargePerPerson: 2555,
-    bonusAmount: 999999,
-  },
+  // {
+  //   id: 13,
+  //   numberOfInvitedMembers: 10000,
+  //   numberOfDeposits: 10000,
+  //   amountOfRechargePerPerson: 2555,
+  //   bonusAmount: 999999,
+  // },
 ];
 
 const getInvitationBonus = async (req, res) => {
@@ -840,7 +840,7 @@ const getInvitationBonus = async (req, res) => {
 const claimInvitationBonus = async (req, res) => {
   try {
     const authToken = req.body.authtoken;
-    const invitationBonusId = req.body.id;
+    const invitationBonusId = req.body.claim_id;
 
     const [userRow] = await connection.execute(
       "SELECT `code`, `invite`, `phone` FROM `users` WHERE `token` = ? AND `veri` = 1",
@@ -903,7 +903,7 @@ const claimInvitationBonus = async (req, res) => {
     });
 
     const claimableBonusData = invitationBonusData.filter(
-      (item) => item.isFinished && item.id === invitationBonusId,
+      (item) => item.isFinished && item.id === parseInt(invitationBonusId),
     );
 
     if (claimableBonusData.length === 0) {
@@ -914,10 +914,10 @@ const claimInvitationBonus = async (req, res) => {
     }
 
     const claimedRewardsData = invitationBonusData.find(
-      (item) => item.isClaimed && item.id === invitationBonusId,
+      (item) => item.isClaimed && item.id === parseInt(invitationBonusId),
     );
 
-    if (claimedRewardsData?.id === invitationBonusId) {
+    if (claimedRewardsData?.id === parseInt(invitationBonusId)) {
       return res.status(200).json({
         status: false,
         message: "Bonus already claimed",
@@ -925,7 +925,7 @@ const claimInvitationBonus = async (req, res) => {
     }
 
     const claimedBonusData = claimableBonusData?.find(
-      (item) => item.id === invitationBonusId,
+      (item) => item.id === parseInt(invitationBonusId),
     );
 
     const time = moment().valueOf();
@@ -938,7 +938,7 @@ const claimInvitationBonus = async (req, res) => {
     await connection.execute(
       "INSERT INTO `claimed_rewards` (`reward_id`, `type`, `phone`, `amount`, `status`, `time`) VALUES (?, ?, ?, ?, ?, ?)",
       [
-        invitationBonusId,
+        parseInt(invitationBonusId),
         REWARD_TYPES_MAP.INVITATION_BONUS,
         user.phone,
         claimedBonusData.bonusAmount,
@@ -976,6 +976,7 @@ const getInvitedMembers = async (req, res) => {
     );
 
     for (let index = 0; index < invitedMembers.length; index++) {
+      
       const invitedMember = invitedMembers[index];
 
       const [[row_2]] = await connection.execute(
