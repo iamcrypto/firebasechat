@@ -1116,7 +1116,7 @@ function tdOnclick(e) {
 
 
 const Pi = window.Pi;
-Pi.init({ version: "2.0", sandbox:false });
+Pi.init({ version: "2.0", sandbox:true });
 async function auth() {
   try {
       
@@ -1875,13 +1875,13 @@ async function auth() {
                   var myModal_result = document.getElementById("myModal_result");
                   var lottery_result = document.getElementById("lottery_result");
             var myModal_result_Period = document.getElementById("myModal_result_Period");
-                  if (list_orders[0].get == 0) {
-                      myModalheader.innerHTML = "Try Again";
-                      myModal_result.innerHTML = "LOSS :" + list_orders[0].money;
-                  } else {
-                      myModalheader.innerHTML = "congratulations";
-                      myModal_result.innerHTML = "WIN :" + list_orders[0].get;
-                  }
+            if (firstGame.get == 0) {
+              myModalheader.innerHTML = "Try Again";
+              myModal_result.innerHTML = "LOSS :" + firstGame.money;
+          } else {
+              myModalheader.innerHTML = "congratulations";
+              myModal_result.innerHTML = "WIN :" + firstGame.get;
+          }
                   myModal_result_Period.innerHTML = "Period : 10min " + firstGame.stage;
                   
                   
