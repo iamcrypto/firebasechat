@@ -177,6 +177,11 @@ const safePage = async (req, res) => {
     return res.render("member/safe.ejs",{ sandbox});
 }
 
+const rechargeAwardCollectionRecord = async (req, res) => {
+    var sandbox = process.env.SANDBOX_MODE;
+    return res.render("checkIn/rechargeAwardCollectionRecord.ejs",{ sandbox});
+  };
+
 const languegePage = async (req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
     return res.render("member/language.ejs", {sandbox});
@@ -347,6 +352,7 @@ module.exports = {
     checkInPage,
     d5chat,
     invibonusPage,
+    rechargeAwardCollectionRecord,
     rebatePage,
     jackpotPage,
     k3chat,

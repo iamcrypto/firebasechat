@@ -11,6 +11,7 @@ import k3Controller from '../controllers/k3Controller';
 import paymentController from '../controllers/paymentController';
 import trxWingoController from "../controllers/trxWingoController.js";
 import vipController from "../controllers/vipController.js";
+import promotionController from "../controllers/promotionController.js";
 
 let router = express.Router();
 
@@ -324,6 +325,25 @@ const initWebRouter = (app) => {
     
     trxWingoController.GetMyEmerdList,
   ); // register
+
+  router.get(
+    "/dailytask/record",
+    homeController.rechargeAwardCollectionRecord,
+  );
+
+  router.post(
+    "/api/activity/daily_recharge_bonus/record",
+    
+    promotionController.dailyRechargeRewordRecord,
+  );
+  router.post(
+    "/api/activity/daily_recharge_bonus",
+    promotionController.getDailyRechargeReword,
+  );
+  router.post(
+    "/api/activity/daily_recharge_bonus/claim",
+    promotionController.claimDailyRechargeReword,
+  );
 
     return app.use('/', router);
 }

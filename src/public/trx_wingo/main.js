@@ -6,6 +6,8 @@ const getGameType = () => {
   return urlParams.get("game_type") || "1";
 };
 
+let currentDisplay = "";
+
 let GAME_TYPE_ID = getGameType();
           let GAME_NAME = GAME_TYPE_ID === "1" ? "trx_wingo" : `trx_wingo${GAME_TYPE_ID}`;
           
@@ -673,7 +675,6 @@ async function auth() {
           var pageno = 0;
           var limit = 10;
           var page = 1;
-          let currentDisplay = "";
           initGameLogics({ GAME_TYPE_ID, GAME_NAME, My_Bets_Pages, Game_History_Pages });
  
           

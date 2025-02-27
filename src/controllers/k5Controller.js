@@ -366,7 +366,7 @@ const add5D = async(game) => {
         let timeNow = Date.now();
         let [k5D] = await connection.query(`SELECT period FROM d5 WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `);
         const [setting] = await connection.query('SELECT * FROM `admin` ');
-        let period = k5D[0].period;
+       let period = k5D[0].period;
 
         let gameRepresentationId = GameRepresentationIds.G5D[game];
         let NewGamePeriod = generatePeriod(gameRepresentationId);
@@ -397,7 +397,6 @@ const add5D = async(game) => {
         }
         const sql = `INSERT INTO d5 SET period = ?, result = ?, game = ?, status = ?, time = ?`;
         await connection.execute(sql, [NewGamePeriod, 0, game, 0, timeNow]);
-
         if (game == 1) join = 'k5d';
         if (game == 3) join = 'k5d3';
         if (game == 5) join = 'k5d5';
