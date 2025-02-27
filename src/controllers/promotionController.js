@@ -907,7 +907,7 @@ const claimInvitationBonus = async (req, res) => {
     );
 
     if (claimableBonusData.length === 0) {
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         message: "You does not meet the requirements to claim this reword!",
       });
@@ -918,7 +918,7 @@ const claimInvitationBonus = async (req, res) => {
     );
 
     if (claimedRewardsData?.id === invitationBonusId) {
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         message: "Bonus already claimed",
       });

@@ -150,6 +150,69 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="/js/client.js"></script>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://momentjs.com/downloads/moment.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+
+  <script>
+    const Pi = window.Pi;
+    Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
+    async function auth() {
+     try {
+         
+         const scopes = ['username', 'payments', 'wallet_address'];
+         function onIncompletePaymentFound(payment) {
+             console.log("incomplete Transaction");
+         }; 
+    
+         Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+             var username = auth.user.username;
+             var password = auth.user.uid;
+             var auth_token = auth.accessToken;
+             function formatIndianNumber(num) {
+                let formattedNum = new Intl.NumberFormat("en-IN", {
+                   maximumFractionDigits: 2,
+                   minimumFractionDigits: 2,
+                }).format(num)
+                return formattedNum
+             }
+       
+             const initInvitationRecord = async () => {
+                try {
+                   const response = await axios.post("/api/activity/invitation/record",{authtoken:auth_token })
+                   console.log(response);
+                   if (response.data.status === true) {
+                      const data = response.data
+                      const list = data.data
+                      const html = list
+                         .map(item => {
+                            return `
+                               <div data-v-67e25db3="" class="item">
+                                   <div data-v-67e25db3="" class="head"><span data-v-67e25db3="" class="name">${item.username}</span> <span data-v-67e25db3="" class="uid">UID:${item.uid}</span></div>
+                                   <div data-v-67e25db3="" class="line">Registration time<span data-v-67e25db3="" class="time">${item.create_time}</span></div>
+                                   <div data-v-67e25db3="" class="line">Deposit amount<span data-v-67e25db3="" class="amount">₹${formatIndianNumber(item.amount)}</span></div>
+                               </div>`
+                         })
+                         .join("")
+       
+                      $(".van-list").html(html)
+                   }
+                } catch (error) {
+                   console.log(error)
+                }
+             }
+             initInvitationRecord()
+    
+      
+            });
+       }
+    catch (err) {
+       alert(err);
+    }
+    }
+    auth();
+    </script>
 </body>
 
 </html>

@@ -332,8 +332,21 @@ const initWebRouter = (app) => {
   );
 
   router.post(
+    "/api/activity/invitation_bonus",
+    promotionController.getInvitationBonus,
+  );
+  router.post(
+    "/api/activity/invitation_bonus/claim",
+    promotionController.claimInvitationBonus,
+  );
+  router.post(
+    "/api/activity/invitation/record",
+    promotionController.getInvitedMembers,
+  );
+
+  router.post(
     "/api/activity/daily_recharge_bonus/record",
-    
+
     promotionController.dailyRechargeRewordRecord,
   );
   router.post(
