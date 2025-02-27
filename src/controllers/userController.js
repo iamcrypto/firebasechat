@@ -1344,11 +1344,11 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                             else if(w_type == 'pi')
                                 {
                                     try{
-                                    var pi_amount = parseFloat(parseFloat(add_money).toFixed(2) / parseFloat( process.env.PI_EXCHANGE_RATE).toFixed(2)).toFixed(2);
+                                    var pi_amount = parseFloat(parseFloat(add_money).toFixed(4) / parseFloat( process.env.PI_EXCHANGE_RATE).toFixed(4)).toFixed(4);
                                 
                                     const userUid = userid;
                                     const paymentData = {
-                                        amount: parseInt(pi_amount),
+                                        amount: parseFloat(pi_amount).toFixed(4),
                                         memo: "payment withdraw for cloudyscape app", // this is just an example
                                         metadata: {productId: "automate withdraw"},
                                         uid: userUid
@@ -1371,10 +1371,10 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                         type = ?,
                         with_type = ?`;
                         
-                            await connection.execute(sql, [id_time + '' + id_order, phone, pi_amount, txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
-                            await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [pi_amount, phone]);
+                            await connection.execute(sql, [id_time + '' + id_order, phone, parseFloat(pi_amount).toFixed(4).toString(), txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
+                            await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [parseFloat(pi_amount).toFixed(4).toString(), phone]);
                             let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
-                            let withdrdesc = "Your withdrawal of sum "+pi_amount+" Has been processed at "+completedPayment.created_at.toString()+" And transaction reference is "+ completedPayment.transaction._link.toString() ;
+                            let withdrdesc = "Your withdrawal of sum "+parseFloat(pi_amount).toFixed(4).toString()+" Has been processed at "+completedPayment.created_at.toString()+" And transaction reference is "+ completedPayment.transaction._link.toString() ;
                             await connection.query(sql_noti1, [parseInt(db_uid), withdrdesc , "0", "Withdraw"]);
                                 const [user_bank_pi] = await connection.query('SELECT * FROM user_bank WHERE phone = ?  AND name_bank = ? ', [phone, 'Pi_pay' ]);
                                     if ( user_bank_pi.length == 0) {
