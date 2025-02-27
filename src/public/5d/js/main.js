@@ -1439,6 +1439,7 @@ socket.on("data-server-5d", function (msg) {
             let Result = msg.data[1];
             socket_call = "called";
             let check = $('#number_result').attr('data-select');
+            callAjaxMeJoin();
             if (check == 'all') {
                 reload_money();
                 callListOrder();

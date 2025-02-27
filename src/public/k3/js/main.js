@@ -1509,7 +1509,6 @@ async function auth() {
                         let data = response.data.gameslist;
                         $("#number_result").text("1/" + response.page);
                         var modal = document.getElementById("myModal_k3");
-                        modal.style.display = "none";
                         // Set the value of firstGame to the first game in the gameslist
                         firstGame = data[0];
                         console.log(firstGame);
@@ -1672,6 +1671,7 @@ async function auth() {
                         socket_call = "called";
                         let check = $('#number_result').attr('data-select');
                         console.log(check);
+                        callAjaxMeJoin();
                         if (check == 'all') {
                             reload_money();
                             callListOrder();
