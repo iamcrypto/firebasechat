@@ -1429,62 +1429,64 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                          
                         }
                         }
-                            else if(w_type == 'pi')
-                                {
-                                    try{
-                                    var pi_amount = parseInt(add_money) / parseInt(process.env.PI_EXCHANGE_RATE);
-                                
-                                    const userUid = userid;
-                                    const paymentData = {
-                                        amount: parseInt(pi_amount),
-                                        memo: "payment withdraw for cloudyscape app", // this is just an example
-                                        metadata: {productId: "automate withdraw"},
-                                        uid: userUid
-                                    }
-                                    //const canId = await pi.cancelPayment("wSXCxk8lWJwn914Vel0WOGRAbpYL");
-                                    const paymentId = await pi.createPayment(paymentData);
-                                    const txid = await pi.submitPayment(paymentId);
-                                    const completedPayment = await pi.completePayment(paymentId, txid);
-                                    const sql = `INSERT INTO withdraw SET 
-                        id_order = ?,
-                        phone = ?,
-                        money = ?,
-                        stk = ?,
-                        name_bank = ?,
-                        ifsc = ?,
-                        name_user = ?,
-                        status = ?,
-                        today = ?,
-                        time = ?,
-                        type = ?,
-                        with_type = ?`;
-                            await connection.execute(sql, [id_time + '' + id_order, phone, pi_amount, txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
-                            await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [pi_amount, phone]);
-                            let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
-                            let withdrdesc = "Your withdrawal of sum "+pi_amount+" Has been processed at "+completedPayment.created_at.toString()+" And transaction reference is "+ completedPayment.transaction._link.toString() ;
-                            await connection.query(sql_noti1, [parseInt(db_uid), withdrdesc , "0", "Withdraw"]);
-                                const [user_bank_pi] = await connection.query('SELECT * FROM user_bank WHERE phone = ?  AND name_bank = ? ', [phone, 'Pi_pay' ]);
-                                    if ( user_bank_pi.length == 0) {
-                                        const sql = `INSERT INTO user_bank SET 
-                                        phone = ?,
-                                        name_bank = ?,
-                                        name_user = ?,
-                                        stk = ?,
-                                        email = ?,
-                                        sdt = ?,
-                                        tinh = ?,
-                                        
-                                        time = ?`;
-                                        await connection.execute(sql, [phone, 'Pi_pay' , "", completedPayment.to_address.toString(), "", completedPayment.user_uid.toString(), "", checkTime]);
-                                    }
-                                    message = 'Withdrawal successful';
+                        else if(w_type == 'pi')
+                            {
+                                try{
+                                var pi_amount = parseFloat(parseFloat(add_money).toFixed(4) / parseFloat( process.env.PI_EXCHANGE_RATE).toFixed(4)).toFixed(4);
+                            
+                                const userUid = userid;
+                                const paymentData = {
+                                    amount: parseFloat(pi_amount).toFixed(4),
+                                    memo: "payment withdraw for cloudyscape app", // this is just an example
+                                    metadata: {productId: "automate withdraw"},
+                                    uid: userUid
                                 }
-                                catch(e)
-                                {
-                                    //message = 'Too Many Payments. Please try again later'; 
-                                    message = e.toString();
+                                //const canId = await pi.cancelPayment("wSXCxk8lWJwn914Vel0WOGRAbpYL");
+                                const paymentId = await pi.createPayment(paymentData);
+                                const txid = await pi.submitPayment(paymentId);
+                                const completedPayment = await pi.completePayment(paymentId, txid);
+                                var block_link = completedPayment.transaction._link.replace("https://api.testnet.minepi.com/",process.env.BLOCK_CHAIN_LINK);
+                                const sql = `INSERT INTO withdraw SET 
+                    id_order = ?,
+                    phone = ?,
+                    money = ?,
+                    stk = ?,
+                    name_bank = ?,
+                    ifsc = ?,
+                    name_user = ?,
+                    status = ?,
+                    today = ?,
+                    time = ?,
+                    type = ?,
+                    with_type = ?`;
+                    
+                        await connection.execute(sql, [id_time + '' + id_order, phone, parseFloat(pi_amount).toFixed(4).toString(), txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
+                        await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [parseFloat(pi_amount).toFixed(4).toString(), phone]);
+                        let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
+                        let withdrdesc = "<span>Your withdrawal of sum "+parseFloat(pi_amount).toFixed(4).toString()+" Has been processed at "+completedPayment.created_at.toString()+" And transaction reference is <a href="+block_link+" target='_blank'>Blockchain Transaction</a></span>" ;
+                        await connection.query(sql_noti1, [parseInt(db_uid), withdrdesc , "0", "Withdraw"]);
+                            const [user_bank_pi] = await connection.query('SELECT * FROM user_bank WHERE phone = ?  AND name_bank = ? ', [phone, 'Pi_pay' ]);
+                                if ( user_bank_pi.length == 0) {
+                                    const sql = `INSERT INTO user_bank SET 
+                                    phone = ?,
+                                    name_bank = ?,
+                                    name_user = ?,
+                                    stk = ?,
+                                    email = ?,
+                                    sdt = ?,
+                                    tinh = ?,
+                                    
+                                    time = ?`;
+                                    await connection.execute(sql, [phone, 'Pi_pay' , "", completedPayment.to_address.toString(), "", completedPayment.user_uid.toString(), "", checkTime]);
                                 }
+                                message = 'Withdrawal successful';
                             }
+                            catch(e)
+                            {
+                                //message = 'Too Many Payments. Please try again later'; 
+                                message = e.toString();
+                            }
+                    }        
                     }
                 } else {
                     message = 'The total bet is not enough to fulfill the request';
