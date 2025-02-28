@@ -1294,20 +1294,31 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
     });
     total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d) + parseInt(total_trx);
     let result = 0;
+    console.log("total wingo betting");
+    console.log(total_w);
+    console.log("total 5d betting");
+    console.log(total_k3);
+    console.log("total k3 betting");
+    console.log(total_5d);
+    console.log("total trx betting");
+    console.log(total_trx);
     if (total - total2 > 0) result = total - total2;
     result = Math.max(result, 0);
     let result2 = parseInt ((parseInt(total) * 80)/100);
+    console.log("total betting amount");
+    console.log(total2);
+    console.log("total recharge amount");
+    console.log(total);
+    console.log("80% recharge amount");
+    console.log(result2);
+    console.log("balanced recharge amount");
+    console.log(result);
     const [user_bank] = await connection.query('SELECT * FROM user_bank WHERE `phone` = ?', [phone]);
     const [withdraw] = await connection.query('SELECT * FROM withdraw WHERE `phone` = ? AND today = ?', [phone, checkTime]);
         if (withdraw.length < 3) {
             if (parseInt(us_money) - parseInt(add_money) >= 0) {
-                console.log(1);
-                console.log(total2);
-                console.log(result2);
                 if (total2 >= result2) {
-                    console.log(2);
                     if (total - total2 >= 0) {
-                        console.log(3);
                         if (result == 0) {
                             console.log(4);
                             message = 'The total bet is not enough to fulfill the request';
@@ -1375,7 +1386,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                             await connection.execute(sql, [id_time + '' + id_order, phone, parseFloat(pi_amount).toFixed(4).toString(), txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
                             await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [parseFloat(pi_amount).toFixed(4).toString(), phone]);
                             let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
-                            let withdrdesc = "<span>Your withdrawal of sum "+parseFloat(pi_amount).toFixed(4).toString()+" Has been processed at "+completedPayment.created_at.toString()+" And transaction reference is <a href="+block_link+" target='_blank'>Blockchain Transaction</a></span>" ;
+                            let withdrdesc = "<span>Your withdrawal of sum "+parseFloat(pi_amount).toFixed(4).toString()+" Has been processed at "+completedPayment.created_at.toString()+" And transaction reference is <a href="+block_link+" target='_blank' style='color:rgb(89, 176, 234);'>Blockchain Transaction</a></span>" ;
                             await connection.query(sql_noti1, [parseInt(db_uid), withdrdesc , "0", "Withdraw"]);
                                 const [user_bank_pi] = await connection.query('SELECT * FROM user_bank WHERE phone = ?  AND name_bank = ? ', [phone, 'Pi_pay' ]);
                                     if ( user_bank_pi.length == 0) {
@@ -1463,7 +1474,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                         await connection.execute(sql, [id_time + '' + id_order, phone, parseFloat(pi_amount).toFixed(4).toString(), txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
                         await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [parseFloat(pi_amount).toFixed(4).toString(), phone]);
                         let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
-                        let withdrdesc = "<span>Your withdrawal of sum "+parseFloat(pi_amount).toFixed(4).toString()+" Has been processed at "+completedPayment.created_at.toString()+" And transaction reference is <a href="+block_link+" target='_blank'>Blockchain Transaction</a></span>" ;
+                        let withdrdesc = "<span>Your withdrawal of sum "+parseFloat(pi_amount).toFixed(4).toString()+" Has been processed at "+completedPayment.created_at.toString()+" And transaction reference is <a href="+block_link+" target='_blank' style='color:rgb(89, 176, 234);'>Blockchain Transaction</a></span>" ;
                         await connection.query(sql_noti1, [parseInt(db_uid), withdrdesc , "0", "Withdraw"]);
                             const [user_bank_pi] = await connection.query('SELECT * FROM user_bank WHERE phone = ?  AND name_bank = ? ', [phone, 'Pi_pay' ]);
                                 if ( user_bank_pi.length == 0) {

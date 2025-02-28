@@ -393,7 +393,7 @@ const add5D = async(game) => {
                 newArr = newArr.slice(0, -1);
             }
             result = arr[0];
-            await connection.execute(`UPDATE d5 SET result = ?,status = ? WHERE period = ? AND game = ${game}`, [result, 1, period]);
+           await connection.execute(`UPDATE d5 SET result = ?,status = ? WHERE period = ? AND game = ${game}`, [result, 1, period]);
         }
         const sql = `INSERT INTO d5 SET period = ?, result = ?, game = ?, status = ?, time = ?`;
         await connection.execute(sql, [NewGamePeriod, 0, game, 0, timeNow]);
@@ -403,6 +403,7 @@ const add5D = async(game) => {
         if (game == 10) join = 'k5d10'; 
 
         await connection.execute(`UPDATE admin SET ${join} = ?`, [newArr]);
+        //console.log("inserted")
     } catch (error) {
         if (error) {
             console.log(error);
