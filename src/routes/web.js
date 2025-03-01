@@ -219,7 +219,33 @@ const initWebRouter = (app) => {
     router.get('/admin/manager/k3',  adminController.adminPageK3); // get info account
 
 
-    router.get('/admin/manager/members',  adminController.membersPage); // get info account
+    router.get(
+      "/attendance/record",
+      homeController.attendanceRecordPage,
+    );
+    router.get(
+      "/attendance/rules",
+      homeController.attendanceRulesPage,
+    );
+    router.get(
+      "/attendance",
+      homeController.attendancePage,
+    );
+    router.post(
+      "/api/activity/attendance_bonus",
+      promotionController.getAttendanceBonus,
+    );
+    router.post(
+      "/api/activity/attendance_bonus/claim",
+      promotionController.claimAttendanceBonus,
+    );
+    router.post(
+      "/api/activity/attendance/record",
+      promotionController.getAttendanceBonusRecord,
+    );
+
+    router.get('/admin/manager/members',  adminController.membersPage);
+    router.post('/admin/manager/makecolloborator',  adminController.makecolloborator); // get info account
     router.get('/admin/manager/adminChatPage',  adminController.adminChatPage);
     router.get('/admin/manager/k3chatPage',  adminController.k3chatPage);
     router.get('/admin/manager/d5chatPage',  adminController.d5chatPage);

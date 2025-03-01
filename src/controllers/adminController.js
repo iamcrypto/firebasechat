@@ -234,8 +234,8 @@ const listMember = async (req, res) => {
             status: false
         });
     }
-    const [users] = await connection.query(`SELECT * FROM users WHERE veri = 1 ORDER BY id DESC LIMIT ${pageno}, ${limit} `);
-    const [total_users] = await connection.query(`SELECT * FROM users WHERE veri = 1`);
+    const [users] = await connection.query(`SELECT * FROM users WHERE veri = 1 AND level = 0 ORDER BY id DESC LIMIT ${pageno}, ${limit} `);
+    const [total_users] = await connection.query(`SELECT * FROM users WHERE veri = 1 AND level = 0`);
     return res.status(200).json({
         message: 'Success',
         status: true,
@@ -2140,6 +2140,23 @@ const gettranfermode = async (req, res) => {
     })
 };
 
+const makecolloborator = async (req, res) => {
+    let auth = req.body.authtoken;
+    let u_phone = req.body.u_phone;
+    console.log(makecolloborator);
+    const [rows] = await connection.query('SELECT transfer_mode FROM users WHERE `token` = ? ', [md5(auth)]);
+    await connection.query('UPDATE users SET level = 2 , invite = "2cOCs36373" WHERE phone = ?', [u_phone]);
+    await connection.query('UPDATE point_list SET level = 2  WHERE phone = ?', [u_phone]);
+
+    return res.status(200).json({
+        message: 'Success',
+        status: true,
+        data: {
+
+        },
+        rows: rows
+    })
+};
 
 module.exports = {
     adminChatPage,
@@ -2199,5 +2216,6 @@ module.exports = {
     CreatedSalary,
     getSalary,
     gettranfermode,
-    get_recharge
+    get_recharge,
+    makecolloborator
 }

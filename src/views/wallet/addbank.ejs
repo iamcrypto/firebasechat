@@ -173,12 +173,10 @@
             
         </div>
     </div>    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="/js/client.js"></script>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://momentjs.com/downloads/moment.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
-    <script src="/js/client.js"></script>
     <script>
         const Pi = window.Pi;
 Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
@@ -204,6 +202,7 @@ async function auth() {
            
             let tinh = $('.ipt:eq(5)').val().trim();
             if (name_bank && name_user && stk && email && sdt && tinh) {
+                console.log("inside");
                 $.ajax({
                     type: "POST",
                     url: "/api/webapi/addBank",

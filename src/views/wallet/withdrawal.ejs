@@ -1075,6 +1075,7 @@ async function auth() {
                     }
                 });
             } else if (!money) {
+                $(".Loading").fadeOut(0);
                 $(this).addClass('block-click');
                 alertMess('Please Enter Complete Information', $(this));
             } else {

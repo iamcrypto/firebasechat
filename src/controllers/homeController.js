@@ -55,6 +55,22 @@ const checkDes = async (req, res) => {
     return res.render("checkIn/checkDes.ejs", {sandbox});
 }
 
+
+const attendancePage = async (req, res) => {
+    var sandbox = process.env.SANDBOX_MODE;
+    return res.render("checkIn/attendance.ejs", {sandbox});
+  };
+
+  const attendanceRecordPage = async (req, res) => {
+    var sandbox = process.env.SANDBOX_MODE;
+    return res.render("checkIn/attendanceRecord.ejs", {sandbox});
+  };
+  const attendanceRulesPage = async (req, res) => {
+    var sandbox = process.env.SANDBOX_MODE;
+    return res.render("checkIn/attendanceRules.ejs", {sandbox});
+  };
+
+
 const checkRecord = async (req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
     return res.render("checkIn/checkRecord.ejs", {sandbox});
@@ -346,6 +362,9 @@ const getSalaryRecord = async (req, res) => {
     })
 }
 module.exports = {
+    attendancePage,
+    attendanceRecordPage,
+    attendanceRulesPage,
     avatarpage,
     languegePage,
     homePage,

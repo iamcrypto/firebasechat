@@ -1342,7 +1342,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                         type = ?,
                         with_type = ?`;
                             await connection.execute(sql, [id_time + '' + id_order, phone, add_money, infoBank.stk, infoBank.name_bank, infoBank.email, infoBank.name_user, 0, checkTime, dates,'manual',w_type]);
-                            await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [add_money, phone]);
+                            await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [parseInt(add_money), phone]);
                             let withdrdesc = "Amount of "+ add_money + " have been transferred successfully.";
                             let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
                             await connection.query(sql_noti1, [parseInt(db_uid), withdrdesc , "0", "Withdraw"]);
@@ -1383,8 +1383,8 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                         type = ?,
                         with_type = ?`;
                         
-                            await connection.execute(sql, [id_time + '' + id_order, phone, parseFloat(pi_amount).toFixed(4).toString(), txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
-                            await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [parseFloat(pi_amount).toFixed(4).toString(), phone]);
+                            await connection.execute(sql, [id_time + '' + id_order, phone, parseFloat(add_money).toFixed(4).toString(), txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
+                            await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [parseFloat(add_money).toFixed(4).toString(), phone]);
                             let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
                             let withdrdesc = "<span>Your withdrawal of sum "+parseFloat(pi_amount).toFixed(4).toString()+" Has been processed at "+completedPayment.created_at.toString()+" And transaction reference is <a href="+block_link+" target='_blank' style='color:rgb(89, 176, 234);'>Blockchain Transaction</a></span>" ;
                             await connection.query(sql_noti1, [parseInt(db_uid), withdrdesc , "0", "Withdraw"]);
@@ -1471,8 +1471,8 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                     type = ?,
                     with_type = ?`;
                     
-                        await connection.execute(sql, [id_time + '' + id_order, phone, parseFloat(pi_amount).toFixed(4).toString(), txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
-                        await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [parseFloat(pi_amount).toFixed(4).toString(), phone]);
+                        await connection.execute(sql, [id_time + '' + id_order, phone, parseFloat(add_money).toFixed(4).toString(), txid, paymentId, completedPayment.transaction._link, "", completedPayment.transaction.verified, checkTime, dates,'manual',w_type]);
+                        await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [parseFloat(add_money).toFixed(4).toString(), phone]);
                         let sql_noti1 = "INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?";
                         let withdrdesc = "<span>Your withdrawal of sum "+parseFloat(pi_amount).toFixed(4).toString()+" Has been processed at "+completedPayment.created_at.toString()+" And transaction reference is <a href="+block_link+" target='_blank' style='color:rgb(89, 176, 234);'>Blockchain Transaction</a></span>" ;
                         await connection.query(sql_noti1, [parseInt(db_uid), withdrdesc , "0", "Withdraw"]);
