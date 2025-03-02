@@ -372,12 +372,38 @@ const initWebRouter = (app) => {
 
   router.post(
     "/api/activity/daily_recharge_bonus/record",
-
     promotionController.dailyRechargeRewordRecord,
   );
   router.post(
+    "/api/activity/daily_betting_bonus/record",
+    promotionController.dailyBetttingRewordRecord,
+  );
+
+  router.post(
+    "/api/activity/weekly_betting_bonus/record",
+    promotionController.weeklyBetttingRewordRecord,
+  );
+
+  router.post(
     "/api/activity/daily_recharge_bonus",
     promotionController.getDailyRechargeReword,
+  );
+  router.post(
+    "/api/activity/daily_betting_bonus",
+    promotionController.getDailyBettingeReword,
+  );
+  router.post(
+    "/api/activity/weekly_betting_bonus",
+    promotionController.getweeklyBettingeReword,
+  );
+  router.post(
+    "/api/activity/daily_betting_bonus/claim",
+    promotionController.claimDailyBettingReword,
+  );
+
+  router.post(
+    "/api/activity/weekly_betting_bonus/claim",
+    promotionController.claimWeeklyBettingReword,
   );
   router.post(
     "/api/activity/daily_recharge_bonus/claim",
