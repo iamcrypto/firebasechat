@@ -1159,7 +1159,7 @@ const getweeklyBettingeReword = async (req, res) => {
     return res.status(200).json({
       data: weekBetingRewordList,
       status: true,
-      message: "Successfully fetched daily recharge bonus data",
+      message: "Successfully fetched weekly betting bonus data",
     });
   } catch (error) {
     console.log(error);
@@ -1657,7 +1657,7 @@ const claimWeeklyBettingReword = async (req, res) => {
 
     return res.status(200).json({
       status: true,
-      message: "Successfully claimed daily betting bonus",
+      message: "Successfully claimed weekly betting bonus",
     });
   } catch (error) {
     console.log(error);
@@ -1699,7 +1699,7 @@ const dailyRechargeRewordRecord = async (req, res) => {
     return res.status(200).json({
       data: claimedRewardsData,
       status: true,
-      message: "Successfully fetched daily recharge bonus record",
+      message: "Successfully fetched weekly betting bonus record",
     });
   } catch (error) {
     console.log(error);
