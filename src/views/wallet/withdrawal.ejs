@@ -970,7 +970,7 @@ async function auth() {
                 success: function (response) {
                     let user = response.userInfo[0];
                     $('.money').text("₹" + user.money);
-                    $('.bankBox .box .item:eq(1) div:eq(1)').html(`2. Remaining Betting Amount<br>For Withdrawal: ₹ ${response.result}`);
+                    $('.bankBox .box .item:eq(1) div:eq(1)').html(`2. Remaining Betting Amount<br>For Withdrawal: ₹ ${response.money}`);
                     if (!response.datas[0]) return;
                     let data = response.datas[0];
                     $('.conBox .list').append(
