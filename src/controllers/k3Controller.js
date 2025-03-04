@@ -230,8 +230,9 @@ const betK3 = async (req, res) => {
         let check = userInfo.money - total;
         if (check >= 0) {
             let timeNow = Date.now();
-            const sql = `INSERT INTO result_k3 SET id_product = ?,phone = ?,code = ?,invite = ?,stage = ?,level = ?,money = ?,price = ?,amount = ?,fee = ?,game = ?,join_bet = ?, typeGame = ?,bet = ?,status = ?,time = ?`;
-            await connection.execute(sql, [id_product, userInfo.phone, userInfo.code, userInfo.invite, period.period, userInfo.level, total, price, xvalue, fee, game, gameJoin, typeGame, listJoin, 0, timeNow]);
+            let checkTime = timerJoin(date.getTime());
+            const sql = `INSERT INTO result_k3 SET id_product = ?,phone = ?,code = ?,invite = ?,stage = ?,level = ?,money = ?,price = ?,amount = ?,fee = ?,game = ?,join_bet = ?, typeGame = ?,bet = ?,status = ?,time = ?,today = ?`;
+            await connection.execute(sql, [id_product, userInfo.phone, userInfo.code, userInfo.invite, period.period, userInfo.level, total, price, xvalue, fee, game, gameJoin, typeGame, listJoin, 0, timeNow,checkTime]);
             await connection.execute('UPDATE `users` SET `money` = `money` - ? WHERE `token` = ? ', [total, md5(auth)]);
             const [users] = await connection.query('SELECT `money`, `level` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [md5(auth)]);
             await rosesPlus(auth, total);
@@ -315,6 +316,7 @@ const addK3 = async (game) => {
         }
         const sql = `INSERT INTO k3 SET period = ?, result = ?, game = ?, status = ?, time = ?`;
         await connection.execute(sql, [NewGamePeriod, 0, game, 0, timeNow]);
+        //console.log("inserted");
 
         if (game == 1) join = 'k3d';
         if (game == 3) join = 'k3d3';
@@ -1034,7 +1036,6 @@ const listOrderOld = async (req, res) => {
         });
     }
     const [user] = await connection.query('SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ', [md5(auth)]);
-
     let game = Number(gameJoin);
 
     const [k5d] = await connection.query(`SELECT * FROM k3 WHERE status != 0 AND game = '${game}' ORDER BY id DESC LIMIT ${pageno}, ${pageto} `);

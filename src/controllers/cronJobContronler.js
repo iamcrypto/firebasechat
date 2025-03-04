@@ -4,6 +4,7 @@ import k5Controller from "./k5Controller";
 import k3Controller from "./k3Controller";
 import vipController from "./vipController.js";
 import paymentController from "./paymentController.js";
+import promotionController from "./promotionController.js";
 import md5 from "md5";
 import "dotenv/config";
 import trxWingoController, {

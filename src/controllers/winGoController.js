@@ -717,6 +717,7 @@ const addWinGo = async (game) => {
         time = ?`;
 
         await connection.execute(sql, [NewGamePeriod, 0, join, 0, timeNow]);
+        //console.log("inserted");
         if (game == 1) join = 'wingo1';
         if (game == 3) join = 'wingo3';
         if (game == 5) join = 'wingo5';
