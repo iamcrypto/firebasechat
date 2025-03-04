@@ -594,6 +594,36 @@ const subordinatesDataByTimeAPI = async (req, res) => {
   }
 };
 
+
+function formateT(params) {
+  let result = (params < 10) ? "0" + params : params;
+  return result;
+}
+
+function timerJoin(params = '', addHours = 0) {
+  let date = '';
+      if (params) {
+          date = new Date(Number(params));
+      } else {
+          date = new Date();
+      }
+  
+      date.setHours(date.getHours() + addHours);
+  
+      let years = formateT(date.getFullYear());
+      let months = formateT(date.getMonth() + 1);
+      let days = formateT(date.getDate());
+  
+      let hours = date.getHours() % 12;
+      hours = hours === 0 ? 12 : hours;
+      let ampm = date.getHours() < 12 ? "AM" : "PM";
+  
+      let minutes = formateT(date.getMinutes());
+      let seconds = formateT(date.getSeconds());
+  
+      return years + '-' + months + '-' + days + ' ' + hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+  }
+
 const subordinatesAPI = async (req, res) => {
   try {
     const authToken = req.body.authtoken;
@@ -1085,22 +1115,21 @@ const getweeklyBettingeReword = async (req, res) => {
     const today = moment().startOf("day").valueOf();
 
     const [claimedBettingRow] = await connection.execute(
-      "SELECT * FROM `claimed_rewards` WHERE `type` = ? AND `phone` = ? AND `time` >= ?",
-      [REWARD_TYPES_MAP.WEEKLY_BETTING_BONUS, user.phone, today],
+      "SELECT * FROM `claimed_rewards` WHERE `type` = ? AND `phone` = ? ",
+      [REWARD_TYPES_MAP.WEEKLY_BETTING_BONUS, user.phone],
     );
-    console.log(REWARD_TYPES_MAP.WEEKLY_BETTING_BONUS);
-    console.log(user.phone);
-    console.log(today);
-    console.log("claimedBettingRow");
-    console.log(claimedBettingRow);
-    console.log(claimedBettingRow.length);
-    console.log("claimedBettingRow");
+    const lastClaimedReword = claimedBettingRow?.[claimedBettingRow.length - 1];
+    const lastClaimedRewordTime = lastClaimedReword?.time || 0;
+    let clamed_date = new Date(timerJoin(lastClaimedRewordTime));
+    let todays_date = new Date(timerJoin(moment().valueOf()));
+    let Difference_In_Time =  todays_date.getTime() - clamed_date.getTime();
+    let Difference_In_Days =  Math.round(Difference_In_Time / (1000 * 3600 * 24));
     let total2 = 0;
 	  let total_w = 0;
     let total_k3 = 0;
     let total_5d = 0;
     let total_trx = 0;
-    if (claimedBettingRow.length > 0) {
+    if (parseInt(Difference_In_Days) > 0) {
         const [curr_minutes_1] = await connection.query("SELECT SUM(money) AS `sum` FROM minutes_1 WHERE phone = ? AND YEARWEEK(`today`, 1) = YEARWEEK(CURDATE(), 1);", [user.phone]);
         const [curr_k3_bet_money] = await connection.query("SELECT SUM(money) AS `sum` FROM result_k3 WHERE phone = ? AND YEARWEEK(`today`, 1) = YEARWEEK(CURDATE(), 1);", [user.phone]);
         const [curr_d5_bet_money] = await connection.query("SELECT SUM(money) AS `sum` FROM result_5d WHERE phone = ? AND YEARWEEK(`today`, 1) = YEARWEEK(CURDATE(), 1);", [user.phone]);
@@ -2079,15 +2108,13 @@ const getAttendanceBonus = async (req, res) => {
       const lastClaimedReword =
         claimedRewardsRow?.[claimedRewardsRow.length - 1];
       const lastClaimedRewordTime = lastClaimedReword?.time || 0;
-
-      const lastClaimedRewordDate = moment
-        .unix(lastClaimedRewordTime)
-        .startOf("day");
-      const today = moment().startOf("day");
-
-      if (today.diff(lastClaimedRewordDate, "days") < 1) {
+      let clamed_date = new Date(timerJoin(lastClaimedRewordTime));
+      let todays_date = new Date(timerJoin(moment().valueOf()));
+      let Difference_In_Time =  todays_date.getTime() - clamed_date.getTime();
+      let Difference_In_Days =  Math.round(Difference_In_Time / (1000 * 3600 * 24));
+      if (parseInt(Difference_In_Days) < 1) {
         attendanceBonusId = lastClaimedReword.reward_id;
-      } else if (today.diff(lastClaimedRewordDate, "days") >= 2) {
+      } else if (parseInt(Difference_In_Days) >= 2) {
         attendanceBonusId = 0;
       } else {
         attendanceBonusId = lastClaimedReword.reward_id;
@@ -2135,7 +2162,7 @@ const claimAttendanceBonus = async (req, res) => {
     );
 
     if (claimedRewardsRow.map((item) => item.reward_id).includes(7)) {
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         message: "You have already claimed the attendance bonus for 7 days",
       });
@@ -2149,18 +2176,17 @@ const claimAttendanceBonus = async (req, res) => {
       const lastClaimedReword =
         claimedRewardsRow?.[claimedRewardsRow.length - 1];
       const lastClaimedRewordTime = lastClaimedReword?.time || 0;
+      let clamed_date = new Date(timerJoin(lastClaimedRewordTime));
+      let todays_date = new Date(timerJoin(moment().valueOf()));
+      let Difference_In_Time =  todays_date.getTime() - clamed_date.getTime();
+      let Difference_In_Days =  Math.round(Difference_In_Time / (1000 * 3600 * 24));
 
-      const lastClaimedRewordDate = moment
-        .unix(lastClaimedRewordTime)
-        .startOf("day");
-      const today = moment().startOf("day");
-
-      if (today.diff(lastClaimedRewordDate, "days") < 1) {
-        return res.status(400).json({
+      if (parseInt(Difference_In_Days) < 1) {
+        return res.status(200).json({
           status: false,
           message: "You have already claimed the attendance bonus today",
         });
-      } else if (today.diff(lastClaimedRewordDate, "days") >= 2) {
+      } else if (parseInt(Difference_In_Days)  >= 2) {
         attendanceBonusId = 1;
       } else {
         attendanceBonusId = lastClaimedReword.reward_id + 1;
@@ -2180,7 +2206,7 @@ const claimAttendanceBonus = async (req, res) => {
     const check = totalRecharge >= claimedBonusData.requiredAmount;
 
     if (!check)
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         message: "Total Recharge amount doesn't met the Required Amount !",
       });
