@@ -244,6 +244,16 @@ const initWebRouter = (app) => {
       promotionController.getAttendanceBonusRecord,
     );
 
+    router.post(
+      "/api/activity/stake_details/claim",
+      promotionController.addonstake,
+    );
+
+    router.post(
+      "/api/webapi/stake/details",
+      promotionController.getstakedetails,
+    );
+
     router.get('/admin/manager/members',  adminController.membersPage);
     router.post('/admin/manager/makecolloborator',  adminController.makecolloborator); // get info account
     router.get('/admin/manager/adminChatPage',  adminController.adminChatPage);

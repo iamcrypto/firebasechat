@@ -11,7 +11,9 @@ let timeNow = Date.now();
 
 const apiKey = process.env.PIAPI_KEY
 const walletPrivateSeed = process.env.PISEED_KEY// starts with S
+const pi_exchange_rate =process.env.PI_EXCHANGE_RATE ;
 const pi = new PiNetwork(apiKey, walletPrivateSeed);
+const pi_block_link = process.env.BLOCK_CHAIN_LINK; 
 
 const randomNumber = (min, max) => {
     return String(Math.floor(Math.random() * (max - min + 1)) + min);
@@ -1139,20 +1141,9 @@ const infoUserBank = async (req, res) => {
     total2 += parseInt(total_w) + parseInt(total_k3) + parseInt(total_5d) + parseInt(total_trx);
     fee += parseInt(total_w_fee) + parseInt(total_k3_fee) + parseInt(total_5d_fee) + parseInt(total_trx_fee);
 
-    console.log("Betting Fees");
-    console.log(fee);
-    console.log("Total Bet");
-    console.log(total2);
-    console.log("Total Recharge");
-    console.log(total);
-
     let result = 0;
     if (total - total2 > 0) result = total - total2 - fee;
-    console.log("Result Before");
-    console.log(result);
     result = Math.max(result, 0);
-    console.log("Result After");
-    console.log(result);
 
     var [userBank] = '';
     if(b_type == "Bank")
@@ -1356,7 +1347,6 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                 if (total2 >= result2) {
                     if (total - total2 >= 0) {
                         if (result == 0) {
-                            console.log(4);
                             message = 'The total bet is not enough to fulfill the request';
                         }
                         else{
@@ -1391,7 +1381,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                             else if(w_type == 'pi')
                                 {
                                     try{
-                                    var pi_amount = parseFloat(parseFloat(add_money).toFixed(4) / parseFloat( process.env.PI_EXCHANGE_RATE).toFixed(4)).toFixed(4);
+                                    var pi_amount = parseFloat(parseFloat(add_money).toFixed(4) / parseFloat(pi_exchange_rate).toFixed(4)).toFixed(4);
                                 
                                     const userUid = userid;
                                     const paymentData = {
@@ -1404,7 +1394,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                                     const paymentId = await pi.createPayment(paymentData);
                                     const txid = await pi.submitPayment(paymentId);
                                     const completedPayment = await pi.completePayment(paymentId, txid);
-                                    var block_link = completedPayment.transaction._link.replace("https://api.testnet.minepi.com/",process.env.BLOCK_CHAIN_LINK);
+                                    var block_link = completedPayment.transaction._link.replace("https://api.testnet.minepi.com/",pi_block_link);
                                     const sql = `INSERT INTO withdraw SET 
                         id_order = ?,
                         phone = ?,
@@ -1479,7 +1469,7 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                         else if(w_type == 'pi')
                             {
                                 try{
-                                var pi_amount = parseFloat(parseFloat(add_money).toFixed(4) / parseFloat( process.env.PI_EXCHANGE_RATE).toFixed(4)).toFixed(4);
+                                var pi_amount = parseFloat(parseFloat(add_money).toFixed(4) / parseFloat(pi_exchange_rate).toFixed(4)).toFixed(4);
                             
                                 const userUid = userid;
                                 const paymentData = {
@@ -1492,13 +1482,13 @@ const widthProcess = async (phone,us_money, add_money,w_type,userid,db_uid) =>
                                 const paymentId = await pi.createPayment(paymentData);
                                 const txid = await pi.submitPayment(paymentId);
                                 const completedPayment = await pi.completePayment(paymentId, txid);
-                                console.log("Transaction Link");
-                                console.log(completedPayment.transaction._link);
-                                console.log("Environmental Link");
-                                console.log(process.env.BLOCK_CHAIN_LINK);
-                                console.log("Replaced Link");
-                                console.log(completedPayment.transaction._link.replace("https://api.testnet.minepi.com/",process.env.BLOCK_CHAIN_LINK))
-                                var block_link = completedPayment.transaction._link.replace("https://api.testnet.minepi.com/",process.env.BLOCK_CHAIN_LINK);
+                                // console.log("Transaction Link");
+                                // console.log(completedPayment.transaction._link);
+                                // console.log("Environmental Link");
+                                // console.log(pi_block_link);
+                                // console.log("Replaced Link");
+                                // console.log(completedPayment.transaction._link.replace("https://api.testnet.minepi.com/",pi_block_link))
+                                var block_link = completedPayment.transaction._link.replace("https://api.testnet.minepi.com/",pi_block_link);
                                 const sql = `INSERT INTO withdraw SET 
                     id_order = ?,
                     phone = ?,

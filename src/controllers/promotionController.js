@@ -18,6 +18,9 @@ function getOrdinal(n) {
     v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
+let timeNow = Date.now();
+
+const pi_exchange_rate =process.env.PI_EXCHANGE_RATE ;
 
 const getSubordinateDataByPhone = async (phone) => {
   const [[row_1]] = await connection.execute(
@@ -2288,6 +2291,131 @@ const getAttendanceBonusRecord = async (req, res) => {
   }
 };
 
+const addonstake = async (req, res) => {
+  const authToken = req.body.authtoken;
+  let stack_amt = req.body.stack_amt;
+  let stack_period = req.body.stack_period;
+  let stack_monthly_roi = req.body.stack_monthly_roi;
+  let stack_yealy_roi = req.body.stack_yealy_roi;
+  let act_stack_amt = stack_amt * pi_exchange_rate;
+  let stack_apr = 0;
+
+  if (!stack_amt && !stack_period ) {
+      return res.status(200).json({
+          message: 'Failed',
+          status: false,
+          timeStamp: timeNow,
+      })
+  }
+  const [userRow] = await connection.execute(
+    "SELECT `phone`,`money` FROM `users` WHERE `token` = ? AND `veri` = 1",
+    [md5(authToken)],
+  );
+  const user = userRow?.[0];
+
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  var rewardid_bonus = '';
+  if(parseInt(stack_period) < 3)
+    {
+      rewardid_bonus = REWARD_TYPES_MAP.ROI_STAKE_1; 
+      stack_apr = process.env.STAKE_ROI_1;
+    }
+    else if(parseInt(stack_period) < 6)
+    {
+      rewardid_bonus = REWARD_TYPES_MAP.ROI_STAKE_3;
+      stack_apr = process.env.STAKE_ROI_3;
+    }
+    else if(parseInt(stack_period) < 9)
+    {
+      rewardid_bonus = REWARD_TYPES_MAP.ROI_STAKE_6;
+      stack_apr = process.env.STAKE_ROI_6; 
+    }
+    else
+    {
+      rewardid_bonus = REWARD_TYPES_MAP.ROI_STAKE_12;
+      stack_apr = process.env.STAKE_ROI_12;
+    }
+
+    const annualReturn = act_stack_amt * (stack_apr / 100);
+    const monthlyReturn =  annualReturn / 12;
+    const totalreturn = monthlyReturn * parseInt(stack_period) 
+
+  if (user.money - act_stack_amt >= 0) {
+    let date = new Date();
+    let checkTime = timerJoin(date.getTime());
+    var toDate = new Date(new Date(date).setMonth(date.getMonth() + parseInt(stack_period)));
+    let checkTime2 = timerJoin(toDate.getTime());
+    await connection.execute(
+      "INSERT INTO `claimed_rewards` (`reward_id`, `type`, `phone`, `amount`, `status`, `time`, `stake_amnt`, `from_date`, `to_date`) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?)",
+      [
+        parseInt("136"),
+        rewardid_bonus,
+        user.phone,
+        (totalreturn + act_stack_amt),
+        2,
+        timeNow,
+        act_stack_amt,
+        checkTime,
+        checkTime2
+      ],
+    );
+    return res.status(200).json({
+      status: true,
+      message: "Successfully raised stake",
+    });
+  }
+  else
+  {
+    return res.status(200).json({
+      message: 'The balance is not enough to fulfill the request',
+      status: false,
+      timeStamp: timeNow,
+  });
+  }
+}
+
+const getstakedetails = async (req, res) => {
+  const authToken = req.body.authtoken;
+
+  const [userRow] = await connection.execute(
+    "SELECT `phone`,`money` FROM `users` WHERE `token` = ? AND `veri` = 1",
+    [md5(authToken)],
+  );
+  const user = userRow?.[0];
+
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  const [row_1] = await connection.execute(
+    "SELECT phone AS phone FROM `claimed_rewards` where `reward_id` = 136 GROUP BY phone;"
+  );
+  const stakeusers = row_1.length || 0;
+
+  const [[row_2]] = await connection.execute(
+    "SELECT SUM(stake_amnt) AS `sum` FROM `claimed_rewards` WHERE `reward_id` = 136;"
+  );
+  const stakeamount = row_2.sum || 0;
+
+  const [[row_3]] = await connection.execute(
+    "SELECT SUM(amount) AS `sum` FROM `claimed_rewards` WHERE `reward_id` = 136 AND status = 1;"
+  );
+  const stakerewards =  row_3.sum || 0;
+
+  const [userstackes] = await connection.query('SELECT * FROM claimed_rewards WHERE `phone` = ? AND `reward_id` = 136 ', [user.phone]);
+  const [useractivestakes] = await connection.query('SELECT * FROM claimed_rewards WHERE status = 2 AND `phone` = ? AND `reward_id` = 136 ', [user.phone]);
+  return res.status(200).json({
+    message: 'Success',
+    status: true,
+    totalstakes : stakeamount,
+    totalstakeusers : stakeusers,
+    totalclaimedrewards : stakerewards,
+    userstakedetails : userstackes,
+    useractivestakes: useractivestakes,
+  });
+}
+
 const promotionController = {
   subordinatesDataAPI,
   subordinatesAPI,
@@ -2308,7 +2436,9 @@ const promotionController = {
   dailyBetttingRewordRecord,
   getweeklyBettingeReword,
   claimWeeklyBettingReword,
-  weeklyBetttingRewordRecord
+  weeklyBetttingRewordRecord,
+  addonstake,
+  getstakedetails,
 };
 
 export default promotionController;
