@@ -2360,6 +2360,7 @@ const addonstake = async (req, res) => {
         checkTime,
         checkTime2
       ],
+      await connection.query('UPDATE users SET money = money - ? WHERE phone = ? ', [parseFloat(act_stack_amt).toFixed(4).toString(), user.phone])
     );
     return res.status(200).json({
       status: true,
