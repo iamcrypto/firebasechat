@@ -198,6 +198,10 @@ const safePage = async (req, res) => {
     return res.render("member/safe.ejs",{ sandbox,roi1,roi2,roi3,roi4, pi_rate});
 }
 
+const invitationRulesPage = async (req, res) => {
+    return res.render("checkIn/invitationRules.ejs");
+  };
+
 const rechargeAwardCollectionRecord = async (req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
     return res.render("checkIn/rechargeAwardCollectionRecord.ejs",{ sandbox});
@@ -415,4 +419,5 @@ module.exports = {
     getSalaryRecord,
     transactionhistoryPage,
     d_get_betting,
+    invitationRulesPage,
 }

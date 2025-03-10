@@ -243,7 +243,7 @@ const initWebRouter = (app) => {
       "/api/activity/attendance/record",
       promotionController.getAttendanceBonusRecord,
     );
-
+    router.get("/invitation_rules",homeController.invitationRulesPage);
     router.post(
       "/api/activity/stake_details/claim",
       promotionController.addonstake,
