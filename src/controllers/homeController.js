@@ -125,6 +125,10 @@ const bonusRecordPage = async (req, res) => {
 
 // wallet
 
+const rabateRatioPage = async (req, res) => {
+    return res.render("promotion/rebateratio.ejs");
+  };
+
 
 const transactionhistoryPage = async (req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
@@ -389,6 +393,7 @@ module.exports = {
     dailytaskPage,
     promotionPage,
     promotion1Page,
+    rabateRatioPage,
     walletPage,
 	wingochat,
     mianPage,
