@@ -39,7 +39,7 @@
             width: 90%;
             margin: auto;
             border-radius: 7px;
-            height: 59%;
+            height: auto;
         }
         .modal {
             display: blocked;
@@ -60,6 +60,7 @@
           .div_pi_input
           {
             display: flex;
+            margin-top:5px;
           }
           .div_pi_input .ml-1 
           {
@@ -74,7 +75,7 @@
           .btn_class
           {
             text-align: center;
-            height: 20px;
+            height: 50px;
             margin-top: 4%;
           }
           .btn_class button
@@ -149,7 +150,7 @@
           .modal-content {
             text-align: -webkit-center;
             position: relative;
-            top: 20%;
+            top: 10%;
           }
       
           .modal-content img {
@@ -178,21 +179,19 @@
       
           /* Circle button style */
           .close-btn {
-            border: 2px solid #fff;
-            /* Black border */
-            border-radius: 50%;
-            /* Circle shape */
-            background-color: transparent;
-            /* Transparent background */
-            width: 30px;
-            /* Width and height should be equal for a circle */
-            height: 30px;
-            /* Width and height should be equal for a circle */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            margin-top: 20%;
+                border: 2px solid #22275b;
+                border-radius: 50%;
+                background-color: transparent;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                margin-top: 0%;
+                position: absolute;
+                right: 10px;
+                top: 10px;
           }
       
           .close-btn:hover {
@@ -207,7 +206,7 @@
             font-family: none;
             line-height: 1;
             /* Tight line height for the "X" */
-            color: #fff;
+            color: #22275b;
             /* Black color for the "X" */
             padding: 0;
             /* No padding */
@@ -1164,6 +1163,9 @@
                       <div class="">
                         <div id="myModal_header">Start Staking</div>
                       </div>
+                      <div class="close-btn">
+                        <span class="close-x">&times;</span>
+                      </div>
                       <div class="pi_amount_class">
                         <label  class="text-sm font-medium">Piπ Amount</label>
                         <div class="div_pi_input">
@@ -1229,9 +1231,7 @@
                         <div class="pi_amount_class btn_class">
                             <button type="button"  id="confirm_stack">Confirm Stake</button>
                         </div>
-                      <div class="close-btn">
-                        <span class="close-x">&times;</span>
-                      </div>
+                    
                     </div>
                   </div>
                 
@@ -1450,8 +1450,13 @@
                         getstakedetails();
 
                      } else {
+                        var modal = document.getElementById("myModal");
+                        modal.style.display = "none";
                         $(".van-toast__text").text(response.message)
-                        $("#failedTost").fadeIn(220)
+                        $("#failedTost").fadeIn(220);
+                        setTimeout(function() {
+                            $("#successTost").fadeOut(220);
+                        }, 1000);
                      }
                 }
             }); 
