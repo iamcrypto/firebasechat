@@ -623,24 +623,34 @@ function showListOrder2(list_orders, x) {
     i++;
     let join = list_orders.bet;
     let color = "";
+    let selected = "";
     if (join == "l") {
       color = "big";
+      selected = "Big";
     } else if (join == "n") {
       color = "small";
+      selected = "Small";
     } else if (join == "t") {
+      selected = "Violet";
       color = "violet";
     } else if (join == "d") {
       color = "red";
+      selected = "Red";
     } else if (join == "x") {
       color = "green";
+      selected = "Green";
     } else if (join == "0") {
       color = "red-violet";
+      selected = "0";
     } else if (join == "5") {
       color = "green-violet";
+      selected = "5";
     } else if (Number(join) % 2 == 0) {
       color = "red";
+      selected = Number(join);
     } else if (Number(join) % 2 != 0) {
       color = "green";
+      selected = Number(join);
     }
     if ((!isNumber(join) && join == "l") || join == "n") {
       checkJoin = `
@@ -657,6 +667,7 @@ function showListOrder2(list_orders, x) {
                     }</span>
                     `;
     }
+
     return (htmls += `
                     <div data-v-a9660e98="" issuenumber="${
                       list_orders.stage
@@ -807,7 +818,7 @@ function showListOrder2(list_orders, x) {
                                 <div data-v-a9660e98="" class="li c-row c-row-between c-row-middle ">
                                     <div data-v-a9660e98="">Select</div>
                                     <div data-v-a9660e98="">
-                                        <div data-v-a9660e98="">${color}</div>
+                                        <div data-v-a9660e98="">${selected}</div>
                                     </div>
                                 </div>
                                 <div data-v-a9660e98="" class="li c-row c-row-between c-row-middle">
@@ -850,7 +861,7 @@ function showListOrder2(list_orders, x) {
         :list_orders.status == 1 && list_orders.bet == 'd'
         ? list_orders.money * 2
         :list_orders.status == 1 && list_orders.bet == 'x'
-        ? list_orders.money * 1.5
+        ? list_orders.money * 2
         :list_orders.status == 1 && list_orders.result ==5 && list_orders.bet == 'x'
         ? list_orders.money * 1.5
         :list_orders.status == 1 && list_orders.bet == 'l'
@@ -876,6 +887,7 @@ function showListOrder2(list_orders, x) {
   $(`.game-list .con-box:eq(${x}) .list #history-order`).html(htmls);
   
 }
+
 
 function formateT(params) {
   let result = params < 10 ? "0" + params : params;

@@ -491,24 +491,34 @@ function showListOrder2(list_orders, x) {
     i++;
     let join = list_orders.bet;
     let color = "";
+    let selected = "";
     if (join == "l") {
       color = "big";
+      selected = "Big";
     } else if (join == "n") {
       color = "small";
+      selected = "Small";
     } else if (join == "t") {
+      selected = "Violet";
       color = "violet";
     } else if (join == "d") {
       color = "red";
+      selected = "Red";
     } else if (join == "x") {
       color = "green";
+      selected = "Green";
     } else if (join == "0") {
       color = "red-violet";
+      selected = "0";
     } else if (join == "5") {
       color = "green-violet";
+      selected = "5";
     } else if (Number(join) % 2 == 0) {
       color = "red";
+      selected = Number(join);
     } else if (Number(join) % 2 != 0) {
       color = "green";
+      selected = Number(join);
     }
     if ((!isNumber(join) && join == "l") || join == "n") {
       checkJoin = `
@@ -525,6 +535,7 @@ function showListOrder2(list_orders, x) {
                     }</span>
                     `;
     }
+
     return (htmls += `
                     <div data-v-a9660e98="" issuenumber="${
                       list_orders.stage
@@ -554,58 +565,58 @@ function showListOrder2(list_orders, x) {
                                     )}</div>
                                 </div>
                                 <div data-v-a9660e98="" class="money">
-                                ${
-                                  list_orders.status==1 && list_orders.bet ==0 
-                                    ? '<span data-v-a9660e98="" class="success"> + ' +
-                                      list_orders.money * 4.5 +
-                                      " </span>"
-                                    :list_orders.status==1 && list_orders.bet ==5
-                                    ? '<span data-v-a9660e98="" class="success"> + ' +
-                                    list_orders.money * 4.5 +
-                                    " </span>"
-                                    : list_orders.status==1 && list_orders.result == 0 && list_orders.bet == 'd'
-                                    ? '<span data-v-a9660e98="" class="success"> + ' +
-                                    list_orders.money * 1.5 +
-                                    " </span>"
-                                    : list_orders.status==1 && list_orders.bet == 'd'
-                                    ? '<span data-v-a9660e98="" class="success"> + ' +
-                                    list_orders.money * 2 +
-                                    " </span>"
-                                    : list_orders.status==1 && list_orders.bet == 't'
-                                    ? '<span data-v-a9660e98="" class="success"> + ' +
-                                    list_orders.money * 4.5 +
-                                    " </span>"
-                                    : list_orders.status==1 && list_orders.result == 5 && list_orders.bet == 'x'
-                                    ? '<span data-v-a9660e98="" class="success"> + ' +
-                                    list_orders.money * 1.5 +
-                                    " </span>"
-                                    : list_orders.status==1 && list_orders.bet == 'x'
-                                    ? '<span data-v-a9660e98="" class="success"> + ' +
-                                    list_orders.money * 2 +
-                                    " </span>"
-                                    : list_orders.status==1 && list_orders.bet == 'l'
-                                    ? '<span data-v-a9660e98="" class="success"> + ' +
-                                    list_orders.money * 2 +
-                                    " </span>"
-                                    : list_orders.status==1 && list_orders.bet == 'n'
-                                    ? '<span data-v-a9660e98="" class="success"> + ' +
-                                    list_orders.money * 2 +
-                                    " </span>"
-                                    : list_orders.status==1
-                                    ?'<span data-v-a9660e98="" class="success"> + ' +
-                                    list_orders.money * 9 +
-                                    " </span>"
-                                    : list_orders.status == 2
-                                    ? '<span data-v-a9660e98="" class="fail"> - ' +
-                                      list_orders.money +
-                                      "</span>"
-                                    : ""
-                                }
+                                        ${
+                                          list_orders.status==1 && list_orders.bet ==0 
+                                            ? '<span data-v-a9660e98="" class="success"> + ' +
+                                              list_orders.money * 4.5 +
+                                              " </span>"
+                                            :list_orders.status==1 && list_orders.bet ==5
+                                            ? '<span data-v-a9660e98="" class="success"> + ' +
+                                            list_orders.money * 4.5 +
+                                            " </span>"
+                                            : list_orders.status==1 && list_orders.result == 0 && list_orders.bet == 'd'
+                                            ? '<span data-v-a9660e98="" class="success"> + ' +
+                                            list_orders.money * 1.5 +
+                                            " </span>"
+                                            : list_orders.status==1 && list_orders.bet == 'd'
+                                            ? '<span data-v-a9660e98="" class="success"> + ' +
+                                            list_orders.money * 2 +
+                                            " </span>"
+                                            : list_orders.status==1 && list_orders.bet == 't'
+                                            ? '<span data-v-a9660e98="" class="success"> + ' +
+                                            list_orders.money * 4.5 +
+                                            " </span>"
+                                            : list_orders.status==1 && list_orders.result == 5 && list_orders.bet == 'x'
+                                            ? '<span data-v-a9660e98="" class="success"> + ' +
+                                            list_orders.money * 1.5 +
+                                            " </span>"
+                                            : list_orders.status==1 && list_orders.bet == 'x'
+                                            ? '<span data-v-a9660e98="" class="success"> + ' +
+                                            list_orders.money * 2 +
+                                            " </span>"
+                                            : list_orders.status==1 && list_orders.bet == 'l'
+                                            ? '<span data-v-a9660e98="" class="success"> + ' +
+                                            list_orders.money * 2 +
+                                            " </span>"
+                                            : list_orders.status==1 && list_orders.bet == 'n'
+                                            ? '<span data-v-a9660e98="" class="success"> + ' +
+                                            list_orders.money * 2 +
+                                            " </span>"
+                                            : list_orders.status==1
+                                            ?'<span data-v-a9660e98="" class="success"> + ' +
+                                            list_orders.money * 9 +
+                                            " </span>"
+                                            : list_orders.status == 2
+                                            ? '<span data-v-a9660e98="" class="fail"> - ' +
+                                              list_orders.money +
+                                              "</span>"
+                                            : ""
+                                        }
                                 </div>
                             </div>
                         </div>
 
-                        <div data-v-a9660e98="" class="details" style="display: none">
+                        <div data-v-a9660e98="" class="details" style="display: none" >
                             <div data-v-a9660e98="" class="tit">Details</div>
                             <div data-v-a9660e98="" class="li c-row c-row-between c-row-middle">
                                 <div data-v-a9660e98="">Order ID</div>
@@ -617,13 +628,13 @@ function showListOrder2(list_orders, x) {
                                 </div>
                                 </div>
                                 <div data-v-a9660e98="" class="li c-row c-row-between c-row-middle">
-                                    <div data-v-a9660e98="">Lottery Period</div>
+                                    <div data-v-a9660e98="">Periods</div>
                                         <div data-v-a9660e98="">${
                                           list_orders.stage
                                         }</div>
                                     </div>
                                     <div data-v-a9660e98="" class="li c-row c-row-between c-row-middle">
-                                        <div data-v-a9660e98="">Bet Amount</div>
+                                        <div data-v-a9660e98="">Amount Spent</div>
                                         <div data-v-a9660e98="">${
                                           list_orders.money + list_orders.fee
                                         }.00</div>
@@ -635,7 +646,7 @@ function showListOrder2(list_orders, x) {
                                         }</div>
                                     </div>
                                     <div data-v-a9660e98="" class="li c-row c-row-between c-row-middle">
-                                        <div data-v-a9660e98="">Amount After Tax</div>
+                                        <div data-v-a9660e98="">Net Amount</div>
                                         <div data-v-a9660e98="" class="red">${
                                           list_orders.money
                                         }.00</div>
@@ -647,7 +658,7 @@ function showListOrder2(list_orders, x) {
                                         }.00</div>
                                     </div>
                                     <div data-v-a9660e98="" class="li c-row c-row-between c-row-middle">
-                                        <div data-v-a9660e98="">Order Number</div>
+                                        <div data-v-a9660e98="">Opening Price</div>
                                         <div data-v-a9660e98="">${
                                           list_orders.result
                                         }</div>
@@ -660,9 +671,9 @@ function showListOrder2(list_orders, x) {
                                         }</div>
                                         <div data-v-a9660e98="" style="display: inline-block; margin-left: 8px;">${
                                           list_orders.result == 0
-                                            ? "Red Violet"
+                                            ? "Purple"
                                             : list_orders.result == 5
-                                            ? "Green Violet"
+                                            ? "Indigo"
                                             : list_orders.result % 2 == 0
                                             ? "Red"
                                             : "Green"
@@ -673,9 +684,9 @@ function showListOrder2(list_orders, x) {
                                     </div>
                                 </div>
                                 <div data-v-a9660e98="" class="li c-row c-row-between c-row-middle ">
-                                    <div data-v-a9660e98="">Choose</div>
+                                    <div data-v-a9660e98="">Select</div>
                                     <div data-v-a9660e98="">
-                                        <div data-v-a9660e98="">${color}</div>
+                                        <div data-v-a9660e98="">${selected}</div>
                                     </div>
                                 </div>
                                 <div data-v-a9660e98="" class="li c-row c-row-between c-row-middle">
@@ -690,7 +701,7 @@ function showListOrder2(list_orders, x) {
       list_orders.status == 1
         ? "Success"
         : list_orders.status == 2
-        ? "Fail"
+        ? "Failure"
         : ""
     }</div>
                                 </div>
@@ -718,7 +729,7 @@ function showListOrder2(list_orders, x) {
         :list_orders.status == 1 && list_orders.bet == 'd'
         ? list_orders.money * 2
         :list_orders.status == 1 && list_orders.bet == 'x'
-        ? list_orders.money * 1.5
+        ? list_orders.money * 2
         :list_orders.status == 1 && list_orders.result ==5 && list_orders.bet == 'x'
         ? list_orders.money * 1.5
         :list_orders.status == 1 && list_orders.bet == 'l'
@@ -732,7 +743,7 @@ function showListOrder2(list_orders, x) {
     </div>
                                 </div>
                                 <div data-v-a9660e98="" class="li c-row c-row-between c-row-middle">
-                                    <div data-v-a9660e98="">Order Time</div>
+                                    <div data-v-a9660e98="">Time</div>
                                     <div data-v-a9660e98="">${timerJoin(
                                       list_orders.time
                                     )}</div>
@@ -742,6 +753,7 @@ function showListOrder2(list_orders, x) {
                     `);
   });
   $(`.game-list .con-box:eq(${x}) .list #history-order`).html(htmls);
+  
 }
 
 function show_statistics(list_orders, x) {
