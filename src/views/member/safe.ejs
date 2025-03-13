@@ -179,23 +179,28 @@
       
           /* Circle button style */
           .close-btn {
-                border: 2px solid #22275b;
-                border-radius: 50%;
-                background-color: transparent;
-                width: 30px;
-                height: 30px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                margin-top: 0%;
-                position: absolute;
-                right: 10px;
-                top: 10px;
+            border: 2px solid #22275b;
+            border-radius: 50%;
+            background-color: transparent;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-top: 0%;
+            position: absolute;
+            right: 10px;
+            top: 10px;
           }
       
           .close-btn:hover {
-            background-color: #ddd;
+            font-family: none;
+            line-height: 1;
+            /* Tight line height for the "X" */
+            color: #22275b;
+            /* Black color for the "X" */
+            padding: 0;
             /* Light grey background on hover */
           }
       
@@ -1449,7 +1454,8 @@
                         }, 1000);
                         getstakedetails();
 
-                     } else {
+                     } 
+                     else {
                         var modal = document.getElementById("myModal");
                         modal.style.display = "none";
                         $(".van-toast__text").text(response.message)

@@ -471,8 +471,8 @@
                             Stake
                           </span>
                           <div data-v-4ac977f5="" class="financialServices__container-footer-des">
-                            <h4 data-v-4ac977f5="">
-                              ₹0.00
+                            <h4 data-v-4ac977f5="" id="stake_amt">
+                              
                             </h4>
                             <i data-v-4ac977f5="" class="van-badge__wrapper van-icon van-icon-arrow">
                               <!---->
@@ -1046,7 +1046,7 @@ async function auth() {
                     },
                     dataType: "json",
                     success: function (response) {
-        
+                        $("#stake_amt").text("₹" +response.user_stake);
                         var xp_Score = parseInt(response.xp_value);
                         var u_level = parseInt(response.level);
                         var lang_code = response.language;

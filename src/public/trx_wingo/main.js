@@ -1493,7 +1493,7 @@ async function auth() {
               console.log(firstGame);
               
               if (firstGame && firstGame.stage === lastGame.period) {
-                var modal = document.getElementById("myModal");
+                var modal = document.getElementById("trx_myModal");
                 modal.style.display = "block";
                 var myModalheader = document.getElementById("myModal_header");
                 var myModal_result = document.getElementById("myModal_result");

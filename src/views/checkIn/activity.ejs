@@ -571,8 +571,8 @@
                     </span>
                   </div>
                 </div>
-                <div data-v-53f1c857="" class="activity-panel-content">
-                  <div data-v-53f1c857="" class="content-title">
+                <div data-v-53f1c857="" class="activity-panel-content" >
+                  <div data-v-53f1c857="" class="content-title" onclick="location.href='/redenvelopes'">
                     <img data-v-53f1c857="" data-src="/assets/png/signInBanner-33f86d3f.png"
                     src="/assets/png/signInBanner-33f86d3f.png" lazy="loaded">
                     <div data-v-53f1c857="" class="content-para">
@@ -730,7 +730,57 @@
 
     <%- include('../nav') -%>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/js/client.js"></script>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://momentjs.com/downloads/moment.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+  <script>
+    const Pi = window.Pi;
+    Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
+    async function auth() {
+     try {
+         
+         const scopes = ['username', 'payments', 'wallet_address'];
+         function onIncompletePaymentFound(payment) {
+             console.log("incomplete Transaction");
+         }; 
     
+         Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+             var username = auth.user.username;
+             var password = auth.user.uid;
+             var auth_token = auth.accessToken;
+             $.ajax({
+              type: "POST",
+              url: "/api/webapi/check_login",
+              data: {
+                  authtoken:auth_token,
+                  username:username,
+                  pwd:password
+              },
+              dataType: "json",
+              success: function (response) {
+                  if(response.data == "register")
+                  {
+                      window.location.href = '/register';
+                  }
+                  else if(response.data == "login")
+                  {
+                      window.location.href = '/login';
+                  }
+                  else{
+          }
+        }
+    });    
+            });
+       }
+    catch (err) {
+       alert(err);
+    }
+    }
+    auth();
+    </script>
     
 </body>
 

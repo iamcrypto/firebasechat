@@ -140,6 +140,16 @@ const cronJobGame1p = (io) => {
 	    cron.schedule("0 2 1 * *", async () => {
         vipController.releaseVIPLevel();
       });
+
+      cron.schedule(
+        "0 0 * * *",
+        async () => {
+          await winGoController.distributeCommission(),
+          await k3Controller.distributeCommission(),
+          await k5Controller.distributeCommission(),
+          await trxWingoController.distributeCommission()
+        }
+      );
 }
 
 module.exports = {

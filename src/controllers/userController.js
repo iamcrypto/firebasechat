@@ -448,7 +448,7 @@ const promotion = async (req, res) => {
         });
     }
 
-    const [user] = await connection.query('SELECT `phone`, `code`,`invite`, `roses_f`, `roses_f1`, `roses_today` FROM users WHERE `token` = ? ', [md5(auth)]);
+    const [user] = await connection.query('SELECT `phone`, `code`,`invite`, `roses_f`, `roses_f1`, `roses_today`,`user_level` FROM users WHERE `token` = ? ', [md5(auth)]);
     const [level] = await connection.query('SELECT * FROM level');
 
     if (!user) {
@@ -460,6 +460,7 @@ const promotion = async (req, res) => {
     }
 
     let userInfo = user[0];
+    console.log(userInfo)
 
     // Directly referred level-1 users
     const [f1s] = await connection.query('SELECT `phone`, `code`,`invite`, `time`,`today` FROM users WHERE `invite` = ? ', [userInfo.code]);
@@ -2321,6 +2322,8 @@ const xpgain_value = async (req, res) => {
     let auth = req.body.authtoken;
     let xp_gain_val = 0;
     let [user] = await connection.query('SELECT * FROM users WHERE `token` = ?', [md5(auth)]);
+    const [user_stoke] = await connection.query('SELECT SUM(stake_amnt) AS `sum` FROM claimed_rewards WHERE status = 2 AND `reward_id` = 136 AND `phone` = ?', [user[0].phone]);
+    const stakeamount = user_stoke[0].sum || 0;
     const [trx_xp] = await connection.query(`SELECT SUM(money) as total FROM trx_wingo_bets WHERE phone = ? `, user[0].phone);
     const [wingo_xp] = await connection.query(`SELECT SUM(money) as total FROM minutes_1 WHERE phone = ? `, user[0].phone);
     const [k3_xp] = await connection.query(`SELECT SUM(money) as total FROM result_k3 WHERE phone = ? `, user[0].phone);
@@ -2341,7 +2344,7 @@ const xpgain_value = async (req, res) => {
     {
         trx_xp[0].total = 0;
     }
-    let level = user[0].level;
+    let level = user[0].user_level;
 
     xp_gain_val = parseInt(wingo_xp[0].total) + parseInt(k3_xp[0].total) + parseInt(d5_xp[0].total) + parseInt(trx_xp[0].total);
 
@@ -2351,6 +2354,7 @@ const xpgain_value = async (req, res) => {
         level: level,
         status: true,
         language:user[0].lang_code,
+        user_stake:stakeamount,
     });
 
 };

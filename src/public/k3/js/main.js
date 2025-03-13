@@ -1183,7 +1183,7 @@ async function auth() {
                 }
                 else{
           $(document).ready(function(){
-            callAjaxMeJoin();
+            //callAjaxMeJoin();
           });
            function reload_money() {
                       $.ajax({
@@ -1421,6 +1421,10 @@ async function auth() {
             setTimeout(
                 function() 
                 {
+                    $('.header-history').addClass('d-none');
+                    $('#myBet').addClass('block-click action');
+                    $('#history').removeClass('block-click action');
+                    $('#number_result').attr('data-select', 'mybet');
                     callAjaxMeJoin();
                 }, 2000);
             }

@@ -244,10 +244,15 @@ const initWebRouter = (app) => {
       promotionController.getAttendanceBonusRecord,
     );
     router.get("/invitation_rules",homeController.invitationRulesPage);
-    router.get("/rebate_ratio",homeController.rabateRatioPage);
+    router.get('/promotion/rebate_ratio', homeController.rabateRatioPage);
     router.post(
       "/api/activity/stake_details/claim",
       promotionController.addonstake,
+    );
+
+    router.post(
+      "/api/subordinates/summary",
+      promotionController.subordinatesDataAPI,
     );
 
     router.post(
