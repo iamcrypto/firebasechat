@@ -210,6 +210,7 @@ const initWebRouter = (app) => {
 
 
     // admin
+    router.get('/admin/manager/main', adminController.adminmainpage); 
     router.get('/admin/manager/index',  adminController.adminPage); // get info account
     router.get('/admin/manager/index/3',  adminController.adminPage3); // get info account
     router.get('/admin/manager/index/5',  adminController.adminPage5); // get info account

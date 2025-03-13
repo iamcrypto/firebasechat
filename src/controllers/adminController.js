@@ -127,6 +127,10 @@ const levelSetting = async (req, res) => {
     return res.render("manage/levelSetting.ejs", {sandbox});
 }
 
+const adminmainpage = async (req, res) => {
+    return res.render("manage/dashboard.ejs");
+}
+
 const CreatedSalaryRecord = async (req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
     return res.render("manage/CreatedSalaryRecord.ejs", {sandbox});
@@ -234,8 +238,8 @@ const listMember = async (req, res) => {
             status: false
         });
     }
-    const [users] = await connection.query(`SELECT * FROM users WHERE veri = 1 AND level != 2 ORDER BY id DESC LIMIT ${pageno}, ${limit} `);
-    const [total_users] = await connection.query(`SELECT * FROM users WHERE veri = 1 AND AND level != 2`);
+    const [users] = await connection.query(`SELECT * FROM users WHERE veri = 1 AND level != 2 ORDER BY id DESC LIMIT ${pageno}, ${limit}; `);
+    const [total_users] = await connection.query(`SELECT * FROM users WHERE veri = 1 AND level != 2; `);
     return res.status(200).json({
         message: 'Success',
         status: true,
@@ -2207,6 +2211,7 @@ module.exports = {
     listRedenvelope,
     listBet,
     adminPage5d,
+    adminmainpage,
     listOrderOld,
     listOrderOldK3,
     editResult,
