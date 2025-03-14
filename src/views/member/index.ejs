@@ -1051,12 +1051,12 @@ async function auth() {
                         var u_level = parseInt(response.level);
                         var lang_code = response.language;
                         $("#lang_code").val(lang_code);
-                        if(u_level == 1)
+                        if(parseInt(u_level) == 1)
                         {
                             $("#level1_div").css("display","flex");
                             $("#level2_div").css("display","none");
                         }
-                        else if(u_level == 2)
+                        else if(parseInt(u_level) == 2)
                         {
                             $("#level1_div").css("display","none");
                             $("#level2_div").css("display","flex");
