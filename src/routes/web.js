@@ -282,6 +282,8 @@ const initWebRouter = (app) => {
     router.post('/admin/manager/settings/get',  adminController.settingGet); // get info account
     router.post('/admin/manager/createBonus',  adminController.createBonus); // get info account
 
+    router.post('/admin/manager/getdashboardInfo',  adminController.getdashboardInfo); 
+
     router.post('/admin/member/listRecharge/:phone',  adminController.listRechargeMem);
     router.post('/admin/member/listWithdraw/:phone',  adminController.listWithdrawMem);
     router.post('/admin/member/redenvelope/:phone',  adminController.listRedenvelope);
