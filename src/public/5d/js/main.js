@@ -19,7 +19,7 @@ function show_statistics(list_orders, x) {
       for (const num of list_orders) {
         counts[num.amount] = counts[num.amount] ? counts[num.amount] + 1 : 1;
       }
-      var fq0= counts[0]; var fq1= counts[1]; var fq2= counts[2]; var fq3= counts[3]; var fq4= counts[4]; var fq5= counts[5];var fq6= counts[6];var fq7= counts[7];var fq8= counts[8];var fq9= counts[9];
+      var fq0= counts[0] ? counts[0] : 0; var fq1= counts[1] ? counts[1] : 0; var fq2= counts[2] ? counts[2] : 0; var fq3= counts[3] ? counts[3] : 0; var fq4= counts[4] ? counts[4] : 0; var fq5= counts[5] ? counts[5] : 0;var fq6= counts[6] ? counts[6] : 0;var fq7= counts[7] ? counts[7] : 0;var fq8= counts[8] ? counts[8] : 0;var fq9= counts[9] ? counts[9] : 0;
       var a_m_indx = {};
       for(var i= 0; i< 10; i++)
       { 
@@ -68,14 +68,14 @@ function show_statistics(list_orders, x) {
           var average_number = sumvalue / (indexs.length - 1);
           sumCount[m] = parseInt(average_number);
         }
-        var ams0= sumCount[0]; var ams1= sumCount[1]; var ams2= sumCount[2]; var ams3= sumCount[3]; var ams4= sumCount[4]; var ams5= sumCount[5];var ams6= sumCount[6];var ams7= sumCount[7];var ams8= sumCount[8];var ams9= sumCount[9];
-      var csq0= csq_counts[0]; var csq1= csq_counts[1]; var csq2= csq_counts[2]; var csq3= csq_counts[3]; var csq4= csq_counts[4]; var csq5= csq_counts[5];var csq6= csq_counts[6];var csq7= csq_counts[7];var csq8= csq_counts[8];var csq9= csq_counts[9];
+        var ams0= sumCount[0] ? sumCount[0] : 0; var ams1= sumCount[1] ? sumCount[1] : 0; var ams2= sumCount[2] ? sumCount[2] : 0; var ams3= sumCount[3] ? sumCount[3] : 0; var ams4= sumCount[4] ? sumCount[4] : 0; var ams5= sumCount[5] ? sumCount[5] : 0;var ams6= sumCount[6] ? sumCount[6] : 0;var ams7= sumCount[7] ? sumCount[7] : 0;var ams8= sumCount[8] ? sumCount[8] : 0;var ams9= sumCount[9] ? sumCount[9] : 0;
+        var csq0= csq_counts[0] ? csq_counts[0] : 0; var csq1= csq_counts[1] ? csq_counts[1] : 0; var csq2= csq_counts[2] ? csq_counts[2] : 0; var csq3= csq_counts[3] ? csq_counts[3] : 0; var csq4= csq_counts[4] ? csq_counts[4] : 0; var csq5= csq_counts[5] ? csq_counts[5] : 0;var csq6= csq_counts[6] ? csq_counts[6] : 0;var csq7= csq_counts[7] ? csq_counts[7] : 0;var csq8= csq_counts[8] ? csq_counts[8] : 0;var csq9= csq_counts[9] ? csq_counts[9] : 0;
       for(var o= 0; o< 10; o++)
       { 
         let index = list_orders.findIndex(obj => parseInt(obj.amount) === o);
         miss_counts[o] = index;
       }
-      var ms0= miss_counts[0]; var ms1= miss_counts[1]; var ms2= miss_counts[2]; var ms3= miss_counts[3]; var ms4= miss_counts[4]; var ms5= miss_counts[5];var ms6= miss_counts[6];var ms7= miss_counts[7];var ms8= miss_counts[8];var ms9= miss_counts[9];
+      var ms0= miss_counts[0] ? miss_counts[0] : 0 ; var ms1= miss_counts[1] ? miss_counts[1] : 0; var ms2= miss_counts[2] ? miss_counts[2] : 0; var ms3= miss_counts[3] ? miss_counts[3] : 0; var ms4= miss_counts[4] ? miss_counts[4] : 0; var ms5= miss_counts[5] ? miss_counts[5] : 0;var ms6= miss_counts[6] ? miss_counts[6] : 0;var ms7= miss_counts[7] ? miss_counts[7] : 0;var ms8= miss_counts[8] ? miss_counts[8] : 0;var ms9= miss_counts[9] ? miss_counts[9] : 0;
       MISSING = `
               <span  class="number-cell">`+ms0+`</span>
               <span  class="number-cell">`+ms1+`</span>
@@ -1210,9 +1210,10 @@ var socket_call = "";
               },
             });
           });
-        
-        function div_click(e)
-        {
+
+          $('.Trend__C-nav .li').click(function (e) {
+            e.preventDefault();
+            var choose_var = $(this).text();
             $.ajax({
                 type: "POST",
                 url: "/api/webapi/5d/GetNoaverageEmerdList_Statistics",
@@ -1225,81 +1226,82 @@ var socket_call = "";
                 },
                 dataType: "json",
                 success: function(response1) {
-            $.ajax({
-                type: "POST",
-                url: "/api/webapi/5d/GetNoaverageEmerdList",
-                data: {
-                    gameJoin: $('html').attr('data-dpr'),
-                    pageno: "0",
-                    pageto: "10",
-                    authtoken:auth_token,
-                },
-                dataType: "json",
-                success: function (response) {
-                    let sta_list_orders = response1.data.gameslist;
-                    var actual_list = '';
-                    var box = {}; // my object
-                    var boxes =  []; 
-                    if(e == "A")
-                    {
-                        sta_list_orders.forEach(function(e,index) {
-                            inside_array = e.result.split('');
-                            box = {
-                                amount: inside_array[0]
-                            }
-                            boxes.push(box);
-                        });
-                    }
-                    else if(e == "B")
-                    {
-                        sta_list_orders.forEach(function(e,index) {
-                            inside_array = e.result.split('');
-                            box = {
-                                amount: inside_array[1]
-                            }
-                            boxes.push(box);
-                        });
-                    }
-                    else if(e == "C")
-                    {
-                        sta_list_orders.forEach(function(e,index) {
-                            inside_array = e.result.split('');
-                            box = {
-                                amount: inside_array[2]
-                            }
-                            boxes.push(box);
-                        });
-                    }
-                    else if(e == "D")
-                    {
-                        sta_list_orders.forEach(function(e,index) {
-                            inside_array = e.result.split('');
-                            box = {
-                                amount: inside_array[3]
-                            }
-                            boxes.push(box);
-                        });
-                    }
-                    else if(e == "E")
-                    {
-                        sta_list_orders.forEach(function(e,index) {
-                            inside_array = e.result.split('');
-                            box = {
-                                amount: inside_array[4]
-                            }
-                            boxes.push(box);
-                        });
-                    }
-                    show_statistics(boxes,2);   
-                    $("#chain_numbers").find('div').removeClass('active');
-                    $("#chain_numbers").find('div:contains("'+e+'")').addClass('active');
-                    let list_orders = response.data.gameslist;
-                    showListOrder_t(list_orders, 2);
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/webapi/5d/GetNoaverageEmerdList",
+                        data: {
+                            gameJoin: $('html').attr('data-dpr'),
+                            pageno: "0",
+                            pageto: "10",
+                            authtoken:auth_token,
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            let sta_list_orders = response1.data.gameslist;
+                            var actual_list = '';
+                            var box = {}; // my object
+                            var boxes =  []; 
+                            if(choose_var == "A")
+                                {
+                                    sta_list_orders.forEach(function(e,index) {
+                                        inside_array = e.result.split('');
+                                        box = {
+                                            amount: inside_array[0]
+                                        }
+                                        boxes.push(box);
+                                    });
+                                }
+                                else if(choose_var == "B")
+                                {
+                                    sta_list_orders.forEach(function(e,index) {
+                                        inside_array = e.result.split('');
+                                        box = {
+                                            amount: inside_array[1]
+                                        }
+                                        boxes.push(box);
+                                    });
+                                }
+                                else if(choose_var == "C")
+                                {
+                                    sta_list_orders.forEach(function(e,index) {
+                                        inside_array = e.result.split('');
+                                        box = {
+                                            amount: inside_array[2]
+                                        }
+                                        boxes.push(box);
+                                    });
+                                }
+                                else if(choose_var == "D")
+                                {
+                                    sta_list_orders.forEach(function(e,index) {
+                                        inside_array = e.result.split('');
+                                        box = {
+                                            amount: inside_array[3]
+                                        }
+                                        boxes.push(box);
+                                    });
+                                }
+                                else if(choose_var == "E")
+                                {
+                                    sta_list_orders.forEach(function(e,index) {
+                                        inside_array = e.result.split('');
+                                        box = {
+                                            amount: inside_array[4]
+                                        }
+                                        boxes.push(box);
+                                    });
+                                }
+                            show_statistics(boxes,2);   
+                            $("#chain_numbers").find('div').removeClass('active');
+                            $("#chain_numbers").find('div:contains("'+choose_var+'")').addClass('active');
+                            let list_orders = response.data.gameslist;
+                            showListOrder_t(list_orders, 2);
+                        }
+                    });
                 }
             });
-        }
-        });
-        }function callListOrder() {
+			});
+        function callListOrder() {
             $.ajax({
                 type: "POST",
                 url: "/api/webapi/5d/GetNoaverageEmerdList",
