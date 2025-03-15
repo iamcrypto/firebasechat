@@ -756,24 +756,35 @@
                             });
                             const initSubordinatesData = async () => {
                                try {
-                                  const response = await axios.post("/api/subordinates/summary",{authtoken:auth_token});
-                      
-                                  $("#directSubordinatesCount").text(response?.data?.data?.directSubordinatesCount);
-                                  $("#noOfRegisteredSubordinates").text(response?.data?.data?.noOfRegisteredSubordinates);
-                                  $("#directSubordinatesRechargeQuantity").text(response?.data?.data?.directSubordinatesRechargeQuantity);
-                                  $("#directSubordinatesRechargeAmount").text(response?.data?.data?.directSubordinatesRechargeAmount);
-                                  $("#directSubordinatesWithDepositCount").text(response?.data?.data?.directSubordinatesWithDepositCount);
-                                  $("#teamSubordinatesCount").text(response?.data?.data?.teamSubordinatesCount);
-                                  $("#noOfRegisterAllSubordinates").text(response?.data?.data?.noOfRegisterAllSubordinates);
-                                  $("#teamSubordinatesRechargeQuantity").text(response?.data?.data?.teamSubordinatesRechargeQuantity);
-                                  $("#teamSubordinatesRechargeAmount").text(response?.data?.data?.teamSubordinatesRechargeAmount);
-                                  $("#teamSubordinatesWithDepositCount").text(response?.data?.data?.teamSubordinatesWithDepositCount);
-                                  $("#totalCommissionsThisWeek").text(response?.data?.data?.totalCommissionsThisWeek);
-                                  $("#totalCommissions").text(response?.data?.data?.totalCommissions);
-                                  $("#yesterdayCommissionAmount").text(response?.data?.data?.totalCommissionsYesterday);
-                                  $('#roses_all').text(response?.data?.data?.totalCommissions);
-                                  $('#week_comm').text(response?.data?.data?.totalCommissions);
-                                  $('#roses_today').text(response?.data?.data?.totalCommissionsYesterday);
+
+                                            
+                            $.ajax({
+                              type: "POST",
+                              url: "/api/subordinates/summary",
+                              data: {
+                                authtoken:auth_token,
+                              },
+                              dataType: "json",
+                              success: function (response) {
+
+                                  $("#directSubordinatesCount").text(response.data.directSubordinatesCount);
+                                  $("#noOfRegisteredSubordinates").text(response.data.noOfRegisteredSubordinates);
+                                  $("#directSubordinatesRechargeQuantity").text(response.data.directSubordinatesRechargeQuantity);
+                                  $("#directSubordinatesRechargeAmount").text(response.data.directSubordinatesRechargeAmount);
+                                  $("#directSubordinatesWithDepositCount").text(response.data.directSubordinatesWithDepositCount);
+                                  $("#teamSubordinatesCount").text(response.data.teamSubordinatesCount);
+                                  $("#noOfRegisterAllSubordinates").text(response.data.noOfRegisterAllSubordinates);
+                                  $("#teamSubordinatesRechargeQuantity").text(response.data.teamSubordinatesRechargeQuantity);
+                                  $("#teamSubordinatesRechargeAmount").text(response.data.teamSubordinatesRechargeAmount);
+                                  $("#teamSubordinatesWithDepositCount").text(response.data.teamSubordinatesWithDepositCount);
+                                  $("#totalCommissionsThisWeek").text(response.data.totalCommissionsThisWeek);
+                                  $("#totalCommissions").text(response.data.totalCommissions);
+                                  $("#yesterdayCommissionAmount").text(response.data.totalCommissionsYesterday);
+                                  $('#roses_all').text(response.data.totalCommissions);
+                                  $('#week_comm').text(response.data.totalCommissions);
+                                  $('#roses_today').text(response.data.totalCommissionsYesterday);
+                              }
+                            });
                                } catch (error) {
                                   console.log(error);
                                }
@@ -811,7 +822,7 @@
                                 type: "POST",
                                 url: "/api/webapi/promotion",
                                 data: {
-                    
+                                  authtoken:auth_token,
                                 },
                                 dataType: "json",
                                 success: function (response) {
@@ -819,7 +830,6 @@
                                     $('#f1').text(response.invite.f1);
                                     $('#f1_today').text(response.invite.f1_today);
                                     const f1Count =response.invite.f1_today;
-                                    console.log(f1Count);
                                     $('#f_all_today').text(response.invite.f_all_today);
                                     $('#f_total').text(response.invite.total_f);
                                     $('#span_level').text(response.info[0].user_level);
@@ -839,7 +849,7 @@
                                     //    qrcode.makeCode(window.location.hostname + `/register?r_code=${response.info[0].code}`);
                                     //}
                     
-                                    makeCode();
+                                   // makeCode();
                                 }
                             });
                             function copy(selector) {

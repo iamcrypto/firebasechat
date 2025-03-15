@@ -75,6 +75,7 @@ const initiateManualUSDTPayment = async (req, res) => {
 
 const addManualUPIPaymentRequest = async (req, res) => {
     try {
+        console.log("fired");
         const data = req.body
         let auth = req.body.authtoken;
         let money = parseInt(data.money);

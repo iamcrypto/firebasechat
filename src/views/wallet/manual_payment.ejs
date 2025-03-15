@@ -5,12 +5,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manual UPI</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="/js/client.js"></script>
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="https://momentjs.com/downloads/moment.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 </head>
 
 <body>
@@ -216,10 +210,10 @@
                         alt="digitalrupee1@ybl" />
                 </p>
             </button>
-        <form class="verification_form__root" action="submit.php" method="post">
+        <form class="verification_form__root">
             <label for="upi_ref_no">UPI Ref. No.</label>
             <input type="text" id="upi_ref_no" name="upi_ref_no" required placeholder="Enter Your UTR here..." />
-            <button id="submit_button" type="submit">Submit</button>
+            <button id="submit_button">Submit</button>
         </form>
 
         <div class="tutorial_root">
@@ -271,22 +265,20 @@
         
     </main>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/js/client.js"></script>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://momentjs.com/downloads/moment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+
     <script>
         const copyUpiId = document.getElementById("copy_upi_id");
-
         copyUpiId.addEventListener("click", function () {
             let upi_id = document.getElementById("upi_id_field").innerText;
             console.log(upi_id);
             navigator.clipboard.writeText(upi_id);
         });
-
-        // const displayAmount = document.getElementById("display_amount");
-        // const urlParams = new URLSearchParams(window.location.search);
-        // const amount = urlParams.get("am");
-        // displayAmount.innerText = amount;
-
-        // const upiPayNow = document.getElementById("upi_pay_now");
-
         const alertMessage = (text) => {
             const msg = document.createElement('div');
             msg.setAttribute('data-v-1dcba851', '');
@@ -324,45 +316,43 @@
                   var username = auth.user.username;
                   var password = auth.user.uid;
                   var auth_token = auth.accessToken;
-                  const submitButton = document.getElementById("submit_button");
-                  submitButton.addEventListener("click", async (event) => {
-                      try {
-          
-          
-                          event.preventDefault();
-                          const upiRefNo = document.getElementById("upi_ref_no").value;
-                          const amount = '<%=Amount%>';
-          
-                          const response = await axios.post("/wallet/paynow/manual_upi_request", {
-                              money: amount,
-                              utr: upiRefNo,
-                              authtoken:auth_token,
-                          })
-          
-                          if (!response?.data) {
-                              alertMessage("Something went Wrong!")
-                              return
-                          }
-          
-                          if (response?.data?.status === false) {
-                              alertMessage(response?.data?.message)
-                              return
-                          }
-          
-                          alertMessage(response?.data?.message)
-          
-                          window.location.href = "/wallet/rechargerecord"
-                      } catch (error) {
-                          console.log(error);
-                          alertMessage("Something went Wrong!")
-                      }
+                  $(document).on("click", '#submit_button', function(e){
+                    e.preventDefault();
+                    const upiRefNo = document.getElementById("upi_ref_no").value;
+                    const amount = '<%=Amount%>';
+                    $.ajax({
+                        type: "POST",
+                        url: "/wallet/paynow/manual_upi_request",
+                        data: {
+                          money: amount,
+                          utr: upiRefNo,
+                          authtoken:auth_token,
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            if (!response) {
+                                alertMessage("Something went Wrong!")
+                                return
+                            }
+            
+                            if (response.status === false) {
+                                alertMessage(response.message)
+                                return
+                            }
+                            alertMessage(response.message)
+            
+                            window.location.href = "/wallet/rechargerecord"; 
+                        }  
+                    });
                   });
-                });
-            }
+                    
+                          
+            });
+        }
         catch (err) {
             alert(err);
         }
-        }
+    }
         auth();
 
        
