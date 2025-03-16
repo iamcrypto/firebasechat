@@ -312,6 +312,10 @@ const recordsalary = async (req, res) => {
     return res.render("member/about/recordsalary.ejs", {sandbox});
 }
 
+const gameStatisticsPage = async (req, res) => {
+    return res.render("member/game_statistics.ejs");
+}
+
 const privacyPolicy = async (req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
     return res.render("member/about/privacyPolicy.ejs", {sandbox});
@@ -403,6 +407,7 @@ module.exports = {
     promotionDesPage,
     comhistoryPage,
     mybethistoryPage,
+    gameStatisticsPage,
     tutorialPage,
     bonusRecordPage,
     rechargePage,

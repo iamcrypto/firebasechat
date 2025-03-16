@@ -90,6 +90,7 @@ const initWebRouter = (app) => {
     router.get('/d5chat', homeController.d5chat);
     router.get('/redenvelopes', homeController.redenvelopes);
     router.get('/mian/forgot', homeController.forgot);
+    router.get("/mian/game_statistics", homeController.gameStatisticsPage);
     router.get('/newtutorial', homeController.newtutorial);
     router.get('/about/privacyPolicy', homeController.privacyPolicy);
     router.get('/about/TermsofService', homeController.riskAgreement);
