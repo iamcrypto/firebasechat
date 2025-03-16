@@ -71,10 +71,6 @@ const cronJobGame1p = (io) => {
           [],
         );
         io.emit("data-server-trx-wingo", { data: trxWingo , 'game': '3' });
-        await winGoController.distributeCommission(),
-          await k3Controller.distributeCommission(),
-          await k5Controller.distributeCommission(),
-          await trxWingoController.distributeCommission()
     });
 
     cron.schedule('*/5 * * * *', async() => {
