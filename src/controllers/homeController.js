@@ -316,9 +316,7 @@ const recordsalary = async (req, res) => {
     return res.render("member/about/recordsalary.ejs", {sandbox});
 }
 
-const gameStatisticsPage = async (req, res) => {
-    return res.render("member/game_statistics.ejs");
-}
+
 
 const privacyPolicy = async (req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
@@ -433,6 +431,5 @@ module.exports = {
     getSalaryRecord,
     transactionhistoryPage,
     d_get_betting,
-    invitationRulesPage,
-    gameStatisticsPage
+    invitationRulesPage
 }
