@@ -93,7 +93,7 @@ const initWebRouter = (app) => {
     router.get("/mian/game_statistics", homeController.gameStatisticsPage);
     router.get('/newtutorial', homeController.newtutorial);
     router.get('/about/privacyPolicy', homeController.privacyPolicy);
-    router.get('/about/riskAgreement', homeController.riskAgreement);
+    router.get('/about/TermsofService', homeController.riskAgreement);
     router.post('/api/betting/get_betting', homeController.d_get_betting);
     router.get('/myProfile', homeController.myProfilePage);
     router.post('/api/webapi/get/mybets', userController.getmybets); 
