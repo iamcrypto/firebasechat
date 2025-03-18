@@ -13,6 +13,10 @@ const homePage = async (req, res) => {
     return res.render("home/index.ejs", { app , sandbox});
 }
 
+const gameStatisticsPage = async (req, res) => {
+    var sandbox = process.env.SANDBOX_MODE;
+    return res.render("member/game_statistics.ejs",{sandbox});
+}
 
 
 const activityPage = async (req, res) => {
@@ -425,4 +429,5 @@ module.exports = {
     transactionhistoryPage,
     d_get_betting,
     invitationRulesPage,
+    gameStatisticsPage
 }

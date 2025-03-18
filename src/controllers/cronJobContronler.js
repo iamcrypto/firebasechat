@@ -5,7 +5,6 @@ import k3Controller from "./k3Controller";
 import vipController from "./vipController.js";
 import paymentController from "./paymentController.js";
 import promotionController from "./promotionController.js";
-import md5 from "md5";
 import "dotenv/config";
 import trxWingoController, {
     TRX_WINGO_GAME_TYPE_MAP,
@@ -74,7 +73,6 @@ const cronJobGame1p = (io) => {
     });
 
     cron.schedule('*/5 * * * *', async() => {
-
         await winGoController.addWinGo(5);
         await winGoController.handlingWinGo1P(5);
         const [winGo1] = await connection.execute('SELECT * FROM `wingo` WHERE `game` = "wingo5" ORDER BY `id` DESC LIMIT 2 ', []);
