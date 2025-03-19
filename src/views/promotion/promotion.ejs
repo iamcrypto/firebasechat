@@ -18,6 +18,11 @@
     <link rel="shortcut icon" href="/images/bitbug_favicon.ico" type="image/x-icon">
 
     <style>
+      #button1
+      {
+        background: transparent;
+        border: none;
+      }
       .mian .promotion .info-data .left .txt[data-v-7c8bbbf4]{
         font-size: 13px;
         text-align: left;
@@ -575,10 +580,10 @@
                             
                                 <div data-v-7c8bbbf4="" class="btn-list c-row c-row-middle-center">
                                     <div data-v-7c8bbbf4="" class="btn-box">
-                                        <div data-v-7c8bbbf4="" class="btn m-b-10 c-row c-row-middle-center tag-read"
+                                        <div data-v-7c8bbbf4="" class="invitation_code btn m-b-10 c-row c-row-middle-center tag-read"
                                             data-clipboard-text=""> <img data-v-932703ba="" src="/assets/png/copy_code-737d1334.png" alt="" style="width: 35px;"> Copy Invitation Code</div>
                                         <div data-v-7c8bbbf4="" data-clipboard-text=""
-                                            class="btn m-b-10 c-row c-row-middle-center tag-read"> <img data-v-932703ba="" src="/assets/png/copy_code-737d1334.png" alt="" style="width: 35px;"> Copy Link</div>
+                                            class="btn m-b-10 c-row c-row-middle-center tag-read"> <img data-v-932703ba="" src="/assets/png/copy_code-737d1334.png" alt="" style="width: 35px;"> <button id="button1" class="btn btn-success" >Share on Social Media</button></div>
                                     </div>
                                 </div>
                             </div>
@@ -748,7 +753,7 @@
                                     sic.removeClass('block-click');
                                 }, 1000);
                             }  
-                            $('.btn-box .btn').click(function (e) {
+                            $('.invitation_code').click(function (e) {
                                 e.preventDefault();
                                 $(this).addClass('block-click');
                                 alertMess('Copy successful', $(this));
@@ -872,6 +877,21 @@
         }
         }
         auth();
+        $('#button1').click(function (e) {
+          e.preventDefault();
+          if (!navigator.share) {
+            Pi.openShareDialog(shareData.title, shareData.text);
+        }else
+        {
+          try {
+             navigator.share(shareData);
+            //resultPara.textContent = 'MDN shared successfully'
+          } catch(err) {
+            //alert('Error: ' + err);
+          }
+        }
+      });
+        
 
              </script>
 </body>
