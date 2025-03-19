@@ -877,20 +877,27 @@
         }
         }
         auth();
-        $('#button1').click(function (e) {
-          e.preventDefault();
-          if (!navigator.share) {
-            Pi.openShareDialog(shareData.title, shareData.text);
-        }else
-        {
-          try {
-             navigator.share(shareData);
-            //resultPara.textContent = 'MDN shared successfully'
-          } catch(err) {
-            //alert('Error: ' + err);
-          }
+        const shareData = {
+          title: 'Chessboard live Platform',
+          text: 'Hi. Check it out this Pi App: Chessboard Live Platform (Pi Network Games from LIVE TELECAST). Try it in Pi Browser. #PiNetwork #PiApps https://livetelecast.online/',
+          //url: 'https://livetelecast.online/',
+      }
+      
+      $('#button1').click(function (e) {
+        e.preventDefault();
+        if (!navigator.share) {
+          Pi.openShareDialog(shareData.title, shareData.text);
+      }else
+      {
+        try {
+           navigator.share(shareData);
+          //resultPara.textContent = 'MDN shared successfully'
+        } catch(err) {
+          //alert('Error: ' + err);
         }
-      });
+      }
+    });
+      
         
 
              </script>
