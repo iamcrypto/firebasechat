@@ -708,7 +708,8 @@
         async function auth() {
           try {
               
-              const scopes = ['username', 'payments', 'wallet_address'];
+              const scopes =
+               ['username', 'payments', 'wallet_address'];
               function onIncompletePaymentFound(payment) {
                   console.log("incomplete Transaction");
               }; 
@@ -718,6 +719,28 @@
                   var password = auth.user.uid;
                   var auth_token = auth.accessToken;
                   pi_username = auth.user.username;
+
+                  const shareData = {
+                    title: 'Chessboard live Platform',
+                    text: 'Hi. Check it out this Pi App: Chessboard Live Platform (Pi Network Games from LIVE TELECAST). Try it in Pi Browser. #PiNetwork #PiApps https://livetelecast.online/'+username,
+                    //url: 'https://livetelecast.online/',
+                }
+                
+                $('#button1').click(function (e) {
+                  e.preventDefault();
+                  console.log(shareData);
+                  if (!navigator.share) {
+                    Pi.openShareDialog(shareData.title, shareData.text);
+                }else
+                {
+                  try {
+                     navigator.share(shareData);
+                    //resultPara.textContent = 'MDN shared successfully'
+                  } catch(err) {
+                    //alert('Error: ' + err);
+                  }
+                }
+              });
                   $.ajax({
                     type: "POST",
                     url: "/api/webapi/check_login",
@@ -869,6 +892,8 @@
                                 document.execCommand("copy");
                                 $temp.remove();
                             }
+
+
                         }
                     }
                 });
@@ -879,27 +904,7 @@
         }
         }
         auth();
-      
-      
-      $('#button1').click(function (e) {
-        e.preventDefault();
-        const shareData = {
-          title: 'Chessboard live Platform',
-          text: 'Hi. Check it out this Pi App: Chessboard Live Platform (Pi Network Games from LIVE TELECAST). Try it in Pi Browser. #PiNetwork #PiApps https://livetelecast.online/'+pi_username,
-          //url: 'https://livetelecast.online/',
-      }
-        if (!navigator.share) {
-          Pi.openShareDialog(shareData.title, shareData.text);
-      }else
-      {
-        try {
-           navigator.share(shareData);
-          //resultPara.textContent = 'MDN shared successfully'
-        } catch(err) {
-          //alert('Error: ' + err);
-        }
-      }
-    });
+        
       
         
 
