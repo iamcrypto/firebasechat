@@ -538,8 +538,10 @@ catch (err) {
     alert(err);
 }
 }
-    });
+
 auth();
+
+});
 
 
 

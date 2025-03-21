@@ -1711,5 +1711,7 @@ async function auth() {
       alert(err);
     }
   }
-});
+
 auth();
+
+});

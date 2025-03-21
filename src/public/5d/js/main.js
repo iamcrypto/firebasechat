@@ -1473,5 +1473,7 @@ socket.on("data-server-5d", function (msg) {
         alert(err);
       }
     }
-});
+
   auth();
+
+});

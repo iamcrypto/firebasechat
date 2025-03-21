@@ -1608,5 +1608,7 @@ async function auth() {
       }
     }
 
-  });
+
   auth();
+
+});

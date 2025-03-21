@@ -1936,6 +1936,6 @@ $.ajax({
     alert(err);
     }
     }
+    auth();
 
   });
-    auth();

@@ -1928,7 +1928,6 @@ async function auth() {
       alert(err);
     }
   }
-});
 auth();
 
 function tdOnclick(e) {
@@ -1948,3 +1947,5 @@ function tdOnclick(e) {
    $('#win_submit').addClass('winspan_db');
   }
 }
+
+});
