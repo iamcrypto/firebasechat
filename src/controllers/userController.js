@@ -2337,6 +2337,14 @@ const set_lang_data = async (req, res) => {
         status: true,
     });
 }
+
+const getsandbox = async (req, res) => {
+    var sandbox = process.env.SANDBOX_MODE;
+    return res.status(200).json({
+        sandbox_val: sandbox,//Register Sucess
+        status: true,
+    });
+}
 const get_lang_data = async (req, res) => {
     let auth = req.body.authtoken;
     let [user] = await connection.query('SELECT * FROM users WHERE `token` = ?', [md5(auth)]);
@@ -2974,4 +2982,5 @@ module.exports = {
     username_transfer,
     phone_transfer,
     user_id_transfer,
+    getsandbox,
 }

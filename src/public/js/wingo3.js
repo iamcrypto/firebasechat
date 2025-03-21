@@ -1125,8 +1125,11 @@ function tdOnclick(e) {
 }
 
 
+fetch("/api/sandbox_val")
+  .then((response) => response.json())
+    .then((data) => {
 const Pi = window.Pi;
-Pi.init({ version: "2.0", sandbox:false });
+Pi.init({ version: "2.0", sandbox:data.sandbox_val });
 async function auth() {
   try {
       
@@ -1948,4 +1951,5 @@ async function auth() {
       alert(err);
     }
   }
+});
   auth();

@@ -25,6 +25,7 @@ const initWebRouter = (app) => {
     router.post('/api/getkefudata', accountController.kePageInfo);
     router.post('/api/sent/otp/verify/reset', accountController.verifyCodePass);
     router.post('/api/resetPasword', accountController.forGotPassword);
+    router.get('/api/sandbox_val', userController.getsandbox);
 
     // page home
     router.get('/', (req, res) => {

@@ -791,9 +791,11 @@ function GetMyEmerdList(datas) {
     $(`#showJoinMe`).html(htmls);
 }
 
-
+fetch("/api/sandbox_val")
+  .then((response) => response.json())
+    .then((data) => {
 const Pi = window.Pi;
-Pi.init({ version: "2.0", sandbox:false });
+Pi.init({ version: "2.0", sandbox:data.sandbox_val });
 async function auth() {
   try {
       
@@ -1471,4 +1473,5 @@ socket.on("data-server-5d", function (msg) {
         alert(err);
       }
     }
+});
   auth();

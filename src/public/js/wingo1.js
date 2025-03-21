@@ -1099,8 +1099,13 @@ $(`.game-betting .box .item:eq(${selectPageTime - 1}) .img`).addClass('block-cli
 $(`.game-betting .box .item .img .van-image img`).attr('src', '/images/icon_clock-gerrn.svg');
 $(`.game-betting .box .item:eq(${selectPageTime - 1}) .img .van-image img`).attr('src', '/images/icon_clock-red.svg');
 
+
+
+fetch("/api/sandbox_val")
+  .then((response) => response.json())
+    .then((data) => {
 const Pi = window.Pi;
-Pi.init({ version: "2.0", sandbox:false });
+Pi.init({ version: "2.0", sandbox: data.sandbox_val});
 async function auth() {
   try {
       
@@ -1923,6 +1928,7 @@ async function auth() {
       alert(err);
     }
   }
+});
 auth();
 
 function tdOnclick(e) {
