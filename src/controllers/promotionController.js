@@ -1348,13 +1348,13 @@ const getDailyRebateReword = async (req, res) => {
     }
 
     const today = moment().startOf("day").valueOf();
-    const [commissions] = await connection.query('SELECT SUM(`money`) as `sum` FROM commissions WHERE phone = ? AND `time` >= ?', [user.phone, today]);
+    const [commissions] = await connection.query('SELECT SUM(`money`) as `sum` FROM commissions WHERE phone = ? AND `time` >= ? AND `level` <= 6;', [user.phone, today]);
 	  let comm_amt = 0;
     comm_amt = commissions[0].sum || 0;
 	
     const todayRebateAmount = comm_amt;
 
-    const [week_commissions] = await connection.query('SELECT SUM(`money`) as `sum` FROM commissions WHERE phone = ?;', [user.phone]);
+    const [week_commissions] = await connection.query('SELECT SUM(`money`) as `sum` FROM commissions WHERE phone = ? AND `level` <= 6;', [user.phone]);
 	  let w_comm_amt = 0;
     w_comm_amt = week_commissions[0].sum || 0;
 	
@@ -1406,7 +1406,7 @@ const claimDailyRebateReword = async (req, res) => {
     }
 
     const today = moment().startOf("day").valueOf();
-    const [commissions] = await connection.query('SELECT SUM(`money`) as `sum` FROM commissions WHERE phone = ? AND `time` >= ?', [user.phone, today]);
+    const [commissions] = await connection.query('SELECT SUM(`money`) as `sum` FROM commissions WHERE phone = ? AND `time` >= ? AND `level` <= 6;', [user.phone, today]);
 	  let comm_amt = 0;
     comm_amt = commissions[0].sum || 0;
 	
