@@ -1104,6 +1104,7 @@ $(`.game-betting .box .item:eq(${selectPageTime - 1}) .img .van-image img`).attr
 fetch("/api/sandbox_val")
   .then((response) => response.json())
     .then((data) => {
+      alert(data.sandbox_val);
 const Pi = window.Pi;
 Pi.init({ version: "2.0", sandbox:data.sandbox_val});
 async function auth() {
