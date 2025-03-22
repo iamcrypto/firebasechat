@@ -626,8 +626,15 @@ fetch("/api/sandbox_val")
   .then((response) => response.json())
     .then((data) => {
 
-const Pi = window.Pi;
-Pi.init({ version: "2.0", sandbox:data.sandbox_val });
+      if(data.sandbox_val.toString().trim() == 'false')
+        {
+          u_sandbox_val = false;
+        }
+        else{
+          u_sandbox_val = true;
+        }
+    const Pi = window.Pi;
+    Pi.init({ version: "2.0", sandbox:u_sandbox_val});
 async function auth() {
   try {
       
