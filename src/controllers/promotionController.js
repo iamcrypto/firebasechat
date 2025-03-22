@@ -1074,6 +1074,15 @@ const WeekBettingBonusList = [
   },
 ]
 
+
+const DailyRebateBonusList = [
+  {
+    id: 1,
+    rebetAmount: 50,
+    bonusAmount: 0,
+  },
+]
+
 const DailyBettingBonusList = [
   {
     id: 1,
@@ -1284,6 +1293,201 @@ const getDailyBettingeReword = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+const dailyRebateRewordRecord = async (req, res) => {
+  try {
+    const authToken = req.body.authtoken;;
+    const [userRow] = await connection.execute(
+      "SELECT `phone` FROM `users` WHERE `token` = ? AND `veri` = 1",
+      [md5(authToken)],
+    );
+    const user = userRow?.[0];
+
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const [claimedRewardsRow] = await connection.execute(
+      "SELECT * FROM `claimed_rewards` WHERE `type` = ? AND `phone` = ?",
+      [REWARD_TYPES_MAP.REBATE_BONUS, user.phone],
+    );
+    const claimedRewardsData = claimedRewardsRow.map((claimedReward) => {
+      const currentDailyBetttingReword = DailyRebateBonusList.find(
+        (item) => item?.id === claimedReward?.reward_id,
+      );
+      return {
+        id: claimedReward.reward_id,
+        requireBettingAmount: currentDailyBetttingReword?.rebetAmount || 0,
+        amount: claimedReward.amount,
+        status: claimedReward.status,
+        time: moment.unix(claimedReward.time).format("YYYY-MM-DD HH:mm:ss"),
+      };
+    });
+    return res.status(200).json({
+      data: claimedRewardsData,
+      status: true,
+      message: "Successfully fetched daily recharge bonus record",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+const getDailyRebateReword = async (req, res) => {
+  try {
+    const authToken = req.body.authtoken;
+    const [userRow] = await connection.execute(
+      "SELECT `phone` FROM `users` WHERE `token` = ? AND `veri` = 1",
+      [md5(authToken)],
+    );
+    const user = userRow?.[0];
+
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const today = moment().startOf("day").valueOf();
+    const [commissions] = await connection.query('SELECT SUM(`money`) as `sum` FROM commissions WHERE phone = ? AND `time` >= ?', [user.phone, today]);
+	  let comm_amt = 0;
+    comm_amt = commissions[0].sum || 0;
+	
+    const todayRebateAmount = comm_amt;
+
+    const [week_commissions] = await connection.query('SELECT SUM(`money`) as `sum` FROM commissions WHERE phone = ?;', [user.phone]);
+	  let w_comm_amt = 0;
+    w_comm_amt = week_commissions[0].sum || 0;
+	
+    const week_RebateAmount = w_comm_amt;
+
+    const [claimedBettingRow] = await connection.execute(
+      "SELECT * FROM `claimed_rewards` WHERE `type` = ? AND `phone` = ? AND `time` >= ?",
+      [REWARD_TYPES_MAP.REBATE_BONUS, user.phone, today],
+    );
+
+
+    const dailyRebateRewordList = DailyRebateBonusList.map((item) => {
+      return {
+        id: item.id,
+        bettingAmount: Math.min(todayRebateAmount, item.rebetAmount),
+        requiredBettingAmount: item.rebetAmount,
+        bonusAmount: todayRebateAmount,
+        weeklyBetAmount:week_RebateAmount,
+        isFinished: todayRebateAmount >= item.rebetAmount,
+        isClaimed: claimedBettingRow.some(
+          (claimedReward) => claimedReward.reward_id === item.id,
+        ),
+      };
+    });
+
+    return res.status(200).json({
+      data: dailyRebateRewordList,
+      status: true,
+      message: "Successfully fetched daily recharge bonus data",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const claimDailyRebateReword = async (req, res) => {
+  try {
+    const authToken = req.body.authtoken;
+    const dailyRebateRewordId = req.body.claim_id;
+    const [userRow] = await connection.execute(
+      "SELECT `phone` FROM `users` WHERE `token` = ? AND `veri` = 1",
+      [md5(authToken)],
+    );
+    const user = userRow?.[0];
+
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const today = moment().startOf("day").valueOf();
+    const [commissions] = await connection.query('SELECT SUM(`money`) as `sum` FROM commissions WHERE phone = ? AND `time` >= ?', [user.phone, today]);
+	  let comm_amt = 0;
+    comm_amt = commissions[0].sum || 0;
+	
+    const todayRebateAmount = comm_amt;
+
+
+    const [claimedBettingRow] = await connection.execute(
+      "SELECT * FROM `claimed_rewards` WHERE `type` = ? AND `phone` = ? AND `time` >= ?",
+      [REWARD_TYPES_MAP.REBATE_BONUS, user.phone, today],
+    );
+
+    const dailyRebateRewordList = DailyRebateBonusList.map((item) => {
+      return {
+        id: item.id,
+        bettingAmount: todayRebateAmount,
+        requiredBettingAmount: item.rebetAmount,
+        bonusAmount: todayRebateAmount,
+        isFinished: todayRebateAmount >= item.rebetAmount,
+        isClaimed: claimedBettingRow.some(
+          (claimedReward) => claimedReward.reward_id === item.id,
+        ),
+      };
+    });
+
+    const claimableBonusData = dailyRebateRewordList.filter(
+      (item) =>
+        item.isFinished && item.bettingAmount >= item.requiredBettingAmount,
+    );
+    if (claimableBonusData.length === 0) {
+      return res.status(200).json({
+        status: false,
+        message: "You does not meet the requirements to claim this reward!",
+      });
+    }
+    const claimedBonusData = claimableBonusData?.find(
+      (item) => item.id === parseInt(dailyRebateRewordId),
+    );
+    const [bonusList] = await connection.query(
+      "SELECT * FROM `claimed_rewards` WHERE `type` = ? AND `phone` = ? AND `time` >= ? AND `reward_id` = ?",
+      [
+        REWARD_TYPES_MAP.REBATE_BONUS,
+        user.phone,
+        today,
+        claimedBonusData.id,
+      ],
+    );
+    if (bonusList.length > 0) {
+      return res.status(200).json({
+        status: false,
+        message: "Bonus already claimed",
+      });
+    }
+    const time = moment().valueOf();
+
+    await connection.execute(
+      "UPDATE `users` SET `money` = `money` + ?, `total_money` = `total_money` + ? WHERE `phone` = ?",
+      [claimedBonusData.bonusAmount, claimedBonusData.bonusAmount, user.phone],
+    );
+
+    await connection.execute(
+      "INSERT INTO `claimed_rewards` (`reward_id`, `type`, `phone`, `amount`, `status`, `time`) VALUES (?, ?, ?, ?, ?, ?)",
+      [
+        claimedBonusData.id,
+        REWARD_TYPES_MAP.REBATE_BONUS,
+        user.phone,
+        claimedBonusData.bonusAmount,
+        REWARD_STATUS_TYPES_MAP.SUCCESS,
+        time,
+      ],
+    );
+
+    return res.status(200).json({
+      status: true,
+      message: "Successfully claimed daily betting bonus",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 
 
 const getDailyRechargeReword = async (req, res) => {
@@ -2440,6 +2644,9 @@ const promotionController = {
   weeklyBetttingRewordRecord,
   addonstake,
   getstakedetails,
+  claimDailyRebateReword,
+  dailyRebateRewordRecord,
+  getDailyRebateReword,
 };
 
 export default promotionController;

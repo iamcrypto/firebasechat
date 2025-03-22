@@ -145,7 +145,8 @@ const cronJobGame1p = (io) => {
           await winGoController.distributeCommission(),
           await k3Controller.distributeCommission(),
           await k5Controller.distributeCommission(),
-          await trxWingoController.distributeCommission()
+          await trxWingoController.distributeCommission(),
+          vipController.releaseRebateCommission();
         }
       );
 }

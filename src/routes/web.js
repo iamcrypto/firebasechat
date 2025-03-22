@@ -407,6 +407,21 @@ const initWebRouter = (app) => {
   );
 
   router.post(
+    "/api/activity/daily_rebate_bonus/record",
+    promotionController.dailyRebateRewordRecord,
+  );
+
+  router.post(
+    "/api/activity/daily_rebate_bonus",
+    promotionController.getDailyRebateReword,
+  );
+
+  router.post(
+    "/api/activity/daily_rebate_bonus/claim",
+    promotionController.claimDailyRebateReword,
+  );
+
+  router.post(
     "/api/activity/daily_recharge_bonus",
     promotionController.getDailyRechargeReword,
   );
