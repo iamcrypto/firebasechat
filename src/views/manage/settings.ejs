@@ -159,6 +159,7 @@ async function auth() {
             },
             dataType: "json",
             success: function (response) {
+                console.log(response);
                 let bank = response.datas[0];
                 let momo = response.momo;
                 $('#edit-momo-name_bank').val(momo.bank_name);
@@ -175,9 +176,7 @@ async function auth() {
                 $('#cskh').val(response.settings[0].cskh);
                 $('#myapp_web').val(response.settings[0].app);
             }
-        });
-    </script>
-    <script>
+	});
         function sendRequest(params1, params2, typer) {
             $.ajax({
                 type: "POST",
@@ -202,10 +201,7 @@ async function auth() {
                             title: 'Phone number does not exist',
                         })
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'An unknown error !',
-                        })
+                       alert('An unknown error !');
                     }
                 }
             });
@@ -290,7 +286,7 @@ async function auth() {
                 })
 
                 if (response?.data?.status === true) {
-                    alertMessage(response?.data?.message)
+                    alert(response?.data?.message)
                 }
             } catch (error) {
                 console.log(error)
@@ -320,16 +316,13 @@ async function auth() {
                 dataType: "json",
                 success: function (response) {
                     if (response.status == true) {
-                        Swal.fire(
+                        alert(
                             'Good job!',
                             'Your Links Updated Successfully!',
                             'success'
                         )
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Empty or Wrong',
-                        })
+                        alert('Empty or Wrong');
                     }
                 }
             });

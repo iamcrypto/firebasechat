@@ -196,8 +196,13 @@ const initWebRouter = (app) => {
     router.post('/manager/member/redenvelope/:phone',  dailyController.listRedenvelope);
     router.post('/manager/member/bet/:phone',  dailyController.listBet);
 
+    router.post('/manager/recharge_apprv', dailyController.collo_rechargeDuyet);
+    router.post('/manager/withdraw_apprv', dailyController.collo_handlWithdraw);
+
 
     router.post('/manager/settings/list',  dailyController.settings);
+    router.post('/manager/settings/get', dailyController.settingGet);
+    router.post('/manager/collo_bank', dailyController.settingCollo_Details);
     router.post('/manager/createBonus',  dailyController.createBonus);
     router.post('/manager/listRedenvelops',  dailyController.listRedenvelops);
 
@@ -309,6 +314,7 @@ const initWebRouter = (app) => {
     router.post('/api/webapi/admin/CreatedSalary',  adminController.CreatedSalary); // get info account
     router.post('/api/webapi/admin/listMember',  adminController.listMember); // get info account
     router.post('/api/webapi/admin/listctv',  adminController.listCTV); // get info account
+    router.post('/api/webapi/admin/get_collo_pay', adminController.getCollotoogle); 
     router.post('/api/webapi/admin/withdraw',  adminController.handlWithdraw); // get info account
     router.post('/api/webapi/admin/recharge',  adminController.recharge); // get info account
     router.post('/api/webapi/admin/recharge_get',  adminController.get_recharge);
@@ -320,6 +326,7 @@ const initWebRouter = (app) => {
     router.post('/api/webapi/admin/statistical',  adminController.statistical2); // get info account
 
     router.post('/api/webapi/admin/banned',  adminController.banned); // get info account
+    router.post('/api/webapi/admin/on_off_collo', adminController.on_off_colloborator); 
 
 
     router.post('/api/webapi/admin/totalJoin',  adminController.totalJoin); // get info account
@@ -335,6 +342,7 @@ const initWebRouter = (app) => {
 
     router.post('/api/webapi/xpgain_value', userController.xpgain_value);
     router.post('/api/webapi/check_login', userController.check_login_val);
+    router.post('/api/webapi/check/GetManual_pay', userController.get_manual_upi_id);
 
     router.get(
         "/trx_wingo",

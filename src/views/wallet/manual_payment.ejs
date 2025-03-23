@@ -202,7 +202,7 @@
                 <p>
                     <strong>UPI ID: </strong>
                     <span id="upi_id_field">
-                        digitalrupee1@ybl
+                        
                     </span>
 
                     <img class="upi_display_content__img"
@@ -316,6 +316,17 @@
                   var username = auth.user.username;
                   var password = auth.user.uid;
                   var auth_token = auth.accessToken;
+                  $.ajax({
+                    type: "POST",
+                    url: "/api/webapi/check/GetManual_pay",
+                    data: {
+                        access_token:auth_token,
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        $("#upi_id_field").text(response.dynamic_upi_Addr);
+                    }
+                });
                   $(document).on("click", '#submit_button', function(e){
                     e.preventDefault();
                     const upiRefNo = document.getElementById("upi_ref_no").value;

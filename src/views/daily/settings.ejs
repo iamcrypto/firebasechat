@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tiranga</title>
+    <title>Setting</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -45,13 +45,42 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div style="padding: 10px 20px;margin-bottom: 200px;">
+                                <div class="form-group">
+                                <!-- <div class="text-center">
+                                     <label for="quantity">Change Deposit Information</label>
+                                 </div>
+                                 <label for="quantity" style="color: #3498db;">BANKING</label>
+                                 <input type="text" class="form-control" placeholder="Rate"
+                                     id="edit-banking-name_bank" value=""><br>
+                                 <input type="text" class="form-control" placeholder="Enter Account Name"
+                                     id="edit-banking-name" value=""><br>
+                                 <input type="text" class="form-control" placeholder="Enter Account Number"
+                                     id="edit-banking-info" value=""><br>
+                                 <button type="submit" class="btn btn-primary edit-banking"
+                                     style="width: 100%;margin-bottom: 20px;">Submit</button>  -->
+                                 <!---------------------------------------------------------------->
+                                 <div class="text-center">
+                                     <label for="quantity">Manual Settings</label>
+                                 </div>
 
+                                 <label for="edit-momo-name_bank" style="color: #3498db;">Rate</label>
+                                 <input type="text" class="form-control" placeholder="Rate"
+                                     id="edit-momo-name_bank" value=""><br>
+                                 <input type="text" class="form-control" placeholder="Wallet Owner Name"
+                                     id="edit-momo-name" value=""><br>
+                                 <input type="text" class="form-control" placeholder="UPI ID" id="edit-momo-info"
+                                     value=""><br>
+                                 <input type="text" class="form-control" placeholder="USDT Wallet Address"
+                                     id="edit-momo-qr" value=""><br>
+                                 <button type="submit" class="btn btn-primary edit-momo"
+                                     style="width: 100%;">Submit</button>
+                             </div>
                                 <div class="form-group">
                                     <div class="text-center">
                                         <label for="telegram">Telegram (Set up for members to use to contact you)</label>
                                     </div>
                                     <label for="telegram" style="color: #3498db;">Link Telegram</label>
-                                    <input type="text" class="form-control" id="telegram" placeholder="Enter Telegram Link" value=""><br>
+                                    <input type="text" id="telegram_url" class="form-control" id="telegram" placeholder="Enter Telegram Link" value=""><br>
                                     <button type="submit" class="btn btn-primary telegram" style="width: 100%;">Edit</button>
                                 </div>
 
@@ -60,46 +89,123 @@
                     </div>
                 </div>
             </div>
-            
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="https://momentjs.com/downloads/moment.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
-    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/dist/js/adminlte.min.js"></script>
-    <script src="/js/admin/admin.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.min.js"></script>
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+      <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+      <script src="/dist/js/adminlte.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.min.js"></script>
+      <script src="/js/admin/admin.js"></script>
+    </script>
     <script>
         const Pi = window.Pi;
-Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
-async function auth() {
-  try {
-      
-      const scopes = ['username', 'payments', 'wallet_address'];
-      function onIncompletePaymentFound(payment) {
-          console.log("incomplete Transaction");
-      }; 
+        Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
+        async function auth() {
+          try {
+              
+              const scopes = ['username', 'payments', 'wallet_address'];
+              function onIncompletePaymentFound(payment) {
+                  console.log("incomplete Transaction");
+              }; 
+        
+              Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+                  var username = auth.user.username;
+                  var password = auth.user.uid;
+                  var auth_token = auth.accessToken;
+                  
+        $.ajax({
+            type: "POST",
+            url: "/manager/settings/get",
+            data: {authtoken:auth_token},
+            dataType: "json",
+            success: function (response) {
+                let bank = response.datas[0];
+                let momo = response.momo;
+                $('#edit-momo-name_bank').val(momo.bank_name);
+                $('#edit-momo-name').val(momo.username);
+                $('#edit-momo-info').val(momo.upi_id);
+                $('#edit-momo-qr').val(momo.usdt_wallet_address);
 
-      Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
-          var username = auth.user.username;
-          var password = auth.user.uid;
-          var auth_token = auth.accessToken;
-          $.ajax({
+                $('#edit-banking-name_bank').val(bank.name_bank);
+                $('#edit-banking-name').val(bank.name_user);
+                $('#edit-banking-info').val(bank.stk);
+                // $('#edit-momo-qr').val(momo.qr_code_image);
+
+                $('#telegram').val(response.settings[0].telegram);
+                $('#cskh').val(response.settings[0].cskh);
+                $('#myapp_web').val(response.settings[0].app);
+            }
+        });
+
+        const alertMessage = (text) => {
+            console.log("123");
+            const msg = document.createElement('div');
+            msg.setAttribute('data-v-1dcba851', '');
+            msg.className = 'msg';
+
+            const msgContent = document.createElement('div');
+            msgContent.setAttribute('data-v-1dcba851', '');
+            msgContent.className = 'msg-content v-enter-active v-enter-to';
+            msgContent.style = '';
+            msgContent.textContent = text;
+
+            msg.appendChild(msgContent);
+            document.body.appendChild(msg);
+
+            setTimeout(() => {
+                msgContent.classList.remove('v-enter-active', 'v-enter-to');
+                msgContent.classList.add('v-leave-active', 'v-leave-to');
+
+                setTimeout(() => {
+                    document.body.removeChild(msg);
+                }, 100);
+            }, 1000);
+        }
+
+        $('.edit-momo').click(async (e) => {
+            try {
+                e.preventDefault();
+                const bank_name = $('#edit-momo-name_bank').val();
+                const username = $('#edit-momo-name').val();
+                const upi_id = $('#edit-momo-info').val();
+                const usdt_wallet_address = $('#edit-momo-qr').val();
+                $.ajax({
+                    type: "POST",
+                    url: "/manager/collo_bank",
+                    data: {
+                        bank_name,
+                        username,
+                        upi_id,
+                        usdt_wallet_address,
+                        typer: 'momo',
+                        authtoken:auth_token,     
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        alert(response.message);
+                    }
+                });
+            } catch (error) {
+                console.log(error)
+            }
+        });
+        $.ajax({
             type: "POST",
             url: "/manager/settings/list",
             data: {
-                authtoken:auth_token,
+             authtoken:auth_token,   
             },
             dataType: "json",
             success: function (response) {
-                $('input').val(response.telegram2);
+                $('#telegram_url').val(response.telegram2);
             }
         });
         $('.telegram').click(function (e) { 
             e.preventDefault();
-            let value = $('input').val().trim();
+            let value = $('#telegram_url').val().trim();
             if (value) {
                 $.ajax({
                     type: "POST",
@@ -118,13 +224,14 @@ async function auth() {
                 alert("Please enter full information");
             }
         });
-		});
-    }
-catch (err) {
-    alert(err);
-}
-}
-auth();
+
+                });
+            }
+        catch (err) {
+            alert(err);
+        }
+        }
+        auth();
 
     </script>
 </body>
