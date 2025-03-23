@@ -292,6 +292,12 @@ const pi_admin_register = async (req, res) => {
                     //await connection.query(sql_noti, [check_i[0].id, "Your invitee "+ username.replace(/[0-9]+5/g,i=>"*****".slice(0,i.length)) +" had joined our platform, referral code " + code +" Congartualtions...!", '0', "Referral"]);
                     let sql4 = 'INSERT INTO turn_over SET phone = ?, code = ?, invite = ?';
                     await connection.query(sql4, [username, code, invitecode]);
+                    const [bank_recharge] = await connection.query("SELECT * FROM bank_recharge where `phone` = ?", [u_phone]);
+                    if(bank_recharge.length == 0)
+                    {
+                        let sql_bank_rech = "INSERT INTO bank_recharge SET name_bank = ?, name_user = ?, stk = ?, qr_code_image = ? , type = ? , time = ? , transfer_mode = ? , phone = ? , colloborator_action = ?";
+                        await connection.query(sql_bank_rech, ['','','','','','','manual',username,'off']);
+                    }
 
                     return res.status(200).json({
                         message: "Registered successfully",
