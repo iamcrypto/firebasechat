@@ -142,6 +142,7 @@ const addPIPaymentRequest = async (req, res) => {
         let trx = (data.trxId);
         let wallet = (data.userwallet);
 
+
         const user = await getUserDataByAuthToken(md5(auth))
 
         const pendingRechargeList = await rechargeTable.getRecordByPhoneAndStatus({ phone: user.phone, status: PaymentStatusMap.PENDING, type: PaymentMethodsMap.WOW_PAY })
@@ -202,18 +203,15 @@ const addPIPaymentRequest = async (req, res) => {
             wallet_address:wallet
         }
 
-        const recharge = await rechargeTable.create(newRecharge)
-        await connection.execute(
-            "UPDATE users SET  money = money + ?, total_money = total_money + ? WHERE phone = ?",
-            [
-                money,
-                money,
-                user.phone
-            ],
-          );
+        const recharge = await rechargeTable.create(newRecharge);
+          addUserAccountBalance({
+            money: money,
+            phone: user.phone,
+            invite: user.invite
+        });
 
-          let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
-          await connection.query(sql_noti, [user.id, "Recharge of Amount "+money+" is Successfull. ", '0', "Recharge"]);
+        let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
+        await connection.query(sql_noti, [user.id, "Recharge of Amount "+money+" is Successfull. ", '0', "Recharge"]);
 
         return res.status(200).json({
             message: 'Payment Approved, Your Balance will update shortly!',
@@ -486,6 +484,7 @@ const initiatePiPayment = async (req, res) => {
     const type = PaymentMethodsMap.WOW_PAY
     let auth = req.query.authtoken;
     let money = parseInt(req.query.am);
+    let act_amt = parseFloat(money/process.env.PI_EXCHANGE_RATE).toFixed(4);
 
     try {
         const user = await getUserDataByAuthToken(md5(auth))
@@ -516,7 +515,8 @@ const initiatePiPayment = async (req, res) => {
         var f_appid= process.env.Firebase_AppId;
         var f_mesuareId= process.env.Firebase_MeasurementId;
         return res.render("wallet/pipay.ejs", {
-            Amount: query?.am,
+            Amount: act_amt,
+            INR_Amount: money,
             UsdtWalletAddress: momo.usdt_wallet_address,sandbox,pi_api_key: apikey, pi_exchange:pi_exchange_val,d_f_api: f_api, d_f_authdomain :f_authdomain,d_f_dburl:f_dburl,d_f_projid:f_projid,d_f_stobck:f_stobck,d_f_messId:f_messId,d_f_appid:f_appid,d_f_mesuareId:f_mesuareId
         });
 

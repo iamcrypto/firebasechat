@@ -2314,7 +2314,7 @@ const getdashboardInfo = async (req, res) => {
             a_month_gift_redeem:giftcodevalue,
             a_month_recharge_bonus:monthrechagebonus,
             a_month_staking_amt: parseFloat(monthstakingamount).toFixed(2),
-            a_month_staking_rewards:stakeROI,
+            a_month_staking_rewards:parseFloat(stakeROI).toFixed(2),
             a_active_stakes:active_stakes_count,
             a_roi_active_stakes:parseFloat(active_stakes_amt).toFixed(2)
         },

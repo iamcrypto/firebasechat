@@ -331,8 +331,10 @@
                       $( "#submit_button" ).click(function() {
                         const amount = '<%=Amount%>';
                         const ex_rate = '<%=pi_exchange%>';
-                        const act_amt = parseInt(amount) * parseInt(ex_rate);
+                        const act_amt = '<%=INR_Amount%>';
                         $("#submit_button").prop( "disabled", true );
+                        console.log(amount);
+                        console.log(act_amt);
                         transfer(amount,auth_token,act_amt);
                         });
                     }).catch(function(error) {
