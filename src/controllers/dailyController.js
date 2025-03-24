@@ -1030,6 +1030,8 @@ const listRechargeP = async(req, res) => {
     let auth = req.body.authtoken;
     const [user] = await connection.query('SELECT * FROM users WHERE token = ? ', [md5(auth)]);
 
+    const [bank_user] = await connection.query('SELECT * FROM bank_recharge WHERE phone = ? ', [user[0].phone]);
+
     if (user.length == 0) {
         return res.status(200).json({
             message: 'Failed',
@@ -1053,6 +1055,7 @@ const listRechargeP = async(req, res) => {
         status: true, 
         list_recharge_news: list_recharge_news,
         timeStamp: timeNow,
+        pay_status: bank_user[0].colloborator_action
     });
 }
 
@@ -1092,7 +1095,7 @@ const addUserAccountBalance = async ({ money, phone, invite }) => {
 
 
 const collo_rechargeDuyet = async (req, res) => {
-    let auth = req.cookies.auth;
+    let auth = req.body.authtoken;
     let id = req.body.id;
     let type = req.body.type;
     if (!auth || !id || !type) {
@@ -1140,7 +1143,6 @@ const collo_rechargeDuyet = async (req, res) => {
     }
     if (type == 'delete') {
         await connection.query(`UPDATE recharge SET status = 2 WHERE id = ?`, [id]);
-
         return res.status(200).json({
             message: 'Cancellation successful',
             status: true,
@@ -1150,7 +1152,8 @@ const collo_rechargeDuyet = async (req, res) => {
 }
 
 const collo_handlWithdraw = async (req, res) => {
-    let auth = req.cookies.auth;
+    let auth = req.body.authtoken;
+    console.log("123");
     let id = req.body.id;
     let type = req.body.type;
     if (!auth || !id || !type) {
@@ -1161,10 +1164,16 @@ const collo_handlWithdraw = async (req, res) => {
         });
     }
     if (type == 'confirm') {
+        console.log(1);
+        console.log(id);
         await connection.query(`UPDATE withdraw SET status = 1 WHERE id = ?`, [id]);
+        console.log(2);
         const [winfo] = await connection.query(`SELECT * FROM withdraw WHERE id = ?`, [id]);
+        console.log(3);
         let withInfo = winfo[0];
+        console.log(4);
         const [senderinfo] = await connection.query(`SELECT * FROM users WHERE phone = ?`, [withInfo.phone]);
+        console.log(5);
         if(withInfo.with_type.trim() == 'transfer')
         {
             await connection.query(`UPDATE withdraw SET status = 1 WHERE id = ?`, [id]);
@@ -1181,9 +1190,11 @@ const collo_handlWithdraw = async (req, res) => {
         }
         else
         {
+            console.log(6);
             let sql_noti = 'INSERT INTO notification SET recipient = ?, description = ?, isread = ?, noti_type = ?';
             await connection.query(sql_noti, [senderinfo?.[0]?.id, "Your withdraw of amoount "+withInfo.money+" approved my admin.", '0', "Withdraw"]);
         }
+        console.log(7);
         return res.status(200).json({
             message: 'Successful application confirmation',
             status: true,
@@ -1191,14 +1202,19 @@ const collo_handlWithdraw = async (req, res) => {
         });
     }
     if (type == 'delete') {
+        console.log(8);
         await connection.query(`UPDATE withdraw SET status = 2 WHERE id = ?`, [id]);
+        console.log(9);
         const [info] = await connection.query(`SELECT * FROM withdraw WHERE id = ?`, [id]);
+        console.log(10);
         await connection.query('UPDATE users SET money = money + ? WHERE phone = ? ', [info[0].money, info[0].phone]);
+        console.log(11);
         return res.status(200).json({
             message: 'Cancel successfully',
             status: true,
             datas: [],
         });
+        console.log(12);
     }
 }
 

@@ -940,7 +940,7 @@ const settingBank = async (req, res) => {
 }
 
 const deleteBankRechargeById = async (id) => {
-    const [recharge] = await connection.query("DELETE FROM bank_recharge WHERE type = 'momo' AND id = ?", [id]);
+    const [recharge] = await connection.query("DELETE FROM bank_recharge WHERE id = ?", [id]);
 
     return recharge
 }

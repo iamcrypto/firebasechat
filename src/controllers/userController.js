@@ -2350,7 +2350,6 @@ const get_manual_upi_id = async (req, res) => {
     else{
         upi_address = bank_recharge[0].stk;
     }
-    console.log(upi_address);
     return res.status(200).json({
         message: 'Successful',//Register Sucess
         dynamic_upi_Addr:upi_address,
