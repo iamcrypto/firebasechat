@@ -268,8 +268,8 @@ const pi_admin_register = async (req, res) => {
                     // } else {
                     //     ctv = check_i[0].ctv;
                     // }
-                    const sql = "INSERT INTO users SET id_user = ?,phone = ?,name_user = ?,level = ?,password = ?, plain_password = ?, money = ?,code = ?,invite = ?,ctv = ?,veri = ?,otp = ?,ip_address = ?,status = ?,time = ?,transfer_mode = ?";
-                    await connection.execute(sql, [id_user, username, name_user,1, md5(pwd), pwd, 0, username, invitecode, ctv, 1, otp2, ip, 1, time,'manual']);
+                    const sql = "INSERT INTO users SET id_user = ?,phone = ?,name_user = ?,level = ?,password = ?, plain_password = ?, money = ?,code = ?,invite = ?,ctv = ?,veri = ?,otp = ?,ip_address = ?,status = ?,time = ?,transfer_mode = ?, lang_code = ?";
+                    await connection.execute(sql, [id_user, username, name_user,1, md5(pwd), pwd, 0, username, invitecode, ctv, 1, otp2, ip, 1, time,'manual', 'en']);
                     await connection.execute('INSERT INTO point_list SET phone = ?', [username]);
                     let [check_code] = await connection.query('SELECT * FROM users WHERE invite = ? ', [invitecode]);
                     // if(check_i.name_user !=='Admin'){
@@ -358,8 +358,8 @@ const pi_register_con = async (req, res) => {
                     } else {
                         ctv = check_i[0].ctv;
                     }
-                    const sql = "INSERT INTO users SET id_user = ?,phone = ?,name_user = ?,password = ?, plain_password = ?, money = ?,code = ?,invite = ?,ctv = ?,veri = ?,otp = ?,ip_address = ?,status = ?,time = ?";
-                    await connection.execute(sql, [id_user, username, name_user, md5(pwd), pwd, 0, username, invitecode, ctv, 1, otp2, ip, 1, time]);
+                    const sql = "INSERT INTO users SET id_user = ?,phone = ?,name_user = ?,password = ?, plain_password = ?, money = ?,code = ?,invite = ?,ctv = ?,veri = ?,otp = ?,ip_address = ?,status = ?,time = ?, lang_code = ?";
+                    await connection.execute(sql, [id_user, username, name_user, md5(pwd), pwd, 0, username, invitecode, ctv, 1, otp2, ip, 1, time, 'en']);
                     await connection.execute('INSERT INTO point_list SET phone = ?', [username]);
                     let [check_code] = await connection.query('SELECT * FROM users WHERE invite = ? ', [invitecode]);
                     if(check_i.name_user !=='Admin'){
