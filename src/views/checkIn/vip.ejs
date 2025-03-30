@@ -6099,9 +6099,13 @@
                     if (vipHistory?.length !== 0) {
                         $(".vip-content-recordVsrule-con").html(vipHistoryHtml);
                     }
-                    else{
-                        $(".vip-content-recordVsrule-con").html("No Data"); 
-                    }
+                    else
+                {
+                    $(".vip-content-recordVsrule-con").html(`<div data-v-f84b843f="" data-v-eaa4a307="" class="empty__container">
+                                <svg data-v-f84b843f="" class="svg-icon icon-empty"><use xlink:href="#icon-empty"></use></svg>
+                                <p data-v-f84b843f="" data-lang="noData">No data</p>
+                            </div>`);
+                }
     
                     $(".ar-loading-view").fadeOut();
                     isHistoryLoading = false;
