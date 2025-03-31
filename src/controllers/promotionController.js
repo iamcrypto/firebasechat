@@ -245,19 +245,17 @@ const getUserLevels = (rows, userCode, maxLevel = 10) => {
 };
 
 const userStats = async (startTime, endTime, phone = "") => {
+  const time = moment().startOf("day").valueOf();
   const [rows] = await connection.query(
     `
-      SELECT
+SELECT
           u.phone,
           u.invite,
           u.code,
           u.time,
           u.id_user,
           COALESCE(r.total_deposit_amount, 0) AS total_deposit_amount,
-          COALESCE(r.total_deposit_number, 0) AS total_deposit_number,
-          COALESCE(m.total_bets, 0) AS total_bets,
-          COALESCE(m.total_bet_amount, 0) AS total_bet_amount,
-          COALESCE(c.total_commission, 0) AS total_commission
+          COALESCE(r.total_deposit_number, 0) AS total_deposit_number
       FROM
           users u
       LEFT JOIN
@@ -268,63 +266,18 @@ const userStats = async (startTime, endTime, phone = "") => {
                   COUNT(CASE WHEN status = 1 THEN phone ELSE NULL END) AS total_deposit_number
               FROM
                   recharge
-              WHERE
-                  time > ? AND time < ?
               GROUP BY
                   phone
-          ) r ON u.phone = r.phone
-      LEFT JOIN
-          (
-              SELECT 
-                  phone,
-                  COALESCE(SUM(total_bet_amount), 0) AS total_bet_amount,
-                  COALESCE(SUM(total_bets), 0) AS total_bets
-              FROM (
-                  SELECT 
-                      phone,
-                      SUM(money + fee) AS total_bet_amount,
-                      COUNT(*) AS total_bets
-                  FROM minutes_1
-                  WHERE time >= ? AND time <= ?
-                  GROUP BY phone
-                  UNION ALL
-                  SELECT 
-                      phone,
-                      SUM(money + fee) AS total_bet_amount,
-                      COUNT(*) AS total_bets
-                  FROM trx_wingo_bets
-                  WHERE time >= ? AND time <= ?
-                  GROUP BY phone
-              ) AS combined
-              GROUP BY phone
-          ) m ON u.phone = m.phone
-      LEFT JOIN
-          (
-              SELECT
-                  from_user_phone AS phone,
-                  SUM(money) AS total_commission
-              FROM
-                  commissions
-              WHERE
-                  time > ? AND time <= ? AND phone = ?
-              GROUP BY
-                  from_user_phone
-          ) c ON u.phone = c.phone
-      GROUP BY
-          u.phone
+          ) r ON u.phone = r.phone    
       ORDER BY
           u.time DESC;
       `,
     [
-      startTime,
-      endTime,
-      startTime,
-      endTime,
-      startTime,
-      endTime,
-      startTime,
-      endTime,
-      phone,
+      // time,
+      // time,
+      // time,
+      // time,
+      // phone,
     ],
   );
 
@@ -362,9 +315,11 @@ const getCommissionStatsByTime = async (time, phone) => {
 const subordinatesDataAPI = async (req, res) => {
   try {
     const authToken = req.body.authtoken;
+    const now = new Date();
     const startOfWeek = getStartOfWeekTimestamp();
-    const { startOfYesterdayTimestamp, endOfYesterdayTimestamp } =
-      yesterdayTime();
+    const startOfYesterdayTimestamp = getTodayStartTime();
+    const endOfYesterdayTimestamp = now.getTime();
+    const time = moment().startOf("day").valueOf();
     const [userRow] = await connection.execute(
       "SELECT * FROM `users` WHERE `token` = ? AND `veri` = 1",
       [md5(authToken)],
@@ -389,7 +344,7 @@ const subordinatesDataAPI = async (req, res) => {
 
     const directSubordinatesCount = level1Referrals.length;
     const noOfRegisteredSubordinates = level1Referrals.filter(
-      (user) => user.time >= startOfYesterdayTimestamp,
+      (user) => user.time >= time,
     ).length;
     const directSubordinatesRechargeQuantity = level1Referrals.reduce(
       (acc, curr) => acc + curr.total_deposit_number,
@@ -405,7 +360,7 @@ const subordinatesDataAPI = async (req, res) => {
 
     const teamSubordinatesCount = usersByLevels.length;
     const noOfRegisterAll = usersByLevels.filter(
-      (user) => user.time >= startOfYesterdayTimestamp,
+      (user) => user.time >= time,
     );
     const noOfRegisterAllSubordinates = noOfRegisterAll.length;
     const teamSubordinatesRechargeQuantity = usersByLevels.reduce(
