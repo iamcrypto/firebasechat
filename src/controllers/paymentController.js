@@ -133,6 +133,8 @@ const addManualUPIPaymentRequest = async (req, res) => {
         let auth = req.body.authtoken;
         let money = parseInt(data.money);
         let utr = parseInt(data.utr);
+        let upi_user = (data.upi_user);
+
         const minimumMoneyAllowed = parseInt(process.env.MINIMUM_MONEY)
 
         if (!money || !(money >= minimumMoneyAllowed)) {
@@ -165,18 +167,58 @@ const addManualUPIPaymentRequest = async (req, res) => {
 
         const orderId = getRechargeOrderId()
 
-        const newRecharge = {
-            orderId: orderId,
-            transactionId: 'NULL',
-            utr: utr,
-            phone: user.phone,
-            money: money,
-            type: PaymentMethodsMap.UPI_MANUAL,
-            status: 0,
-            today: rechargeTable.getCurrentTimeForTodayField(),
-            url: "NULL",
-            time: timeNow,
-            wallet_address:""
+        var newRecharge
+        if(upi_user_level == 1)
+        {
+            newRecharge = {
+                orderId: orderId,
+                transactionId: 'NULL',
+                utr: utr,
+                phone: user.phone,
+                money: money,
+                type: PaymentMethodsMap.UPI_MANUAL,
+                status: 0,
+                today: rechargeTable.getCurrentTimeForTodayField(),
+                url: "NULL",
+                time: timeNow,
+                redirect_to:"",
+            }
+        }
+        if(upi_user_level == 2){
+            const [rows] = await connection.execute('SELECT * FROM `point_list` WHERE `phone` = ? ', [upi_user]);
+            let coll_rech_limit = rows[0].recharge;
+            if(parseInt(coll_rech_limit) >= money)
+            {
+                await connection.query(`UPDATE point_list SET recharge = recharge - ? WHERE level = 2 and phone = ?`, [money, upi_user]);
+                newRecharge = {
+                    orderId: orderId,
+                    transactionId: 'NULL',
+                    utr: utr,
+                    phone: user.phone,
+                    money: money,
+                    type: PaymentMethodsMap.UPI_MANUAL,
+                    status: 0,
+                    today: rechargeTable.getCurrentTimeForTodayField(),
+                    url: "NULL",
+                    time: timeNow,
+                    redirect_to:"colloborator",
+                }    
+            }
+            else{
+                newRecharge = {
+                    orderId: orderId,
+                    transactionId: 'NULL',
+                    utr: utr,
+                    phone: user.phone,
+                    money: money,
+                    type: PaymentMethodsMap.UPI_MANUAL,
+                    status: 0,
+                    today: rechargeTable.getCurrentTimeForTodayField(),
+                    url: "NULL",
+                    time: timeNow,
+                    redirect_to:"admin",
+                }    
+            }
         }
 
         const recharge = await rechargeTable.create(newRecharge)
@@ -268,7 +310,8 @@ const addPIPaymentRequest = async (req, res) => {
             today: rechargeTable.getCurrentTimeForTodayField(),
             url: "NULL",
             time: timeNow234,
-            wallet_address:wallet
+            wallet_address:wallet,
+            redirect_to:"",
         }
 
         const recharge = await rechargeTable.create(newRecharge);
@@ -348,7 +391,8 @@ const addManualUSDTPaymentRequest = async (req, res) => {
             today: rechargeTable.getCurrentTimeForTodayField(),
             url: "NULL",
             time: timeNow,
-            wallet_address:""
+            wallet_address:"",
+            redirect_to:"",
         }
 
         const recharge = await rechargeTable.create(newRecharge)
@@ -429,7 +473,8 @@ const initiateUPIPayment = async (req, res) => {
             today: rechargeTable.getCurrentTimeForTodayField(),
             url: ekqrData.data.payment_url,
             time: timeNow,
-            wallet_address:""
+            wallet_address:"",
+            redirect_to:"",
         }
 
         const recharge = await rechargeTable.create(newRecharge)
@@ -664,8 +709,8 @@ const verifyPiPayment = async (req, res) => {
             today: rechargeTable.getCurrentTimeForTodayField(),
             url: 'NULL',
             time: timeNow,
-            wallet_address:""
-            
+            wallet_address:"",
+            redirect_to:"",            
         }
 
 

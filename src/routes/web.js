@@ -200,6 +200,9 @@ const initWebRouter = (app) => {
     router.post('/manager/withdraw_apprv', dailyController.collo_handlWithdraw);
 
 
+
+    router.post('/api/webapi/admin/get_bank_request', adminController.getbankRequest); 
+    router.post('/api/webapi/admin/accept_reject', adminController.ReqAcceptReject); 
     router.post('/manager/settings/list',  dailyController.settings);
     router.post('/manager/settings/get', dailyController.settingGet);
     router.post('/manager/collo_bank', dailyController.settingCollo_Details);

@@ -2254,7 +2254,7 @@ const updatenotifications = async (req, res) => {
 };
 
 
-const get_user_invitor = async (phone_num) => {
+const get_user_invitor = async (phone_num,amount) => {
     let phone = phone_num;
     let invite_phone = "";
     let invite_role = "";
@@ -2316,12 +2316,28 @@ const get_user_invitor = async (phone_num) => {
       invite_role = "admin";
       invite_phone =  username;
     }
+    if(invite_role = "colloborator")
+    {
+        const [rows] = await connection.execute('SELECT * FROM `point_list` WHERE `phone` = ? ', [invite_phone]);
+        let coll_rech_limit = rows[0].recharge;
+        if(parseInt(coll_rech_limit) >= amount)
+        {
+            invite_phone =  invite_phone;   
+        }
+        else
+        {
+            const [f_admin] = await connection.query('SELECT *  FROM users WHERE `level` = 1 ');
+            invite_role = 'admin';
+            invite_phone = f_admin[0].phone;  
+        }
+    }
     return invite_phone;
   }
 
 
 const get_manual_upi_id = async (req, res) => {
     let auth = req.body.access_token;
+    let money = req.body.amount;
     const [rows] = await connection.execute('SELECT * FROM `users` WHERE `token` = ? ', [md5(auth)]);
     const [bank_recharge_momo] = await connection.query("SELECT * FROM bank_recharge WHERE phone = ?", [rows[0].phone]);
 
@@ -2337,22 +2353,27 @@ const get_manual_upi_id = async (req, res) => {
         usdt_wallet_address: bank_recharge_momo_data?.qr_code_image || "",
     }
 	
-	const user_admin_invitor = await get_user_invitor(rows[0].phone);
+	const user_admin_invitor = await get_user_invitor(rows[0].phone,money);
     const [bank_recharge] = await connection.query("SELECT * FROM bank_recharge WHERE phone = ?", [user_admin_invitor]);
     var upi_address = '';
+    var upi_image = '';
     if(bank_recharge[0].colloborator_action == "off")
     {
         const [f_admin] = await connection.query('SELECT *  FROM users WHERE `level` = 1 ');
         var invite_phone = f_admin[0].phone;
         const [bank_recharge12] = await connection.query("SELECT * FROM bank_recharge WHERE phone = ?", [invite_phone]);
         upi_address = bank_recharge12[0].stk;
+        upi_image = bank_recharge12[0].qr_code_image.toString().trim();
     }
     else{
         upi_address = bank_recharge[0].stk;
+        upi_image = bank_recharge[0].qr_code_image.toString().trim();
     }
     return res.status(200).json({
         message: 'Successful',//Register Sucess
         dynamic_upi_Addr:upi_address,
+        upi_user_phone:user_admin_invitor,
+        upi_address_image:upi_image.replace(/\\/g, "/").replace("src/public",""),
         status: true
     });
 }

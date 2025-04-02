@@ -142,11 +142,11 @@ const cronJobGame1p = (io) => {
       cron.schedule(
         "0 0 * * *",
         async () => {
+          await vipController.releaseRebateCommission(),
           await winGoController.distributeCommission(),
           await k3Controller.distributeCommission(),
           await k5Controller.distributeCommission(),
-          await trxWingoController.distributeCommission(),
-          vipController.releaseRebateCommission();
+          await trxWingoController.distributeCommission();
         }
       );
 }

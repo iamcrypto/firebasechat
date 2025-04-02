@@ -69,9 +69,12 @@
                                  <input type="text" class="form-control" placeholder="Wallet Owner Name"
                                      id="edit-momo-name" value=""><br>
                                  <input type="text" class="form-control" placeholder="UPI ID" id="edit-momo-info"
-                                     value=""><br>
+                                     value="" required><br>
                                  <input type="text" class="form-control" placeholder="USDT Wallet Address"
                                      id="edit-momo-qr" value=""><br>
+                                <label for="qr_code" style="color: #3498db;">Upload Qr Code</label>
+                                <input type='file' name='fileUploaded' id="qr_code_scanner" accept="image/*" required>
+                                <label id="qr_code_image" name="qr_code_image" style="color: green;" ></label>
                                  <button type="submit" class="btn btn-primary edit-momo"
                                      style="width: 100%;">Submit</button>
                              </div>
@@ -129,6 +132,8 @@
                 $('#edit-momo-info').val(momo.upi_id);
                 $('#edit-momo-qr').val(momo.usdt_wallet_address);
 
+                $('#qr_code_image').text(momo.qr_code_image.toString().trim().replace(/\\/g, "/").replace("src/public",document.location.origin));
+
                 $('#edit-banking-name_bank').val(bank.name_bank);
                 $('#edit-banking-name').val(bank.name_user);
                 $('#edit-banking-info').val(bank.stk);
@@ -172,26 +177,59 @@
                 const username = $('#edit-momo-name').val();
                 const upi_id = $('#edit-momo-info').val();
                 const usdt_wallet_address = $('#edit-momo-qr').val();
-                $.ajax({
-                    type: "POST",
-                    url: "/manager/collo_bank",
-                    data: {
-                        bank_name,
-                        username,
-                        upi_id,
-                        usdt_wallet_address,
-                        typer: 'momo',
-                        authtoken:auth_token,     
-                    },
-                    dataType: "json",
-                    success: function (response) {
-                        alert(response.message);
+                const file_code = $('#qr_code_scanner')[0].files[0];
+                if(upi_id.length != 0)
+                {
+                    if($('#qr_code_scanner')[0].files.length != 0 || $('#qr_code_image').text().length != 0)
+                    {
+                        var file_name_up = '';
+                        var tarr = $('#qr_code_image').text().split('/');
+                        if($('#qr_code_scanner')[0].files.length == 0)
+                        {
+                            
+                            file_name_up = tarr[tarr.length-1];
+                        }
+                        else{
+                            file_name_up = $('#qr_code_scanner')[0].files[0].name
+                        }
+                        let formData = new FormData();    
+                        formData.append('qr_code', file_code);
+                        formData.append('file_name',file_name_up);
+                        formData.append("bank_name", bank_name);
+                        formData.append("username", username);
+                        formData.append("upi_id", upi_id);
+                        formData.append("usdt_wallet_address", usdt_wallet_address);
+                        formData.append("typer", "momo");
+                        formData.append("authtoken", auth_token);
+                        
+                        fetch('/manager/collo_bank', {
+                        method: 'POST', 
+                        body: formData,
+                        data: {
+                            file_name: file_name_up,
+                        }, 
+                        mode: "cors",
+                      }).then(res =>{ res.json().then((data)=>{
+                        if (data.status === true) {
+                            alert("Details Updated Successfully!");
+                        }
+                      });
+                    });
                     }
-                });
+                    else
+                    {
+                        alert("Atleast one file is required!");
+                    }
+                }
+                else{
+                    alert("UPi id is required!");
+                }   
             } catch (error) {
                 console.log(error)
             }
         });
+
+
         $.ajax({
             type: "POST",
             url: "/manager/settings/list",
