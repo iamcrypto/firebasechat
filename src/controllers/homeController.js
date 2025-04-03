@@ -190,10 +190,8 @@ const readFileAsync = async () => {
   }
   
 const mianPage = async (req, res) => {
-    const [settings] = await connection.query('SELECT `cskh` FROM admin');
-    let cskh = settings[0].cskh;
     var sandbox = process.env.SANDBOX_MODE;
-    return res.render("member/index.ejs",{cskh, sandbox});
+    return res.render("member/index.ejs",{sandbox});
 }
 
 const safePage = async (req, res) => {

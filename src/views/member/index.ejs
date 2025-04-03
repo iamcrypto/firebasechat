@@ -815,7 +815,7 @@
                                             </i>
                                         </div>
                                     </div>
-                                    <div data-v-21f3500a="" class="item c-row c-row-between" onclick="location.href='<%=cskh%>'">
+                                    <div data-v-21f3500a="" class="item c-row c-row-between" id="whatsapp_link" data-link="">
                                         <div data-v-21f3500a="" class="c-row c-row-middle">
                                             <i class="fab fa-whatsapp fa-lg center" style="color: #2aaaf3"></i>
                                             <span data-v-21f3500a="" class="name">Whatsapp Support</span>
@@ -1049,6 +1049,7 @@ async function auth() {
                         $("#stake_amt").text("₹" +response.user_stake);
                         var xp_Score = parseInt(response.xp_value);
                         var u_level = parseInt(response.level);
+                        $("#whatsapp_link").attr("data-link",response.whatsapp_data);
                         var lang_code = response.language;
                         $("#lang_code").val(lang_code);
                         if(parseInt(u_level) == 1)
@@ -1116,6 +1117,10 @@ async function auth() {
                     $(".Loading").fadeOut(0);
                 }
             }
+            });
+
+            $("#whatsapp_link").click(function (e) {
+                window.location.href = "/" + $("#whatsapp_link").attr("data-link");
             });
             
         });

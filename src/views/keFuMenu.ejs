@@ -1557,15 +1557,13 @@
 			<div data-v-6a5413fb="" data-v-28fadbec="" class="content">
 				<div data-v-6a5413fb="">
 
-					<a href="/wingochat">
-						<div data-v-6a5413fb="" class="content-item">
+						<div data-v-6a5413fb="" class="content-item" id="whatsapp_link" data-link="">
 							<div data-v-6a5413fb="" class="content-item-title"><img data-v-6a5413fb="" alt="" class=""
 									data-origin="https://www.bigdaddygame2.com/assets/png/CStype3-7588d980.png"
-									src="./index_files/CStype3-7588d980.png"><span data-v-6a5413fb="">WingoChat</span>
+									src="./index_files/CStype3-7588d980.png"><span data-v-6a5413fb="">WhatsApp</span>
 							</div><i data-v-6a5413fb="" class="van-badge__wrapper van-icon van-icon-arrow"
 								style="color: rgb(168, 168, 168); font-size: 18px;"></i>
 						</div>
-					</a>
 
 					<div data-v-6a5413fb="" class="content-item" class="content-item" id="telegram_link" data-link="">
 						<div data-v-6a5413fb="" class="content-item-title"><img data-v-6a5413fb="" alt="" class=""
@@ -1620,12 +1618,15 @@ async function auth() {
             },
             dataType: "json",
             success: function (response) {
-			  console.log(response.telegram_data);
 			  $("#telegram_link").attr("data-link",response.telegram_data);
+			  $("#whatsapp_link").attr("data-link",response.whatsapp_data);
             }
           });
 		  $("#telegram_link").click(function (e) {
 			window.location.href = "/" + $("#telegram_link").attr("data-link");
+		  });
+		  $("#whatsapp_link").click(function (e) {
+			window.location.href = "/" + $("#whatsapp_link").attr("data-link");
 		  });
         });
       }

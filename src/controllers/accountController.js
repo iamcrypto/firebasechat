@@ -169,7 +169,7 @@ const register = async (req, res) => {
         const [check_u] = await connection.query('SELECT * FROM users WHERE phone = ?', [username]);
         const [check_i] = await connection.query('SELECT * FROM users WHERE code = ? ', [invitecode]);
         const [check_ip] = await connection.query('SELECT * FROM users WHERE ip_address = ? ', [ip]);
-
+        
         if (check_u.length == 1 && check_u[0].veri == 1) {
             return res.status(200).json({
                 message: 'Registered phone number',
@@ -569,22 +569,24 @@ const kePageInfo = async (req, res) => {
     const [users] = await connection.query('SELECT `level`, `ctv` FROM users WHERE token = ?', [md5(auth)]);
 
     let telegram = '';
+    let whatsapp = '';
     if (users.length == 0) {
-        let [settings] = await connection.query('SELECT `telegram`, `cskh` FROM admin');
+        let [settings] = await connection.query('SELECT `telegram`, `cskh`,`whatsapp` FROM admin');
         telegram = settings[0].telegram;
+        whatsapp = settings[0].whatsapp;
     } else {
         if (users[0].level != 0) {
             var [settings] = await connection.query('SELECT * FROM admin');
-
         } else {
-            var [check] = await connection.query('SELECT `telegram` FROM point_list WHERE phone = ?', [users[0].ctv]);
+            var [check] = await connection.query('SELECT `telegram`,`whatsapp` FROM point_list WHERE phone = ?', [users[0].ctv]);
             if (check.length == 0) {
                 var [settings] = await connection.query('SELECT * FROM admin');
             } else {
-                var [settings] = await connection.query('SELECT `telegram` FROM point_list WHERE phone = ?', [users[0].ctv]);
+                var [settings] = await connection.query('SELECT `telegram`, `whatsapp` FROM point_list WHERE phone = ?', [users[0].ctv]);
             }
         }
         telegram = settings[0].telegram;
+        whatsapp = settings[0].whatsapp;
     }
     return res.status(200).json({
         message: 'Success',
@@ -592,7 +594,8 @@ const kePageInfo = async (req, res) => {
         data: {
 
         },
-        telegram_data: telegram
+        telegram_data: telegram,
+        whatsapp_data: whatsapp
     })
 }
 

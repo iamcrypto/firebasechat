@@ -2406,6 +2406,26 @@ const xpgain_value = async (req, res) => {
     let auth = req.body.authtoken;
     let xp_gain_val = 0;
     let [user] = await connection.query('SELECT * FROM users WHERE `token` = ?', [md5(auth)]);
+    let telegram = '';
+    let whatsapp = '';
+    if (user.length == 0) {
+        let [settings] = await connection.query('SELECT `telegram`, `cskh`,`whatsapp` FROM admin');
+        telegram = settings[0].telegram;
+        whatsapp = settings[0].whatsapp;
+    } else {
+        if (user[0].level != 0) {
+            var [settings] = await connection.query('SELECT * FROM admin');
+        } else {
+            var [check] = await connection.query('SELECT `telegram`,`whatsapp` FROM point_list WHERE phone = ?', [users[0].ctv]);
+            if (check.length == 0) {
+                var [settings] = await connection.query('SELECT * FROM admin');
+            } else {
+                var [settings] = await connection.query('SELECT `telegram`, `whatsapp` FROM point_list WHERE phone = ?', [users[0].ctv]);
+            }
+        }
+        telegram = settings[0].telegram;
+        whatsapp = settings[0].whatsapp;
+    }
     const [user_stoke] = await connection.query('SELECT SUM(stake_amnt) AS `sum` FROM claimed_rewards WHERE status = 2 AND `reward_id` = 136 AND `phone` = ?', [user[0].phone]);
     const stakeamount = user_stoke[0].sum || 0;
     const [trx_xp] = await connection.query(`SELECT SUM(money) as total FROM trx_wingo_bets WHERE phone = ? `, user[0].phone);
@@ -2439,6 +2459,7 @@ const xpgain_value = async (req, res) => {
         status: true,
         language:user[0].lang_code,
         user_stake:stakeamount,
+        whatsapp_data:whatsapp,
     });
 
 };
