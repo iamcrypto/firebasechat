@@ -2,6 +2,10 @@ import connection from "../config/connectDB";
 import jwt from 'jsonwebtoken'
 import md5 from "md5";
 import "dotenv/config";
+import path from 'path';
+var multer  = require('multer');
+import formidable from "formidable";
+import fs from 'fs';
 import {
     getStartOfWeekTimestamp,
     getTimeBasedOnDate,
@@ -572,13 +576,13 @@ const infoCtv = async(req, res) => {
     let trxloss= 0;
     for (let i = 0; i < list_mem.length; i++) {
         let phone = list_mem[i].phone;
-        const [wingo_wins] = await connection.query('SELECT `money`, `time` FROM minutes_1 WHERE phone = ? AND status = 1 ', [phone]);
+        const [wingo_wins] = await connection.query('SELECT `get`, `time` FROM minutes_1 WHERE phone = ? AND status = 1 ', [phone]);
         const [wingo_losses] = await connection.query('SELECT `money`, `time` FROM minutes_1 WHERE phone = ? AND status = 2 ', [phone]);
         for (let i = 0; i < wingo_wins.length; i++) {
             let today = timerJoin1();
             let time = timerJoin1(wingo_wins[i].time);
             if (time == today) {
-                wingowin += wingo_wins[i].money;
+                wingowin += wingo_wins[i].get;
             }
         }
         for (let i = 0; i < wingo_losses.length; i++) {
@@ -589,13 +593,13 @@ const infoCtv = async(req, res) => {
             }
         }
 
-        const [k3_wins] = await connection.query('SELECT `money`, `time` FROM result_k3 WHERE phone = ? AND status = 1 ', [phone]);
+        const [k3_wins] = await connection.query('SELECT `get`, `time` FROM result_k3 WHERE phone = ? AND status = 1 ', [phone]);
         const [k3_losses] = await connection.query('SELECT `money`, `time` FROM result_k3 WHERE phone = ? AND status = 2 ', [phone]);
         for (let i = 0; i < k3_wins.length; i++) {
             let today = timerJoin1();
             let time = timerJoin1(k3_wins[i].time);
             if (time == today) {
-                k3win += k3_wins[i].money;
+                k3win += k3_wins[i].get;
             }
         }
         for (let i = 0; i < k3_losses.length; i++) {
@@ -606,13 +610,13 @@ const infoCtv = async(req, res) => {
             }
         }
 
-        const [d5_wins] = await connection.query('SELECT `money`, `time` FROM result_5d WHERE phone = ? AND status = 1 ', [phone]);
+        const [d5_wins] = await connection.query('SELECT `get`, `time` FROM result_5d WHERE phone = ? AND status = 1 ', [phone]);
         const [d5_losses] = await connection.query('SELECT `money`, `time` FROM result_5d WHERE phone = ? AND status = 2 ', [phone]);
         for (let i = 0; i < d5_wins.length; i++) {
             let today = timerJoin1();
             let time = timerJoin1(d5_wins[i].time);
             if (time == today) {
-                d5win += d5_wins[i].money;
+                d5win += d5_wins[i].get;
             }
         }
         for (let i = 0; i < d5_losses.length; i++) {
@@ -623,13 +627,13 @@ const infoCtv = async(req, res) => {
             }
         }
 
-        const [trx_wins] = await connection.query('SELECT `money`, `time` FROM trx_wingo_bets WHERE phone = ? AND status = 1 ', [phone]);
+        const [trx_wins] = await connection.query('SELECT `get`, `time` FROM trx_wingo_bets WHERE phone = ? AND status = 1 ', [phone]);
         const [trx_losses] = await connection.query('SELECT `money`, `time` FROM trx_wingo_bets WHERE phone = ? AND status = 2 ', [phone]);
         for (let i = 0; i < trx_wins.length; i++) {
             let today = timerJoin1();
             let time = timerJoin1(trx_wins[i].time);
             if (time == today) {
-                trxwin += trx_wins[i].money;
+                trxwin += trx_wins[i].get;
             }
         }
         for (let i = 0; i < trx_losses.length; i++) {
@@ -751,7 +755,7 @@ const settingGet = async (req, res) => {
                 timeStamp: timeNow,
             });
         }
-        const [rows] = await connection.execute('SELECT * FROM `users` WHERE `token` = ? AND veri = 1', [auth]);
+        const [rows] = await connection.execute('SELECT * FROM `users` WHERE `token` = ? AND veri = 1', [md5(auth)]);
         const [bank_recharge] = await connection.query("SELECT * FROM bank_recharge where `phone` = ? AND status= 1", [rows[0].phone]);
         const [bank_recharge_momo] = await connection.query("SELECT * FROM bank_recharge WHERE type = 'momo' AND `phone` = ? AND status= 1", [rows[0].phone]);
         const [settings] = await connection.query('SELECT * FROM point_list where `phone` = ?;', [rows[0].phone]);
@@ -807,29 +811,45 @@ const upload = multer({
     },
 }).single('qr_code');
 
+const getCommissionStatsByTime = async (time, phone) => {
+    const { startOfYesterdayTimestamp, endOfYesterdayTimestamp } =
+      yesterdayTime();
+    const [commissionRow] = await connection.execute(
+      `
+        SELECT
+            time,
+            SUM(COALESCE(c.money, 0)) AS total_commission,
+            SUM(CASE 
+                WHEN c.time >= ? 
+                THEN COALESCE(c.money, 0)
+                ELSE 0 
+            END) AS last_week_commission,
+            SUM(CASE 
+                WHEN c.time > ? AND c.time <= ?
+                THEN COALESCE(c.money, 0)
+                ELSE 0 
+            END) AS yesterday_commission
+        FROM
+            commissions c
+        WHERE
+            c.phone = ?
+        `,
+      [time, startOfYesterdayTimestamp, endOfYesterdayTimestamp, phone],
+    );
+    return commissionRow?.[0] || {};
+  };
+  
+
 const settingCollo_Details = async (req, res) => {
     try {
-        
-        let uploadfile = await upload(req, res, (err) =>{
-            if(err){
-                console.log(err);
-            }else{
-                console.log('file uploaded succcessfully');
-            }
-        });
-
-        const form = formidable({});
-        let fields;
-
-        [fields] = await form.parse(req);
-        let auth =  fields["authtoken"];
-
-
-        let name_bank = fields["name_bank"];
-        let name =fields["name"];
-        let info = fields["info"];
-        let qr = fields["qr"];
-        let typer =  fields["typer"];
+        let name_bank = req.body.name_bank;
+        let name = req.body.name;
+        let info = req.body.info;
+        let qr =  req.body.qr;
+        let typer =  req.body.typer;
+        let auth = req.body.authtoken;
+        let file_exits = req.body.file_exits;
+        let file_name = req.body.file_name;
 
         if (!auth || !typer) {
             return res.status(200).json({
@@ -849,7 +869,6 @@ const settingCollo_Details = async (req, res) => {
         }
 
         if (typer == 'momo') {
-            
             const [bank_recharge] = await connection.query(`SELECT * FROM bank_recharge WHERE phone = ? AND status = 0;`, [users[0].phone]);
             var transfer_mode = '';
             if(bank_recharge.length != 0)
@@ -859,8 +878,10 @@ const settingCollo_Details = async (req, res) => {
             else{
                 transfer_mode = "manual";
             }
-            let file_name1 = fields["file_name"];
+
+            let file_name1 = req.body.file_name;
             const uploadDir1 = path.join(path_dir + '/src/public/qr_code/'+file_name1);
+
             const deleteRechargeQueries = bank_recharge.map(recharge => {
                 if(recharge.qr_code_image.toString().trim() != uploadDir1)
                 {
@@ -874,19 +895,20 @@ const settingCollo_Details = async (req, res) => {
                 return deleteBankRechargeById(recharge.id)
             });
 
-            await Promise.all(deleteRechargeQueries)
+           await Promise.all(deleteRechargeQueries)
 
             //await connection.query(`UPDATE bank_recharge SET name_bank = ?, name_user = ?, stk = ?, qr_code_image = ? WHERE type = 'upi'`, [name_bank, name, info, qr]);
 
-            const bankName = fields["bank_name"];
-            const username = fields["username"]
-            const upiId =  fields["upi_id"]
-            const usdtWalletAddress =  fields["usdt_wallet_address"]
+ 
+            const bankName = req.body.bank_name;
+            const username =  req.body.username;
+            const upiId =  req.body.upi_id;
+            const usdtWalletAddress =  req.body.usdt_wallet_address;
             let timeNow = Date.now();
 
             await connection.query("INSERT INTO bank_recharge SET name_bank = ?, name_user = ?, stk = ?, qr_code_image = ?, upi_wallet = ?, transfer_mode = ?,phone=?, colloborator_action = ?, time = ?, type = 'momo', status = 0;", [
                 bankName, username, upiId, uploadDir1, usdtWalletAddress,transfer_mode,users[0].phone, "off", timeNow
-            ])
+            ]);
 
             return res.status(200).json({
                 message: 'Successfully changed',
@@ -1733,6 +1755,33 @@ const buffMoney = async(req, res) => {
         });
     }
 }
+
+const upload_qr_code = async (req, res) => {
+    try
+    {
+        let uploadfile = await upload(req, res, (err) =>{
+            if(err){
+                console.log(err);
+            }else{
+                console.log('file uploaded succcessfully');
+            }
+        });
+        return res.status(200).json({
+            message: 'Success',
+            status: true,
+            datas: 'uploaded',  
+        });
+    }
+    catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            message: 'Failed',
+            status: false,
+        });
+    }
+}
+
+
   
 module.exports = {
     settingGet,
@@ -1764,5 +1813,6 @@ module.exports = {
     listWithdrawMem,
     listRedenvelope,
     listBet,
-    incomeInfo
+    incomeInfo,
+    upload_qr_code
 }

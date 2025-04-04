@@ -61,71 +61,6 @@ const initiateManualUSDTPayment = async (req, res) => {
     });
 }
 
-const get_user_invitor = async (phone_num) => {
-    let phone = phone_num;
-    let invite_phone = "";
-    let invite_role = "";
-    const [f1s] = await connection.query('SELECT * FROM users WHERE `phone` = ? ', [phone]);
-    if(phone != "8895203112"){
-    const [f1s_inv] = await connection.query('SELECT * FROM users WHERE `code` = ? ', [f1s[0].invite]);
-      if(parseInt(f1s_inv[0].level) != 2 && parseInt(f1s_inv[0].level) != 1)
-      { 
-        const [f2s_inv] = await connection.query('SELECT * FROM users WHERE `code` = ? ', [f1s_inv[0].invite]);
-        if(parseInt(f2s_inv[0].level) != 2 && parseInt(f2s_inv[0].level) != 1)
-        { 
-          const [f3s_inv] = await connection.query('SELECT * FROM users WHERE `code` = ? ', [f2s_inv[0].invite]);
-          if(parseInt(f3s_inv[0].level) != 2 && parseInt(f3s_inv[0].level) != 1)
-          {
-            const [f4s_inv] = await connection.query('SELECT * FROM users WHERE `code` = ? ', [f3s_inv[0].invite]);
-            if(parseInt(f4s_inv[0].level) != 2 && parseInt(f4s_inv[0].level) != 1)
-            {
-              const [f5s_inv] = await connection.query('SELECT * FROM users WHERE `code` = ? ', [f4s_inv[0].invite]);
-              if(parseInt(f5s_inv[0].level) != 2 && parseInt(f5s_inv[0].level) != 1)
-              {
-                const [f6s_inv] = await connection.query('SELECT * FROM users WHERE `code` = ? ', [f5s_inv[0].invite]);
-                if(parseInt(f6s_inv[0].level) != 2 && parseInt(f6s_inv[0].level) != 1)
-                {
-                  const [f_admin] = await connection.query('SELECT *  FROM users WHERE `level` = 1 ');
-                  invite_role = 'admin';
-                  invite_phone = f_admin[0].phone;
-                }
-                else{
-                  invite_role = f6s_inv[0].level == 2 ? "colloborator" : "admin";
-                  invite_phone = f6s_inv[0].phone ;
-                }
-              }
-              else{
-                invite_role = f5s_inv[0].level == 2 ? "colloborator" : "admin";
-                invite_phone = f5s_inv[0].phone ;
-              }
-            }
-            else{
-              invite_role = f4s_inv[0].level == 2 ? "colloborator" : "admin";
-              invite_phone = f4s_inv[0].phone ;
-            }
-          }
-          else{
-            invite_role = f3s_inv[0].level == 2 ? "colloborator" : "admin";
-            invite_phone = f3s_inv[0].phone ;
-          }
-        }
-        else{
-          invite_role = f2s_inv[0].level == 2 ? "colloborator" : "admin";
-          invite_phone = f2s_inv[0].phone ;
-        }
-      }
-      else{
-        invite_role = f1s_inv[0].level == 2 ? "colloborator" : "admin";
-        invite_phone = f1s_inv[0].phone ;
-      }
-    }
-    else{
-      invite_role = "admin";
-      invite_phone =  phone_num;
-    }
-    return invite_phone;
-  }
-  
 
 const addManualUPIPaymentRequest = async (req, res) => {
     try {
@@ -166,6 +101,8 @@ const addManualUPIPaymentRequest = async (req, res) => {
         }
 
         const orderId = getRechargeOrderId()
+        const [rows] = await connection.execute('SELECT * FROM `users` WHERE `phone` = ? ', [upi_user]);
+        const upi_user_level = rows[0].level;
 
         var newRecharge
         if(upi_user_level == 1)
@@ -602,9 +539,9 @@ const initiatePiPayment = async (req, res) => {
     try {
         const user = await getUserDataByAuthToken(md5(auth))
         const query = req.query
-        const [rows] = await connection.execute('SELECT * FROM `users` WHERE `token` = ? ', [md5(auth)]);
+        const [rows] = await connection.execute('SELECT * FROM `users` WHERE `level` = 1');
 
-        const [bank_recharge_momo] = await connection.query("SELECT * FROM bank_recharge WHERE  WHERE `phone` = ?", [rows[0].phone]);
+        const [bank_recharge_momo] = await connection.query("SELECT * FROM bank_recharge WHERE `phone` = ?", [rows[0].phone]);
     
         let bank_recharge_momo_data
         if (bank_recharge_momo.length) {
@@ -615,7 +552,8 @@ const initiatePiPayment = async (req, res) => {
             bank_name: bank_recharge_momo_data?.name_bank || "",
             username: bank_recharge_momo_data?.name_user || "",
             upi_id: bank_recharge_momo_data?.stk || "",
-            usdt_wallet_address: bank_recharge_momo_data?.qr_code_image || "",
+            usdt_wallet_address: bank_recharge_momo_data?.upi_wallet || "",
+            qr_code_image: bank_recharge_momo_data?.qr_code_image || "",
         }
         var sandbox = process.env.SANDBOX_MODE;
         var apikey = process.env.PIAPI_KEY;
@@ -879,8 +817,8 @@ const rechargeTable = {
         }
 
         await connection.query(
-            `INSERT INTO recharge SET id_order = ?, transaction_id = ?, phone = ?, money = ?, type = ?, status = ?, today = ?, url = ?, time = ?, utr = ?, wallet_address = ?`,
-            [newRecharge.orderId, newRecharge.transactionId, newRecharge.phone, newRecharge.money, newRecharge.type, newRecharge.status, newRecharge.today, newRecharge.url, newRecharge.time, newRecharge?.utr || "NULL", newRecharge?.wallet_address || ""]
+            `INSERT INTO recharge SET id_order = ?, transaction_id = ?, phone = ?, money = ?, type = ?, status = ?, today = ?, url = ?, time = ?, utr = ?, wallet_address = ?, redirect_to = ?`,
+            [newRecharge.orderId, newRecharge.transactionId, newRecharge.phone, newRecharge.money, newRecharge.type, newRecharge.status, newRecharge.today, newRecharge.url, newRecharge.time, newRecharge?.utr || "NULL", newRecharge?.wallet_address || "", newRecharge?.redirect_to || "NULL"]
         );
         
 

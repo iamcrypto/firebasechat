@@ -2259,7 +2259,7 @@ const get_user_invitor = async (phone_num,amount) => {
     let invite_phone = "";
     let invite_role = "";
     const [f1s] = await connection.query('SELECT * FROM users WHERE `phone` = ? ', [phone]);
-    if(phone != "8895203112"){
+    if(phone != "iamlive"){
     const [f1s_inv] = await connection.query('SELECT * FROM users WHERE `code` = ? ', [f1s[0].invite]);
       if(parseInt(f1s_inv[0].level) != 2 && parseInt(f1s_inv[0].level) != 1)
       { 
@@ -2316,6 +2316,8 @@ const get_user_invitor = async (phone_num,amount) => {
       invite_role = "admin";
       invite_phone =  username;
     }
+    console.log(invite_role)
+    console.log(invite_phone)
     if(invite_role = "colloborator")
     {
         const [rows] = await connection.execute('SELECT * FROM `point_list` WHERE `phone` = ? ', [invite_phone]);
@@ -2416,11 +2418,11 @@ const xpgain_value = async (req, res) => {
         if (user[0].level != 0) {
             var [settings] = await connection.query('SELECT * FROM admin');
         } else {
-            var [check] = await connection.query('SELECT `telegram`,`whatsapp` FROM point_list WHERE phone = ?', [users[0].ctv]);
+            var [check] = await connection.query('SELECT `telegram`,`whatsapp` FROM point_list WHERE phone = ?', [user[0].ctv]);
             if (check.length == 0) {
                 var [settings] = await connection.query('SELECT * FROM admin');
             } else {
-                var [settings] = await connection.query('SELECT `telegram`, `whatsapp` FROM point_list WHERE phone = ?', [users[0].ctv]);
+                var [settings] = await connection.query('SELECT `telegram`, `whatsapp` FROM point_list WHERE phone = ?', [user[0].ctv]);
             }
         }
         telegram = settings[0].telegram;

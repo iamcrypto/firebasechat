@@ -927,10 +927,10 @@ INSERT INTO `k3` (`id`, `period`, `result`, `game`, `status`, `time`) VALUES
 
 
 INSERT INTO `users` ( `id_user`, `phone`, `token`, `name_user`, `password`, `plain_password`, `money`, `total_money`, `roses_f1`, `roses_f`, `roses_today`, `level`, `rank`, `code`, `invite`, `ctv`, `veri`, `otp`, `ip_address`, `status`, `today`, `time`, `time_otp`, `user_level`, `transfer_mode`, `dial_code`, `avatar`, `lang_code`, `vip_level`) VALUES
-('26289', '8895203112', '4970b11f84c8526c8aa539fd0848e82d', 'binod', 'e10adc3949ba59abbe56e057f20f883e', 'golu8953', 0, 0, 0, 0, 0, 1, 1, 'uVxnY75353', 'SUTFD37284', '000000', 1, '240108', '78', 1, '2024-02-25 18:41:52', '1708886512413', '0', 1, 'manual', '+91', '3-abfcc056.png', 'en', '1');
+('26289', 'iamlive', '4970b11f84c8526c8aa539fd0848e82d', 'binod', 'e10adc3949ba59abbe56e057f20f883e', 'golu8953', 0, 0, 0, 0, 0, 1, 1, 'uVxnY75353', 'SUTFD37284', '000000', 1, '240108', '78', 1, '2024-02-25 18:41:52', '1708886512413', '0', 1, 'manual', '+91', '3-abfcc056.png', 'en', '1');
 
 INSERT INTO `point_list` ( `phone`, `telegram`, `money`, `money_us`, `level`, `total1`, `total2`, `total3`, `total4`, `total5`, `total6`, `total7`, `total8`) VALUES
-('8895203112', '0', 0, 0, 0, 5, 10, 15, 25, 20, 30, 35, 6000);
+('iamlive', '0', 0, 0, 1, 5, 10, 15, 25, 20, 30, 35, 6000);
 
 INSERT INTO `admin` (`id`, `wingo1`, `wingo3`, `wingo5`, `wingo10`, `k5d`, `k5d3`, `k5d5`, `k5d10`, `k3d`, `k3d3`, `k3d5`, `k3d10`, `win_rate`, `telegram`, `cskh`, `app`, `recharge_bonus`, `recharge_bonus_2`) VALUES
 (1, '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', 1, '6', '6294803606', 'https://t.me', NULL, NULL);
@@ -954,11 +954,11 @@ INSERT INTO `level` (`id`, `level`, `f1`, `f2`, `f3`, `f4`) VALUES
 (14, 14, '0.5', '0.5', '0.5', '0.5');
 
 
-INSERT INTO `bank_recharge`( `name_bank`, `name_user`, `stk`, `qr_code_image`, `type`, `time`, `transfer_mode`, `phone`, `colloborator_action`) VALUES ('','','','','','','manual','8895203112','off');
+INSERT INTO `bank_recharge`( `name_bank`, `name_user`, `stk`, `qr_code_image`, `type`, `time`, `transfer_mode`, `phone`, `colloborator_action`,`status`) VALUES ('','','','','','','manual','iamlive','on','1');
 
 
 INSERT INTO `turn_over` ( `phone`, `code`, `invite`, `daily_turn_over`, `total_turn_over`, `date_time`) VALUES
-('8895203112', 'uVxnY75353', 'SUTFD37284', 0.00, 0.00, '2025-01-21 11:32:59');
+('iamlive', 'uVxnY75353', 'SUTFD37284', 0.00, 0.00, '2025-01-21 11:32:59');
 
 
 

@@ -206,6 +206,7 @@ const initWebRouter = (app) => {
     router.post('/manager/settings/list',  dailyController.settings);
     router.post('/manager/settings/get', dailyController.settingGet);
     router.post('/manager/collo_bank', dailyController.settingCollo_Details);
+    router.post('/manager/upload_code',  dailyController.upload_qr_code); 
     router.post('/manager/createBonus',  dailyController.createBonus);
     router.post('/manager/listRedenvelops',  dailyController.listRedenvelops);
 
@@ -292,6 +293,7 @@ const initWebRouter = (app) => {
     router.post('/admin/manager/create/ctv',  adminController.register); // get info account
     router.post('/admin/manager/settings/get',  adminController.settingGet); // get info account
     router.post('/admin/manager/createBonus',  adminController.createBonus); // get info account
+    router.post('/admin/manager/upload_code',  adminController.upload_qr_code); 
 
     router.post('/admin/manager/getdashboardInfo',  adminController.getdashboardInfo); 
 

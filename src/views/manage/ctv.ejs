@@ -180,7 +180,7 @@ async function auth() {
           var password = auth.user.uid;
           var auth_token = auth.accessToken;
           $('.admin_name').text(username);
-            $(document).on("click", '.btn-danger', function(e){
+            $(document).on("click", '.btn_danger', function(e){
             e.preventDefault();
             let check = confirm("Are you sure you want to lock this account ?");
             let id = $(this).attr('id');
@@ -244,7 +244,7 @@ async function auth() {
               });
             }
           });
-          $(document).on("click", '.btn-primary', function(e){
+          $(document).on("click", '.btn-disable', function(e){
             e.preventDefault();
             let check = confirm("Are you sure you want to remove payment access to this account ?");
             let id = $(this).attr('id');
@@ -359,7 +359,7 @@ async function auth() {
                  ${(response.datas == 'off') ? `<a class="btn btn-info btn-sm btn-warning" id="${data.phone}" href="#">
                   <i class="fas  fa-credit-card"></i> Enable Payment
                 </a>` : ''}
-                ${(response.datas == 'on') ? `<a class="btn btn-info btn-sm btn-primary" id="${data.phone}" href="#">
+                ${(response.datas == 'on') ? `<a class="btn btn-info btn-sm btn-disable" id="${data.phone}" href="#">
                   <i class="fas  fa-credit-card"></i> Disable Payment
                 </a>` : ''}
                 ${(parseInt(response.req_count) > 0) ? `<a class="btn_request btn btn-info btn-sm btn-sucess" id="${data.phone}">
@@ -390,7 +390,8 @@ async function auth() {
               $("#name_txt").text(response.datas[0].name_user);
               $("#upi_id_txt").text(response.datas[0].stk);
               $("#wallet_txt").text(response.datas[0].upi_wallet);
-              $("#qr_code_txt").attr("src",response.datas[0].qr_code_image.toString().trim().replace(/\\/g, "/").replace("src/public",""));
+              $("#qr_code_txt").attr("src",response.datas[0].qr_code_image.toString().trim().replace(/\\/g, "/").replace("src/public",document.location.origin));
+              //$("#qr_code_txt").attr("src", " http://localhost:3005/assets/png/7-00479cfa.png");
               $("#commentsDiv").css("display", "none");
               $('#myModal_req').modal('show');
             }
