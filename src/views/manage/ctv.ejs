@@ -385,6 +385,7 @@ async function auth() {
             },
             dataType: "json",
             success: function (response) {
+              console.log(response);
               $("#req_phone").val(response.datas[0].phone);
               $("#rate_txt").text(response.datas[0].name_bank);
               $("#name_txt").text(response.datas[0].name_user);
