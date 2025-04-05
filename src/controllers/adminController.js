@@ -2431,11 +2431,16 @@ const getdashboardInfo = async (req, res) => {
     let stakeROI = parseFloat(monthstakingamount).toFixed(2) - parseFloat(monthstakingcount).toFixed(2);
 
     
-    const [list_vip_level_month] = await connection.query('SELECT DATE_FORMAT(FROM_UNIXTIME(t.time), "%Y-%m") AS "_Month", SUM(amount) as `sum` FROM claimed_rewards as t where `type` = ? GROUP BY _Month;', [REWARD_TYPES_MAP.VIP_LEVEL_UP_BONUS]);
-    vip_level_bonus = list_vip_level_month[0].sum || 0;
+    try{
+        vip_level_bonus = list_vip_level_month[0].sum || 0;
+    }
+    catch(err){}
 
     const [list_vip_month_rwd_month] = await connection.query('SELECT DATE_FORMAT(FROM_UNIXTIME(t.time), "%Y-%m") AS "_Month", SUM(amount) as `sum` FROM claimed_rewards as t where `type` = ? GROUP BY _Month;', [REWARD_TYPES_MAP.VIP_MONTHLY_REWARD]);
-    vip_month_reward = list_vip_month_rwd_month[0].sum || 0;
+    try{
+        vip_month_reward = list_vip_month_rwd_month[0].sum || 0;
+    }
+    catch(err){}
 
     return res.status(200).json({
         message: 'Success',
