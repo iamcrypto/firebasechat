@@ -606,11 +606,8 @@
                 }
         
                 const handleWowPayPaymentRequest = async (moneyAmount,auth_token) => {
-                
-                        window.location.href = `/wallet/paynow/pipay?am=${moneyAmount}&authtoken=${auth_token}`
-            
+                        window.location.href = `/wallet/paynow/pipay?am=${moneyAmount}`
                 }
-        
                 const handleManualUSDTPaymentRequest = async (moneyAmount) => {
                     window.location.href = `/wallet/paynow/manual_usdt?am=${moneyAmount}`
                 }

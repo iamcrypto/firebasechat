@@ -532,12 +532,10 @@ const verifyUPIPayment = async (req, res) => {
 
 const initiatePiPayment = async (req, res) => {
     const type = PaymentMethodsMap.WOW_PAY
-    let auth = req.query.authtoken;
     let money = parseInt(req.query.am);
     let act_amt = parseFloat(money/process.env.PI_EXCHANGE_RATE).toFixed(4);
 
     try {
-        const user = await getUserDataByAuthToken(md5(auth))
         const query = req.query
         const [rows] = await connection.execute('SELECT * FROM `users` WHERE `level` = 1');
 
