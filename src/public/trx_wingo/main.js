@@ -882,11 +882,12 @@ async function auth() {
                   alertMessage(response.message);
                   if (response.status === false) return;
                   $("#balance_amount").text("₹ " + response.money + ".00");
-                  socket.emit("data-server_2", {
+                  socket.emit("data-server_trx_call", {
                     money: currentX * money,
                     join,
                     time: Date.now(),
                     change: response.change,
+                    game:GAME_TYPE_ID,
                   });
           
                   initMyBets();
@@ -1454,7 +1455,7 @@ async function auth() {
          
 
 
-          socket.on("data-server-trx-wingo", async function (msg) {
+        socket.on("data-server-trx-wingo_1", async function (msg) {
             try {
               console.log(msg);
           

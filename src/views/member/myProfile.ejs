@@ -9,6 +9,7 @@
     <title>Tiranga</title>
     <link rel="stylesheet" href="./index_files/index-96409872.css">
     <link href="/css/home/chunk-vendors.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css">
     <link href="/css/home/app.css" rel="stylesheet" />
     <link rel="shortcut icon" href="/images/bitbug_favicon.ico" type="image/x-icon" />
     <style>
@@ -179,7 +180,7 @@
                 <div data-v-106b99c8="" class="navbar-title">Profile</div>
                 <div data-v-106b99c8="" class="navbar-right"></div>
             </div>
-            <div data-v-9f3a9836="" class="profile">
+            <div data-v-9f3a9836="" class="profile" >
                 <div data-v-9f3a9836="" class="item c-row c-row-between c-row-middle-center">
                     <div data-v-9f3a9836="" class="lab">Avatar</div>
                     <div data-v-9f3a9836="" class="img">
@@ -386,7 +387,7 @@ async function auth() {
             };
             $("#prof_image").attr("src","/assets/png/"+ response.data.user_avatar);
             $('.profile .name').text(response.data.phone_user);
-            $('.profile .id').text(response.data.id_user);
+            $('.profile .id').html(`<span>UID | </span> <span id="user_id">`+data.data.id_user+`</span> <i data-v-9f3a9836="" class="m-l-10 fa-solid fa-copy" style="color: rgb(149, 149, 149); font-size: 16px; margin-left:10px;"></i>`);
             $('.profile .number').text( response.data.country_code +" "+ response.data.name_user);
             $("#drop_down_val").find('span').text(response.data.country_code);
             $("input").val(response.data.name_user);
@@ -420,6 +421,29 @@ async function auth() {
                         }
                     });
                 }
+        });
+
+        function alertMess(text) {
+            $('body').append(
+                `
+                <div data-v-1dcba851="" class="msg">
+                    <div data-v-1dcba851="" class="msg-content v-enter-active v-enter-to" style=""> ${text} </div>
+                </div>
+                `
+            );
+            setTimeout(() => {
+                $('.msg .msg-content').removeClass('v-enter-active v-enter-to');
+                $('.msg .msg-content').addClass('v-leave-active v-leave-to');
+                setTimeout(() => {
+                    $('.msg').remove();
+                }, 100);
+            }, 1000);
+        }
+        $(document).on("click", '.copy_user_id', function(e){
+            e.preventDefault();
+            var userid = $("#user_id").text();
+           alertMess('Copy successful', $(this));
+            navigator.clipboard.writeText(userid);
         });
         $('.sure').click(function (e) {
             e.preventDefault();

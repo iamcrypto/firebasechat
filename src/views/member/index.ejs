@@ -367,8 +367,7 @@
             </div>
             <div data-v-8cd483ca="" class="menu-box">
                 <div data-v-8cd483ca="" class="info p-t-30 p-l-30 p-b-30 p-r-20" style="padding-top: 0rem!important">
-                    <div data-v-8cd483ca="" class="c-row c-row-between c-row-middle state-box c-pr"
-                        onclick="location.href='/myProfile'">
+                    <div data-v-8cd483ca="" class="c-row c-row-between c-row-middle state-box c-pr">
                         <div data-v-8cd483ca="" class="c-row c-row-middle">
                             <div data-v-8cd483ca="" class="user-img">
                                 <img data-v-8cd483ca="" src="/assets/png/1-a6662edb.png" class="img" id="prof_image" >
@@ -383,7 +382,7 @@
                             
 
                         </div>
-                        <div data-v-8cd483ca="" class="profile">
+                        <div data-v-8cd483ca="" class="profile" onclick="location.href='/myProfile'">
                             <i data-v-8cd483ca="" class="fa-regular fa-angle-right fa-fade fa-lg center"
                                 style="color: #8f5206; font-size: 20px;">
                             </i>
@@ -1031,8 +1030,8 @@ async function auth() {
                             };
                             $("#prof_image").attr("src","/assets/png/"+ response.data.user_avatar);
                             $('.infoName .name').text(username);
-                            $('.infoName .id').text(`UID   |    ${response.data.id_user}`);
-                            $('.infoName .id').attr('data-clipboard-text', '');
+                            $('.infoName .id').html(`<span>UID | </span> <span id="user_id">`+data.data.id_user+`</span><i class="copy_user_id fa-solid fa-copy" style="margin-left:10px;"></i>`);
+                            $('.infoName .id').attr('data-clipboard-text', data.data.id_user);
                             $('.infoName .number').text(`Mobile Number:${response.data.country_code }  ${response.data.name_user.slice(0, 2)}****${response.data.name_user.slice(-4)}`);
                             $('.money .txt').text(` ₹ ${response.data.money_user} `);
                         }
@@ -1119,6 +1118,12 @@ async function auth() {
             }
             });
 
+            $(document).on("click", '.copy_user_id', function(e){
+                e.preventDefault();
+                var userid = $("#user_id").text();
+               alertMess('Copy successful', $(this));
+                navigator.clipboard.writeText(userid);
+            });
             $("#whatsapp_link").click(function (e) {
                 window.location.href = "/" + $("#whatsapp_link").attr("data-link");
             });

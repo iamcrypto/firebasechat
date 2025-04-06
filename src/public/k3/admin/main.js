@@ -348,6 +348,7 @@ async function auth() {
                 },
                 dataType: "json",
                 success: function (response) {
+                    console.log(response);
                     $(`#total`).text('0');
                     $(`#2-so-trung`).text('0');
                     $(`#3-so-trung`).text('0');

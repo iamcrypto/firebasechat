@@ -44,6 +44,11 @@ const adminPageK3 = async (req, res) => {
     return res.render("manage/k3.ejs", {sandbox});
 }
 
+const adminPageTrx = async (req, res) => {
+    var sandbox = process.env.SANDBOX_MODE;
+    return res.render("manage/manaJtrx.ejs", {sandbox});
+} 
+
 const ctvProfilePage = async (req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
     var phone = req.params.phone;
@@ -181,6 +186,54 @@ const middlewareAdminController = async (req, res, next) => {
         return res.redirect("/login");
     }
 }
+
+
+const totalJoinTRX = async (req, res) => {
+    let auth = req.body.authtoken;
+    let game = req.body.typeid;
+    if (!game) {
+        return res.status(200).json({
+            message: 'Failed',
+            status: false,
+            timeStamp: timeNow,
+        });
+    }
+    let join = '';
+    if (game == 1) join = 'trx_wingo';
+    if (game == 3) join = 'trx_wingo3';
+    if (game == 5) join = 'trx_wingo5';
+    if (game == 10) join = 'trx_wingo10';
+
+    let admjoin = '';
+    if (game == 1) admjoin = 'trx_wingo1';
+    if (game == 3) admjoin = 'trx_wingo3';
+    if (game == 5) admjoin = 'trx_wingo5';
+    if (game == 10) admjoin = 'trx_wingo10';
+    const [rows] = await connection.query('SELECT * FROM users WHERE `token` = ? ', [md5(auth)]);
+    if (rows.length > 0) {
+        const [trx_wingoall] = await connection.query(`SELECT * FROM trx_wingo_bets WHERE game = "${join}" AND status = 0 AND level = 0 ORDER BY id ASC `, [auth]);
+        const [trx_winGo1] = await connection.execute(`SELECT * FROM trx_wingo_game WHERE status = 0 AND game = '${join}' ORDER BY id DESC LIMIT 1 `, []);
+        const [trx_winGo10] = await connection.execute(`SELECT * FROM trx_wingo_game WHERE status != 0 AND game = '${join}' ORDER BY id DESC LIMIT 10 `, []);
+        const [setting] =  await connection.query(`SELECT ${admjoin} FROM admin`);
+        
+        return res.status(200).json({
+            message: 'Success',
+            status: true,
+            datas: trx_wingoall,
+            lotterys: trx_winGo1,
+            list_orders: trx_winGo10,
+            setting: setting,
+            timeStamp: timeNow,
+        });
+    } else {
+        return res.status(200).json({
+            message: 'Failed',
+            status: false,
+            timeStamp: timeNow,
+        });
+    }
+}
+
 
 const totalJoin = async (req, res) => {
     let auth = req.body.authtoken;
@@ -378,6 +431,64 @@ const statistical2 = async (req, res) => {
         rechargeToday: recharge_today[0].total,
         withdrawToday: withdraw_today[0].total,
     });
+}
+
+const TRXchangeAdmin = async (req, res) => {
+    let auth = req.body.authtoken;
+    let value = req.body.value;
+    let type = req.body.type;
+    let typeid = req.body.typeid;
+
+    if (!value || !type || !typeid) return res.status(200).json({
+        message: 'Failed',
+        status: false,
+        timeStamp: timeNow,
+    });;
+    let game = '';
+    let bs = '';
+    if (typeid == '1') {
+        game = 'trx_wingo1';
+        bs = 'bs1';
+    }
+    if (typeid == '2') {
+        game = 'trx_wingo3';
+        bs = 'bs3';
+    }
+    if (typeid == '3') {
+        game = 'trx_wingo5';
+        bs = 'bs5';
+    }
+    if (typeid == '4') {
+        game = 'trx_wingo10';
+        bs = 'bs10';
+    }
+    switch (type) {
+        case 'change-wingo1':
+            await connection.query(`UPDATE admin SET ${game} = ? `, [value]);
+            return res.status(200).json({
+                message: 'Editing results successfully',
+                status: true,
+                timeStamp: timeNow,
+            });
+            break;
+        case 'change-win_rate':
+            await connection.query(`UPDATE admin SET ${bs} = ? `, [value]);
+            return res.status(200).json({
+                message: 'Editing win rate successfully',
+                status: true,
+                timeStamp: timeNow,
+            });
+            break;
+
+        default:
+            return res.status(200).json({
+                message: 'Failed',
+                status: false,
+                timeStamp: timeNow,
+            });
+            break;
+    }
+
 }
 
 const changeAdmin = async (req, res) => {
@@ -2625,7 +2736,7 @@ const on_off_colloborator = async (req, res) => {
 
 const getbankRequest = async (req, res) => {
     try {
-        let auth = req.cookies.auth;
+        let auth = req.body.authtoken;
         let phone = req.body.id;
         if (!auth) {
             return res.status(200).json({
@@ -2655,7 +2766,7 @@ const getbankRequest = async (req, res) => {
 
 const ReqAcceptReject = async (req, res) => {
     try {
-        let auth = req.cookies.auth;
+        let auth = req.body.authtoken;;
         let phone = req.body.id;
         let type = req.body.type;
         let comments = req.body.comments;
@@ -2751,8 +2862,10 @@ module.exports = {
     adminPage5,
     adminPage10,
     totalJoin,
+    totalJoinTRX,
     middlewareAdminController,
     changeAdmin,
+    TRXchangeAdmin,
     membersPage,
     k3chatPage,
     d5chatPage,
@@ -2806,5 +2919,6 @@ module.exports = {
     get_recharge,
     makecolloborator,
     getdashboardInfo,
-    upload_qr_code
+    upload_qr_code,
+    adminPageTrx
 }
