@@ -2736,7 +2736,6 @@ const on_off_colloborator = async (req, res) => {
 
 const getbankRequest = async (req, res) => {
     try {
-        let auth = req.body.authtoken;
         let phone = req.body.id;
         if (!auth) {
             return res.status(200).json({
@@ -2766,7 +2765,11 @@ const getbankRequest = async (req, res) => {
 
 const ReqAcceptReject = async (req, res) => {
     try {
+<<<<<<< HEAD
         let auth = req.body.authtoken;;
+=======
+        let auth = req.body.authtoken;
+>>>>>>> 519a96e4dff52c2853c89ac814603db3b5218681
         let phone = req.body.id;
         let type = req.body.type;
         let comments = req.body.comments;
