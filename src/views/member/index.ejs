@@ -937,10 +937,10 @@
             .then(response => response.json())
             .then(data => {
                 $('.money .txt').text(` ₹ ${data.data.money_user} `);
+                setTimeout(() => {
+                    $(this).removeClass('action block-click');
+                }, 3000);
 			});	
-            setTimeout(() => {
-                $(this).removeClass('action block-click');
-            }, 3000);
         });
 
         $('.van-dialog__cancel').click(function (e) {
