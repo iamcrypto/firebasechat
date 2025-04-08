@@ -2314,7 +2314,7 @@ const get_user_invitor = async (phone_num,amount) => {
     }
     else{
       invite_role = "admin";
-      invite_phone =  username;
+      invite_phone =  phone_num;
     }
     console.log(invite_role)
     console.log(invite_phone)

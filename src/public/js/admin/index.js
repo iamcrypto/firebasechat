@@ -60,9 +60,9 @@ function showJoinMember(data) {
 
 
 function showJoinMember2(data) {
-    if (data.change == 1) return;
+    //if (data.change == 1) return;
     let bet = data.join;
-    let money = formatMoney(data.money, ',');
+    let money = formatMoney(data.bet_amount, ',');
     let name = data.bet;
     let time = timerJoin(data.time);
     let result = '';
@@ -148,6 +148,7 @@ function showListOrder3(list_orders, x) {
 }
 
 
+var u_sandbox_val = '';
 fetch("/api/sandbox_val")
   .then((response) => response.json())
     .then((data) => {
@@ -188,7 +189,8 @@ $(`.container-fluid:eq(1) .row:eq(0) .info-box-content:eq(${Number(typeid) - 1})
 
 
 socket.on("data-server_2", function (msg) {
-    console.log("123");
+    if(parseInt(msg.game) == parseInt(typeid))
+        {
     showJoinMember2(msg);
     $(".direct-chat-warning .direct-chat-messages").animate({
         scrollTop: $(".direct-chat-msg").prop("scrollHeight")
@@ -279,6 +281,7 @@ socket.on("data-server_2", function (msg) {
     $('.orderNumber:eq(10)').attr('totalmoney', n);
     $('.orderNumber:eq(11)').attr('totalmoney', l);
     $('.orderNumbers').attr('totalmoney', ns);
+}
 });
 
 

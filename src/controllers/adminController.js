@@ -211,7 +211,7 @@ const totalJoinTRX = async (req, res) => {
     if (game == 10) admjoin = 'trx_wingo10';
     const [rows] = await connection.query('SELECT * FROM users WHERE `token` = ? ', [md5(auth)]);
     if (rows.length > 0) {
-        const [trx_wingoall] = await connection.query(`SELECT * FROM trx_wingo_bets WHERE game = "${join}" AND status = 0 AND level = 0 ORDER BY id ASC `, [auth]);
+        const [trx_wingoall] = await connection.query(`SELECT * FROM trx_wingo_bets WHERE game = "${join}" AND status = 0 ORDER BY id ASC `, [auth]);
         const [trx_winGo1] = await connection.execute(`SELECT * FROM trx_wingo_game WHERE status = 0 AND game = '${join}' ORDER BY id DESC LIMIT 1 `, []);
         const [trx_winGo10] = await connection.execute(`SELECT * FROM trx_wingo_game WHERE status != 0 AND game = '${join}' ORDER BY id DESC LIMIT 10 `, []);
         const [setting] =  await connection.query(`SELECT ${admjoin} FROM admin`);
@@ -254,7 +254,8 @@ const totalJoin = async (req, res) => {
     const [rows] = await connection.query('SELECT * FROM users WHERE `token` = ? ', [md5(auth)]);
 
     if (rows.length > 0) {
-        const [wingoall] = await connection.query(`SELECT * FROM minutes_1 WHERE game = "${game}" AND status = 0 AND level = 0 ORDER BY id ASC `, [md5(auth)]);
+        console.log(game);
+        const [wingoall] = await connection.query(`SELECT * FROM minutes_1 WHERE game = "${game}" AND status = 0 ORDER BY id ASC `, [md5(auth)]);
         const [winGo1] = await connection.execute(`SELECT * FROM wingo WHERE status = 0 AND game = '${game}' ORDER BY id DESC LIMIT 1 `, []);
         const [winGo10] = await connection.execute(`SELECT * FROM wingo WHERE status != 0 AND game = '${game}' ORDER BY id DESC LIMIT 10 `, []);
         const [setting] = await connection.execute(`SELECT * FROM admin `, []);
@@ -2123,7 +2124,7 @@ const listOrderOld = async (req, res) => {
 
     const [k5d] = await connection.query(`SELECT * FROM d5 WHERE status != 0 AND game = '${game}' ORDER BY id DESC LIMIT 10 `);
     const [period] = await connection.query(`SELECT period FROM d5 WHERE status = 0 AND game = '${game}' ORDER BY id DESC LIMIT 1 `);
-    const [waiting] = await connection.query(`SELECT phone, money, price, amount, bet, join_bet FROM result_5d WHERE status = 0 AND level = 0 AND game = '${game}' AND join_bet = '${internet_bet}' ORDER BY id ASC `);
+    const [waiting] = await connection.query(`SELECT phone, money, price, amount, bet, join_bet FROM result_5d WHERE status = 0  AND game = '${game}' AND join_bet = '${internet_bet}' ORDER BY id ASC `);
     const [settings] = await connection.query(`SELECT ${join} FROM admin`);
     if (k5d.length == 0) {
         return res.status(200).json({
@@ -2179,7 +2180,7 @@ const listOrderOldK3 = async (req, res) => {
 
     const [k5d] = await connection.query(`SELECT * FROM k3 WHERE status != 0 AND game = '${game}' ORDER BY id DESC LIMIT 10 `);
     const [period] = await connection.query(`SELECT period FROM k3 WHERE status = 0 AND game = '${game}' ORDER BY id DESC LIMIT 1 `);
-    const [waiting] = await connection.query(`SELECT phone, money, price, typeGame, amount, bet FROM result_k3 WHERE status = 0 AND level = 0 AND game = '${game}' ORDER BY id ASC `);
+    const [waiting] = await connection.query(`SELECT phone, money, price, typeGame, amount, bet FROM result_k3 WHERE status = 0 AND game = '${game}' ORDER BY id ASC `);
     const [settings] = await connection.query(`SELECT ${join} FROM admin`);
     if (k5d.length == 0) {
         return res.status(200).json({
@@ -2384,6 +2385,7 @@ const getdashboardInfo = async (req, res) => {
     let total_5d = 0;
     let total_trx = 0;
     let totalWinning = 0;
+    let totalLoss = 0;
     let totalProfit= 0;
     let win_total_w = 0;
     let win_total_k3 = 0;
@@ -2394,6 +2396,42 @@ const getdashboardInfo = async (req, res) => {
 
     const today = moment().startOf("day").valueOf();
     const yesterday = moment().subtract(1, "days").valueOf();
+
+    let td_wingo_bet= 0;
+    let td_5d_bet= 0;
+    let td_k3_bet= 0;
+    let td_trx_bet= 0;
+    let td_totalBet = 0;
+
+    let td_wingo_win= 0;
+    let td_5d_win= 0;
+    let td_k3_win= 0;
+    let td_trx_win= 0;
+    let td_totalwin = 0;
+    let td_totalLoss = 0;
+
+    const [win_td_minutes_1] = await connection.query("SELECT SUM(get) AS `sum` FROM minutes_1 WHERE  `time` >= ?;", [today]);
+    const [win_td_k3_bet_money] = await connection.query("SELECT SUM(get) AS `sum` FROM result_k3 WHERE  `time` >= ?;", [today]);
+    const [win_td_d5_bet_money] = await connection.query("SELECT SUM(get) AS `sum` FROM result_5d WHERE  `time` >= ?;", [today]);
+    const [win_td_trx_bet_money] = await connection.query("SELECT SUM(get) AS `sum` FROM trx_wingo_bets WHERE  `time` >= ?;", [today]);
+    td_wingo_win = win_td_minutes_1[0].sum || 0;
+    td_k3_win = win_td_k3_bet_money[0].sum || 0;
+    td_5d_win = win_td_d5_bet_money[0].sum || 0;
+    td_trx_win = win_td_trx_bet_money[0].sum || 0;
+    td_totalwin += parseInt(td_wingo_win) + parseInt(td_k3_win) + parseInt(td_5d_win) + parseInt(td_trx_win);
+
+    const [td_minutes_1] = await connection.query("SELECT SUM(money) AS `sum` FROM minutes_1 WHERE  `time` >= ?;", [today]);
+    const [td_k3_bet_money] = await connection.query("SELECT SUM(money) AS `sum` FROM result_k3 WHERE  `time` >= ?;", [today]);
+    const [td_d5_bet_money] = await connection.query("SELECT SUM(money) AS `sum` FROM result_5d WHERE  `time` >= ?;", [today]);
+    const [td_trx_bet_money] = await connection.query("SELECT SUM(money) AS `sum` FROM trx_wingo_bets WHERE  `time` >= ?;", [today]);
+    td_wingo_bet = td_minutes_1[0].sum || 0;
+    td_k3_bet = td_k3_bet_money[0].sum || 0;
+    td_5d_bet = td_d5_bet_money[0].sum || 0;
+    td_trx_bet = td_trx_bet_money[0].sum || 0;
+    td_totalBet += parseInt(td_wingo_bet) + parseInt(td_k3_bet) + parseInt(td_5d_bet) + parseInt(td_trx_bet);
+
+    td_totalLoss =  td_totalwin - td_totalBet;
+
     const [today_minutes_1] = await connection.query("SELECT SUM(money) AS `sum` FROM minutes_1 WHERE  `time` >= ?;", [yesterday]);
     const [today_k3_bet_money] = await connection.query("SELECT SUM(money) AS `sum` FROM result_k3 WHERE  `time` >= ?;", [yesterday]);
     const [today_d5_bet_money] = await connection.query("SELECT SUM(money) AS `sum` FROM result_5d WHERE  `time` >= ?;", [yesterday]);
@@ -2570,8 +2608,9 @@ const getdashboardInfo = async (req, res) => {
             a_TotalWithdrawal_No:totalwithdrawal_no,
             a_TotalWithdrawal_AMT:totalwithdrawal_amt,
             a_WithdrawalRequests:withdrawalRequest,
-            a_TodaysTotalBets:totalBet,
-            a_TodaysTotalWin:totalWinning,
+            a_TodaysTotalBets:td_totalBet,
+            a_TodaysTotalWin:td_totalwin,
+            a_TodaysTotalLoss:td_totalLoss,
             a_TodaysProfit:totalProfit,
             a_TodaysProfit_EXP:profit_after_exp,
             a_month_colloborator:colloboratordata.result_val,
@@ -2766,11 +2805,7 @@ const getbankRequest = async (req, res) => {
 
 const ReqAcceptReject = async (req, res) => {
     try {
-<<<<<<< HEAD
-        let auth = req.body.authtoken;;
-=======
         let auth = req.body.authtoken;
->>>>>>> 519a96e4dff52c2853c89ac814603db3b5218681
         let phone = req.body.id;
         let type = req.body.type;
         let comments = req.body.comments;

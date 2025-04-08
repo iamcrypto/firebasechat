@@ -988,6 +988,8 @@
             }
         }
 
+        
+
             $("#not_count").css({"display":"none"});
         const Pi = window.Pi;
 Pi.init({ version: "2.0", sandbox: <%=sandbox%> });
@@ -1035,8 +1037,8 @@ async function auth() {
                             };
                             $("#prof_image").attr("src","/assets/png/"+ response.data.user_avatar);
                             $('.infoName .name').text(username);
-                            $('.infoName .id').html(`<span>UID | </span> <span id="user_id">`+data.data.id_user+`</span><i class="copy_user_id fa-solid fa-copy" style="margin-left:10px;"></i>`);
-                            $('.infoName .id').attr('data-clipboard-text', data.data.id_user);
+                            $('.infoName .id').html(`<span>UID | </span> <span id="user_id">`+response.data.id_user+`</span><i class="copy_user_id fa-solid fa-copy" style="margin-left:10px;"></i>`);
+                            $('.infoName .id').attr('data-clipboard-text', response.data.id_user);
                             $('.infoName .number').text(`Mobile Number:${response.data.country_code }  ${response.data.name_user.slice(0, 2)}****${response.data.name_user.slice(-4)}`);
                             $('.money .txt').text(` ₹ ${response.data.money_user} `);
                         }
@@ -1122,6 +1124,23 @@ async function auth() {
                 }
             }
             });
+
+            function alertMess(text) {
+                $('body').append(
+                    `
+                    <div data-v-1dcba851="" class="msg">
+                        <div data-v-1dcba851="" class="msg-content v-enter-active v-enter-to" style=""> ${text} </div>
+                    </div>
+                    `
+                );
+                setTimeout(() => {
+                    $('.msg .msg-content').removeClass('v-enter-active v-enter-to');
+                    $('.msg .msg-content').addClass('v-leave-active v-leave-to');
+                    setTimeout(() => {
+                        $('.msg').remove();
+                    }, 100);
+                }, 1000);
+            }
 
             $(document).on("click", '.copy_user_id', function(e){
                 e.preventDefault();

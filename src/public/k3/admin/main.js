@@ -175,7 +175,7 @@ function messNewJoin3(datas) {
 
 function messNewJoin(data) {
     let game = $('html').attr('data-change');
-    if (data.change == 1) return;
+    //if (data.change == 1) return;
     if (data.game != game) return;
 
     let typeGame = '';
@@ -251,7 +251,7 @@ function messNewJoin(data) {
 
 function messNewJoin5(data) {
     let game = $('html').attr('data-change');
-    if (data.change == 1) return;
+    //if (data.change == 1) return;
     if (data.game != game) return;
     let typeGame = "";
     if (data.gameJoin == 1) typeGame = "total";

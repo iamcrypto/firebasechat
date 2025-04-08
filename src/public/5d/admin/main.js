@@ -161,7 +161,7 @@ function messNewJoin(data) {
     if(internalb == data.join.trim())
     {
     let game = $('html').attr('data-change');
-    if (data.change == 1) return;
+    //if (data.change == 1) return;
     if (data.game != game) return;
 
     let bet = data.join; // Join game ví dụ a b c d e tổng
@@ -188,12 +188,11 @@ function messNewJoin(data) {
 }
 }
 function messNewJoin5(data) {
-
     var internalb= $("#manage_2").find('.sub-menu-color').attr('data').trim();
     if(internalb == data.join.trim())
     {
     let game = $('html').attr('data-change');
-    if (data.chane == 1) return;
+    //if (data.change == 1) return;
     if (data.game != game) return;
     var prev_total = parseInt($("#total_bet").text().trim());
     var overall_bet = 0 + prev_total;
@@ -329,7 +328,6 @@ $(".start-order").click(function (e) {
 
   socket.on("data-server-5d", function (msg) {
     if (msg) {
-
         callListOrder();
         $('.direct-chat-msg').html('');
     }

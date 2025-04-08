@@ -40,7 +40,7 @@ const cronJobGame1p = (io) => {
           `SELECT * FROM trx_wingo_game WHERE game = '${TRX_WINGO_GAME_TYPE_MAP.MIN_1}' ORDER BY id DESC LIMIT 2`,
           [],
         );
-        io.emit("data-server-trx-wingo_1", { data: trxWingo, 'game': '1' });
+        io.emit("data-server-trx-wingo", { data: trxWingo, 'game': '1' });
     });
 
     cron.schedule('*/3 * * * *', async() => {
@@ -70,7 +70,7 @@ const cronJobGame1p = (io) => {
           `SELECT * FROM trx_wingo_game WHERE game = '${TRX_WINGO_GAME_TYPE_MAP.MIN_3}' ORDER BY id DESC LIMIT 2`,
           [],
         );
-        io.emit("data-server-trx-wingo_1", { data: trxWingo , 'game': '3' });
+        io.emit("data-server-trx-wingo", { data: trxWingo , 'game': '3' });
     });
 
     cron.schedule('*/5 * * * *', async() => {
@@ -98,7 +98,7 @@ const cronJobGame1p = (io) => {
           `SELECT * FROM trx_wingo_game WHERE game = '${TRX_WINGO_GAME_TYPE_MAP.MIN_5}' ORDER BY id DESC LIMIT 2`,
           [],
         );
-        io.emit("data-server-trx-wingo_1", { data: trxWingo, 'game': '5' });
+        io.emit("data-server-trx-wingo", { data: trxWingo, 'game': '5' });
     });
     
     cron.schedule('*/10 * * * *', async() => {
@@ -127,7 +127,7 @@ const cronJobGame1p = (io) => {
           `SELECT * FROM trx_wingo_game WHERE game = '${TRX_WINGO_GAME_TYPE_MAP.MIN_10}' ORDER BY id DESC LIMIT 2`,
           [],
         );
-        io.emit("data-server-trx-wingo_1", { data: trxWingo, 'game': '10' });
+        io.emit("data-server-trx-wingo", { data: trxWingo, 'game': '10' });
     });
 
     cron.schedule('0 1 * * *', async() => {

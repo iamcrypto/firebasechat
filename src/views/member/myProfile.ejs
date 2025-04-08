@@ -387,7 +387,7 @@ async function auth() {
             };
             $("#prof_image").attr("src","/assets/png/"+ response.data.user_avatar);
             $('.profile .name').text(response.data.phone_user);
-            $('.profile .id').html(`<span>UID | </span> <span id="user_id">`+data.data.id_user+`</span> <i data-v-9f3a9836="" class="m-l-10 fa-solid fa-copy" style="color: rgb(149, 149, 149); font-size: 16px; margin-left:10px;"></i>`);
+            $('.profile .id').html(`<span>UID | </span> <span id="user_id">`+response.data.id_user+`</span> <i data-v-9f3a9836="" class="copy_user_id m-l-10 fa-solid fa-copy" style="color: rgb(149, 149, 149); font-size: 16px; margin-left:10px;"></i>`);
             $('.profile .number').text( response.data.country_code +" "+ response.data.name_user);
             $("#drop_down_val").find('span').text(response.data.country_code);
             $("input").val(response.data.name_user);
