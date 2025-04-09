@@ -744,6 +744,10 @@ function getNthMinuteSinceDayStart() {
   return diff;
 }
 
+function randomIntFromInterval(min, max) { // min and max included 
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 const addTrxWingo = async (game) => {
   try {
     let join = "";
@@ -766,68 +770,103 @@ const addTrxWingo = async (game) => {
 
     if (isPendingGame) {
       // console.log("TRX WINGO GAME PENDING GAME INSERTIONS Start")
-      const isAdminManipulatedResult = false;
+      try{
 
-      if (isAdminManipulatedResult) {
-      } else {
-        let response = await axios({
-          method: "GET",
-          url: "https://apilist.tronscanapi.com/api/block?sort=-balance&start=0&limit=20&producer=&number=&start_timestamp=&end_timestamp=",
-          headers: {
-            "TRON-PRO-API-KEY": process.env.TRON_API_KEY,
-          },
-        });
-        //console.log(response.data.data);
-        if (response.data.data === undefined) {
-          throw new Error("Data is undefined");
+        const isAdminManipulatedResult = false;
+        const [setting] = await connection.query('SELECT * FROM `admin` ');
+        let nextResult = '';
+        if (game == 1) nextResult = setting[0].trx_wingo1;
+        if (game == 3) nextResult = setting[0].trx_wingo3;
+        if (game == 5) nextResult = setting[0].trx_wingo5;
+        if (game == 10) nextResult = setting[0].trx_wingo10;
+        if (nextResult == '-1') {
+          const rndInt = randomIntFromInterval(0, 9);
+          let response = await axios({
+            method: "GET",
+            url: "https://apilist.tronscanapi.com/api/block?sort=-balance&start=0&limit=20&producer=&number=&start_timestamp=&end_timestamp=",
+            headers: {
+              "TRON-PRO-API-KEY": process.env.TRON_API_KEY,
+            },
+          });
+         // console.log(response.data.data);
+         const data_json = response.data.data[rndInt];
+         const NextBlock = [];
+         NextBlock.id = data_json.number;
+         NextBlock.hash = data_json.hash;
+         NextBlock.blockTime = data_json.timestamp;
+         NextBlock.timeSS = moment(data_json.timestamp).format("ss");
+          // const NextBlock = response.data.data
+          //   .map((item) => {
+          //     return {
+          //       id: item.number,
+          //       hash: item.hash,
+          //       blockTime: item.timestamp,
+          //       timeSS: moment(item.timestamp).format("ss"),
+          //     };
+          //   })
+          //   .find((item) => item.timeSS === process.env.TRX_WINGO_GAME_TIME_SS);
+  
+          if (NextBlock === undefined) {
+            throw new Error("NextBlock is undefined");
+          }
+  
+          const BlockId = NextBlock.id;
+          const BlockTime = NextBlock.blockTime;
+          const Hash = NextBlock.hash;
+  
+          let Result = generateResultByHash(Hash);
+  
+          // console.log({
+          //    BlockId,
+          //    BlockTime: moment(BlockTime).format("HH:mm:ss"),
+          //    Hash,
+          //    Result,
+          // })
+  
+          await connection.query(
+            `
+                 UPDATE trx_wingo_game
+                 SET result = ?, status = ?, block_id = ?, block_time = ?, hash = ?, release_status = 1
+                 WHERE period = ? AND game = ?
+                 `,
+            [
+              Result,
+              TRX_WINGO_GAME_STATUS_MAP.COMPLETED,
+              BlockId,
+              BlockTime,
+              Hash,
+              PendingGamePeriod,
+              join,
+            ],
+          );   
+          // console.log("TRX WINGO GAME PENDING GAME INSERTIONS Successfully")
         }
-        const NextBlock = response.data.data.map((item) => {
-            return {
-              id: item.number,
-              hash: item.hash,
-              blockTime: item.timestamp,
-              timeSS: moment(item.timestamp).format("ss"),
-            };
-          })
-          .find((item) => item.timeSS === process.env.TRX_WINGO_GAME_TIME_SS);
-
-          //console.log(NextBlock);
-        if (NextBlock === undefined) {
-          throw new Error("NextBlock is undefined");
-        }
-
-        const BlockId = NextBlock.id;
-        const BlockTime = NextBlock.blockTime;
-        const Hash = NextBlock.hash;
-
-        let Result = generateResultByHash(Hash);
-
-        // console.log({
-        //    BlockId,
-        //    BlockTime: moment(BlockTime).format("HH:mm:ss"),
-        //    Hash,
-        //    Result,
-        // })
-
-        await connection.query(
-          `
-               UPDATE trx_wingo_game
-               SET result = ?, status = ?, block_id = ?, block_time = ?, hash = ?, release_status = 1
-               WHERE period = ? AND game = ?
-               `,
-          [
-            Result,
-            TRX_WINGO_GAME_STATUS_MAP.COMPLETED,
-            BlockId,
-            BlockTime,
-            Hash,
-            PendingGamePeriod,
-            join,
-          ],
-        );
-
-        // console.log("TRX WINGO GAME PENDING GAME INSERTIONS Successfully")
+      else {
+          await connection.query(
+            `
+                 UPDATE trx_wingo_game
+                 SET status = ?, release_status = 1
+                 WHERE period = ? AND game = ?
+                 `,
+            [
+              TRX_WINGO_GAME_STATUS_MAP.COMPLETED,
+              PendingGamePeriod,
+              join,
+            ],
+          );
+          let adminJoin = '';
+          if (game == 1) adminJoin = 'trx_wingo1';
+          if (game == 3) adminJoin = 'trx_wingo3';
+          if (game == 5) adminJoin = 'trx_wingo5';
+          if (game == 10) adminJoin = 'trx_wingo10';
+  
+          await connection.execute(`UPDATE admin SET ${adminJoin} = ?`, ['-1']);
+        }  
       }
+      catch (error) {
+        console.log(error);
+      }
+    
     }
 
     let gameRepresentationId = GameRepresentationIds.TRXWINGO[game];
@@ -848,7 +887,6 @@ const addTrxWingo = async (game) => {
       "INSERT INTO trx_wingo_game SET period = ?, result = 0, game = ?, status = 0, block_id = 0, block_time = '', hash = '', time = ?",
       [NewGamePeriod, join, timeNow],
     );
-    
     // console.log("TRX WINGO GAME INSERT SUCCESSFULLY")
   } catch (error) {
     if (error?.response?.status === 403) {
@@ -1111,6 +1149,59 @@ const rosesPlus1 = async (phone, money, levels = [], timeNow = "") => {
   }
 };
 
+const manageResult = async (req, res) => {
+  try {
+    let auth = req.body.authtoken;
+    let hash_number = req.body.hash_number;
+    let hash_hash = req.body.hash_hash;
+    let hash_result = req.body.hash_result;
+    let hash_time = req.body.hash_time;
+    let typeid = req.body.typeid;
+    let join = '';
+    let game = '';
+    if (typeid == 1) join = 'trx_wingo1' , game = 'trx_wingo';
+    if (typeid == 3) join = 'trx_wingo3', game = 'trx_wingo3';
+    if (typeid == 5) join = 'trx_wingo5',game = 'trx_wingo5';
+    if (typeid == 10) join = 'trx_wingo10',game = 'trx_wingo10';
+    const [trxWingoNow] = await connection.query(
+      "SELECT period FROM trx_wingo_game WHERE status = 0 AND game = ? ORDER BY id DESC LIMIT 1",
+      [game],
+    );
+    const isPendingGame = trxWingoNow.length;
+    const PendingGamePeriod = trxWingoNow?.[0]?.period
+      ? parseInt(trxWingoNow?.[0]?.period)
+      : 0;
+
+    if (isPendingGame) {
+      await connection.query(
+        `
+             UPDATE trx_wingo_game
+             SET result = ?, status = ?, block_id = ?, block_time = ?, hash = ?, release_status = 0
+             WHERE period = ? AND game = ?
+             `,
+        [
+          hash_result,
+          TRX_WINGO_GAME_STATUS_MAP.PENDING,
+          hash_number,
+          hash_time,
+          hash_hash,
+          PendingGamePeriod,
+          game,
+        ],
+      );
+
+      const sql = `UPDATE admin SET ${join} = ?`;
+      await connection.execute(sql, [hash_result]);
+    }
+    return res.status(200).json({
+      message: 'Editing is successful',//Register Sucess
+      status: true
+    });
+  }
+  catch (error) {
+    console.log(error);
+  }
+};
 
 const distributeCommission = async () => {
   try {
@@ -1171,7 +1262,8 @@ const trxWingoController = {
   trxWingoPage5,
   trxWingoPage10,
   trxWingoBlockPage,
-  distributeCommission
+  distributeCommission,
+  manageResult,
 };
 
 export default trxWingoController;

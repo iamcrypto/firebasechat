@@ -338,7 +338,6 @@ const initWebRouter = (app) => {
     router.post('/api/webapi/admin/totalJoin',  adminController.totalJoin); // get info account
     router.post('/api/webapi/admin/totalJoin_trx', adminController.totalJoinTRX); 
     router.post('/api/webapi/admin/change',  adminController.changeAdmin); // get info account
-    router.post('/api/webapi/admin/trx_change', adminController.TRXchangeAdmin); 
     router.post('/api/webapi/admin/profileUser',  adminController.profileUser); // get info account
 
     // admin 5d 
@@ -380,6 +379,7 @@ const initWebRouter = (app) => {
    
     trxWingoController.Stat_listOrderOld,
   ); 
+  router.post("/api/webapi/trx_wingo/manageResult", trxWingoController.manageResult,); 
       router.post(
       "/api/vip/history",
       vipController.getVIPHistory,

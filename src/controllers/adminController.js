@@ -434,64 +434,6 @@ const statistical2 = async (req, res) => {
     });
 }
 
-const TRXchangeAdmin = async (req, res) => {
-    let auth = req.body.authtoken;
-    let value = req.body.value;
-    let type = req.body.type;
-    let typeid = req.body.typeid;
-
-    if (!value || !type || !typeid) return res.status(200).json({
-        message: 'Failed',
-        status: false,
-        timeStamp: timeNow,
-    });;
-    let game = '';
-    let bs = '';
-    if (typeid == '1') {
-        game = 'trx_wingo1';
-        bs = 'bs1';
-    }
-    if (typeid == '2') {
-        game = 'trx_wingo3';
-        bs = 'bs3';
-    }
-    if (typeid == '3') {
-        game = 'trx_wingo5';
-        bs = 'bs5';
-    }
-    if (typeid == '4') {
-        game = 'trx_wingo10';
-        bs = 'bs10';
-    }
-    switch (type) {
-        case 'change-wingo1':
-            await connection.query(`UPDATE admin SET ${game} = ? `, [value]);
-            return res.status(200).json({
-                message: 'Editing results successfully',
-                status: true,
-                timeStamp: timeNow,
-            });
-            break;
-        case 'change-win_rate':
-            await connection.query(`UPDATE admin SET ${bs} = ? `, [value]);
-            return res.status(200).json({
-                message: 'Editing win rate successfully',
-                status: true,
-                timeStamp: timeNow,
-            });
-            break;
-
-        default:
-            return res.status(200).json({
-                message: 'Failed',
-                status: false,
-                timeStamp: timeNow,
-            });
-            break;
-    }
-
-}
-
 const changeAdmin = async (req, res) => {
     let auth = req.body.authtoken;
     let value = req.body.value;
@@ -2904,7 +2846,6 @@ module.exports = {
     totalJoinTRX,
     middlewareAdminController,
     changeAdmin,
-    TRXchangeAdmin,
     membersPage,
     k3chatPage,
     d5chatPage,
