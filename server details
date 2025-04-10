@@ -64,3 +64,45 @@ early whip know sibling high father connect flat clown
 scorpion plunge 
 ghost lazy habit coyote wrong inquiry 
 seed into shell script render burger polar
+
+
+ "start": "pm2 start ecosystem.config.js --env production"
+
+
+"database": "nodemon --exec ./node_modules/.bin/babel-node src/modal/CreateDatabase.js",
+"start": "nodemon --exec ./node_modules/.bin/babel-node server.js"
+
+
+"nodemon": "^3.1.9",
+
+
+
+
+
+pm2 stop app
+pm2 stop database
+pm2 delete app
+pm2 delete database
+git pull
+npm install
+npm start
+pm2 logs
+
+
+Iam user credentials
+
+https://559050242556.signin.aws.amazon.com/console
+
+binod
+
+hjEC6'3[
+
+
+
+to delete git which is not pushed 
+
+git reset --soft HEAD~1
+
+	
+
+

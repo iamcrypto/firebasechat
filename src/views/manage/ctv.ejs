@@ -288,7 +288,7 @@ async function auth() {
         var pageno = 0;
         var pageto = 30;
         var page = 1;
-
+        
         $.ajax({
           type: "POST",
           url: "/api/webapi/admin/listctv",
@@ -390,7 +390,7 @@ async function auth() {
               $("#name_txt").text(response.datas[0].name_user);
               $("#upi_id_txt").text(response.datas[0].stk);
               $("#wallet_txt").text(response.datas[0].upi_wallet);
-              $("#qr_code_txt").attr("src",response.datas[0].qr_code_image.toString().trim().replace(/\\/g, "/").replace("src/public",document.location.origin));
+              $("#qr_code_txt").attr("src","<%=ams_url%>" + response.datas[0].qr_code_image.toString().trim());
               //$("#qr_code_txt").attr("src", " http://localhost:3005/assets/png/7-00479cfa.png");
               $("#commentsDiv").css("display", "none");
               $('#myModal_req').modal('show');

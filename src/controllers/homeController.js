@@ -327,11 +327,8 @@ const newtutorial = async (req, res) => {
 }
 
 const forgot = async (req, res) => {
-    let auth = req.body.authtoken;
-    const [user] = await connection.query('SELECT `time_otp` FROM users WHERE token = ? ', [md5(auth)]);
-    let time = user[0].time_otp;
     var sandbox = process.env.SANDBOX_MODE;
-    return res.render("member/forgot.ejs", { time, sandbox });
+    return res.render("member/forgot.ejs", { sandbox });
 }
 
 const redenvelopes = async (req, res) => {
