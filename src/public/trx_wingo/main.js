@@ -6,6 +6,13 @@ const getGameType = () => {
   return urlParams.get("game_type") || "1";
 };
 
+
+const STATUS_MAP = {
+  WIN: "win",
+  LOSS: "loss",
+  NONE: "none",
+};
+
 let currentDisplay = "";
 
 let GAME_TYPE_ID = getGameType();
@@ -673,12 +680,6 @@ async function auth() {
           var limit = 10;
           var page = 1;
           
-          const STATUS_MAP = {
-            WIN: "win",
-            LOSS: "loss",
-            NONE: "none",
-          };
-
           var pageno = 0;
           var limit = 10;
           var page = 1;

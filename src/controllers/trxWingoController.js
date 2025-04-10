@@ -779,6 +779,7 @@ const addTrxWingo = async (game) => {
         if (game == 3) nextResult = setting[0].trx_wingo3;
         if (game == 5) nextResult = setting[0].trx_wingo5;
         if (game == 10) nextResult = setting[0].trx_wingo10;
+        console.log(nextResult);
         if (nextResult == '-1') {
           const rndInt = randomIntFromInterval(0, 9);
           let response = await axios({
