@@ -70,37 +70,40 @@
                                 </div> -->
 
                                 <div class="form-group">
-                                   <!-- <div class="text-center">
-                                        <label for="quantity">Change Deposit Information</label>
-                                    </div>
-                                    <label for="quantity" style="color: #3498db;">BANKING</label>
-                                    <input type="text" class="form-control" placeholder="Rate"
-                                        id="edit-banking-name_bank" value=""><br>
-                                    <input type="text" class="form-control" placeholder="Enter Account Name"
-                                        id="edit-banking-name" value=""><br>
-                                    <input type="text" class="form-control" placeholder="Enter Account Number"
-                                        id="edit-banking-info" value=""><br>
-                                    <button type="submit" class="btn btn-primary edit-banking"
-                                        style="width: 100%;margin-bottom: 20px;">Submit</button>  -->
-                                    <!---------------------------------------------------------------->
-                                    <div class="text-center">
-                                        <label for="quantity">Manual Settings</label>
-                                    </div>
+                                    <form id="data" method="post" enctype="multipart/form-data">
 
-                                    <label for="edit-momo-name_bank" style="color: #3498db;">Rate</label>
-                                    <input type="text" class="form-control" placeholder="Rate"
-                                        id="edit-momo-name_bank" value=""><br>
-                                    <input type="text" class="form-control" placeholder="Wallet Owner Name"
-                                        id="edit-momo-name" value=""><br>
-                                    <input type="text" class="form-control" placeholder="UPI ID" id="edit-momo-info"
-                                        value="" required><br>
-                                    <input type="text" class="form-control" placeholder="USDT Wallet Address"
-                                        id="edit-momo-qr" value=""><br>
-                                    <label for="qr_code" style="color: #3498db;">Upload Qr Code</label>
-                                    <input type='file' name='fileUploaded' id="qr_code_scanner" accept="image/*" required>
-                                    <label id="qr_code_image" name="qr_code_image" style="color: green;" ></label>
-                                    <button type="submit" class="btn btn-primary edit-momo"
-                                        style="width: 100%;">Submit</button>
+                                        <!-- <div class="text-center">
+                                             <label for="quantity">Change Deposit Information</label>
+                                         </div>
+                                         <label for="quantity" style="color: #3498db;">BANKING</label>
+                                         <input type="text" class="form-control" placeholder="Rate"
+                                             id="edit-banking-name_bank" value=""><br>
+                                         <input type="text" class="form-control" placeholder="Enter Account Name"
+                                             id="edit-banking-name" value=""><br>
+                                         <input type="text" class="form-control" placeholder="Enter Account Number"
+                                             id="edit-banking-info" value=""><br>
+                                         <button type="submit" class="btn btn-primary edit-banking"
+                                             style="width: 100%;margin-bottom: 20px;">Submit</button>  -->
+                                         <!---------------------------------------------------------------->
+                                         <div class="text-center">
+                                            <label for="quantity">Manual Settings</label>
+                                        </div>
+        
+                                        <label for="edit-momo-name_bank" style="color: #3498db;">Rate</label>
+                                        <input type="text" class="form-control" placeholder="Rate" name="edit_rate" id="edit-momo-name_bank">
+                                        <br>
+                                        <input type="text" class="form-control" placeholder="Wallet Owner Name" name="edit_username"  id="edit-momo-name"><br>
+                                        <input type="text" class="form-control" placeholder="UPI ID" name="edit_qr_id" id="edit-momo-info"><br>
+                                        <input type="text" class="form-control" placeholder="USDT Wallet Address" name="edit_upi_id" id="edit-momo-qr">
+                                      <br>
+                                       <label for="qr_code" style="color: #3498db;">Upload Qr Code</label>
+                                       <input type='file' name='fileUploaded' id="qr_code_scanner" accept="image/*">
+                                       <label id="qr_code_image" name="qr_code_image" style="color: green;float: right;margin-right: 25%;" ></label>
+                                       <input type="hidden" id="qr_code_image_hdd" name="qr_code_image_hdd" value="">
+        
+                                        <button type="submit" class="btn btn-primary" style="margin-top: 70px;">Submit</button>
+        
+                                        </form>
                                 </div>
 
                                 <div class="form-group">
@@ -157,6 +160,24 @@ async function auth() {
           var password = auth.user.uid;
           var auth_token = auth.accessToken;
           $('.admin_name').text(username);
+          $("form#data").submit(function(e) {
+            e.preventDefault();    
+            var formData = new FormData(this);
+            formData.append('authtoken', auth_token);  
+            $.ajax({
+                url: '/upload_admin',
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.status === true) {
+                        alert("Details Updated Successfully!");
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
           $.ajax({
             type: "POST",
             url: "/admin/manager/settings/get",
@@ -277,94 +298,7 @@ async function auth() {
             }, 1000);
         }
 
-    $(document).off('click', '.edit-momo').on("click", '.edit-momo', function(e){
-            try {
-                e.preventDefault();
-                const bank_name = $('#edit-momo-name_bank').val();
-                const username = $('#edit-momo-name').val();
-                const upi_id = $('#edit-momo-info').val();
-                const usdt_wallet_address = $('#edit-momo-qr').val();
-                const file_code = $('#qr_code_scanner')[0].files[0];
-                let formData = new FormData();    
-                formData.append('qr_code', file_code);                     
-                let file_exits = "";
-                if(upi_id.length != 0)
-                {
-                    if($('#qr_code_scanner')[0].files.length != 0 || $('#qr_code_image').text().length != 0)
-                    {
-                        var file_name_up = '';
-                        var tarr = $('#qr_code_image').text().split('/');
-                        if($('#qr_code_scanner')[0].files.length == 0)
-                        {
-                            file_exits = "no_file";
-                            file_name_up = tarr[tarr.length-1];
-                            $.ajax({
-                                type: "POST",
-                                url: "/admin/manager/settings/bank",
-                                data: {
-                                    file_exits:file_exits,
-                                    file_name:file_name_up,
-                                    bank_name: bank_name,
-                                    username: username,
-                                    upi_id: upi_id,
-                                    usdt_wallet_address: usdt_wallet_address,
-                                    typer: "momo",
-                                    authtoken:auth_token,
-                                },
-                                dataType: "json",
-                                success: function (response) {                        
-                                    if (response.status === true) {
-                                    alert("Details Updated Successfully!");
-                                }
-                            }
-                            });
-                        }
-                        else{
-                            file_exits = "has_file";
-                            file_name_up = $('#qr_code_scanner')[0].files[0].name.toString().trim();
-                            fetch('/admin/manager/upload_code', {
-                                method: 'POST', 
-                                body: formData,
-                                mode: "cors",
-                              }).then(res =>{ res.json().then((data)=>{
-                                if (data.status === true) {
-                                    $.ajax({
-                                        type: "POST",
-                                        url: "/admin/manager/settings/bank",
-                                        data: {
-                                            file_exits:file_exits,
-                                            file_name:file_name_up,
-                                            bank_name: bank_name,
-                                            username: username,
-                                            upi_id: upi_id,
-                                            usdt_wallet_address: usdt_wallet_address,
-                                            typer: "momo",
-                                            authtoken:auth_token,
-                                        },
-                                        dataType: "json",
-                                        success: function (response) {                        
-                                            if (response.status === true) {
-                                            alert("Details Updated Successfully!");
-                                        }
-                                    }
-                                    });
-                                }
-                            });
-                        });   
-                        }    
-                    }
-                    else
-                    {
-                        alert("Atleast one file is required!");
-                    }
-                }
-                else{
-                    alert("UPi id is required!");
-                }      
-            } catch (error) {
-                console.log(error)
-            }
-        });
+ 
         $('.edit-banking').click(function (e) {
             e.preventDefault();
             const name_bank = $('#edit-banking-name_bank').val();

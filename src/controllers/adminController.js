@@ -756,7 +756,7 @@ const settingGet = async (req, res) => {
                 username: bank_recharge_momo_data?.name_user || "",
                 upi_id: bank_recharge_momo_data?.stk || "",
                 usdt_wallet_address: bank_recharge_momo_data?.upi_wallet || "",
-                qr_code_image: bank_recharge_momo_data?.qr_code_image || "",
+                qr_code_image: process.env.AWS_BUCKET_URL +  bank_recharge_momo_data?.qr_code_image || "",
             }
         });
     } catch (error) {
@@ -946,107 +946,7 @@ const handlWithdraw = async (req, res) => {
     }
 }
 
-let path_dir = path.dirname(path.basename(__dirname));
-const uploadDir = path.join(path_dir + '/src/public/qr_code');
-let uploaded_fileName = '';
-const storage = multer.diskStorage({
-    destination: uploadDir,
-    filename: function(req, file, cb){
-        uploaded_fileName = file.originalname;
-        cb(null, file.originalname);
-    }
-})
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 1000000 //give no. of bytes
-    },
-}).single('qr_code');
 
-const settingBank = async (req, res) => {
-    try {
-        let name_bank = req.body.name_bank;
-        let name = req.body.name;
-        let info = req.body.info;
-        let qr =  req.body.qr;
-        let typer =  req.body.typer;
-        let auth = req.body.authtoken;
-        let file_exits = req.body.file_exits;
-        let file_name = req.body.file_name;
-
-        if (!auth || !typer) {
-            return res.status(200).json({
-                message: 'Failed',
-                status: false,
-                timeStamp: timeNow,
-            });
-        }
-        const [users] = await connection.query('SELECT * FROM users WHERE token = ?', [md5(auth)]);
-        if (typer == 'bank') {
-            await connection.query(`UPDATE bank_recharge SET name_bank = ?, name_user = ?, stk = ? WHERE type = 'bank' AND phone = ?`, [name_bank, name, info, users[0].phone]);
-            return res.status(200).json({
-                message: 'Successful change',
-                status: true,
-                datas: recharge,
-            });
-        }
-
-        if (typer == 'momo') {
-            const [bank_recharge] = await connection.query(`SELECT * FROM bank_recharge WHERE phone = ?;`, [users[0].phone]);
-            var transfer_mode = '';
-            if(bank_recharge.length != 0)
-            {
-                transfer_mode = bank_recharge[0].transfer_mode;
-            }
-            else{
-                transfer_mode = "manual";
-            }
-
-            let file_name1 = req.body.file_name;
-            const uploadDir1 = path.join(path_dir + '/src/public/qr_code/'+file_name1);
-
-            const deleteRechargeQueries = bank_recharge.map(recharge => {
-                if(recharge.qr_code_image.toString().trim() != uploadDir1)
-                {
-                    if (fs.existsSync(recharge.qr_code_image.toString().trim())) {
-                        fs.unlink(recharge.qr_code_image.toString().trim(),function(err){
-                        if(err) return console.log(err);
-                        console.log('file deleted successfully');
-                    });  
-                    };
-                }
-                return deleteBankRechargeById(recharge.id)
-            });
-
-           await Promise.all(deleteRechargeQueries)
-
-            //await connection.query(`UPDATE bank_recharge SET name_bank = ?, name_user = ?, stk = ?, qr_code_image = ? WHERE type = 'upi'`, [name_bank, name, info, qr]);
-
- 
-            const bankName = req.body.bank_name;
-            const username =  req.body.username;
-            const upiId =  req.body.upi_id;
-            const usdtWalletAddress =  req.body.usdt_wallet_address;
-            let timeNow = Date.now();
-
-            await connection.query("INSERT INTO bank_recharge SET name_bank = ?, name_user = ?, stk = ?, qr_code_image = ?, upi_wallet = ?, transfer_mode = ?,phone=?, colloborator_action = ?, time = ?, type = 'momo', status = 1;", [
-                bankName, username, upiId, uploadDir1, usdtWalletAddress,transfer_mode,users[0].phone, "off", timeNow
-            ])
-
-            return res.status(200).json({
-                message: 'Successfully changed',
-                status: true,
-                datas: [],
-            });
-       }
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            message: 'Something went wrong!',
-            status: false,
-        });
-    }
-}
 
 const deleteBankRechargeById = async (id) => {
     const [recharge] = await connection.query("DELETE FROM bank_recharge WHERE id = ?", [id]);
@@ -2815,31 +2715,6 @@ const ReqAcceptReject = async (req, res) => {
 
 }
 
-const upload_qr_code = async (req, res) => {
-    try
-    {
-        let uploadfile = await upload(req, res, (err) =>{
-            if(err){
-                console.log(err);
-            }else{
-                console.log('file uploaded succcessfully');
-            }
-        });
-        return res.status(200).json({
-            message: 'Success',
-            status: true,
-            datas: 'uploaded',  
-        });
-    }
-    catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            message: 'Failed',
-            status: false,
-        });
-    }
-}
-
 
 module.exports = {
     getbankRequest,
@@ -2874,7 +2749,6 @@ module.exports = {
     handlWithdraw,
     settings,
     editResult2,
-    settingBank,
     settingGet,
     settingCskh,
     settingbuff,
@@ -2908,6 +2782,5 @@ module.exports = {
     get_recharge,
     makecolloborator,
     getdashboardInfo,
-    upload_qr_code,
     adminPageTrx
 }

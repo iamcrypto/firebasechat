@@ -2365,11 +2365,11 @@ const get_manual_upi_id = async (req, res) => {
         var invite_phone = f_admin[0].phone;
         const [bank_recharge12] = await connection.query("SELECT * FROM bank_recharge WHERE phone = ?", [invite_phone]);
         upi_address = bank_recharge12[0].stk;
-        upi_image = bank_recharge12[0].qr_code_image.toString().trim();
+        upi_image = process.env.AWS_BUCKET_URL + bank_recharge12[0].qr_code_image.toString().trim();
     }
     else{
         upi_address = bank_recharge[0].stk;
-        upi_image = bank_recharge[0].qr_code_image.toString().trim();
+        upi_image = process.env.AWS_BUCKET_URL +  bank_recharge[0].qr_code_image.toString().trim();
     }
     return res.status(200).json({
         message: 'Successful',//Register Sucess
