@@ -933,7 +933,7 @@ const handlingTrxWingo1P = async (typeid) => {
       let id = orders.id;
       let result = orders.result;
       let bet = orders.bet;
-      let total = orders.money;
+      let total = orders.money + orders.fee;
       let phone = orders.phone;
       let winAmount = calculateWinAmount(bet, result, total);
       // x - green
