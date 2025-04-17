@@ -50,105 +50,154 @@ function timerJoin(params = '', addHours = 0) {
     }
 
 
-const rosesPlus = async (auth, money, fee) => {
-    const [level] = await connection.query("SELECT * FROM level ");
-  
-    const [user] = await connection.query(
-      "SELECT `phone`, `code`, `invite` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ",
-      [auth],
-    );
-    let timeNow = Date.now();
-    let userInfo = user[0];
-    const [f1] = await connection.query(
-      "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
-      [userInfo.invite],
-    );
-    if (money >= 100) {
-      if (f1.length > 0) {
-        let infoF1 = f1[0];
-          let rosesF1 = (money / 100) * level[parseInt(infoF1.user_level)].f1;
-          await connection.query(
-            "UPDATE users SET money = money + ?, roses_f1 = roses_f1 + ?, roses_f = roses_f + ?, roses_today = roses_today + ? WHERE phone = ? ",
-            [rosesF1, rosesF1, rosesF1, rosesF1, infoF1.phone],
-          );
-          const sqlF1 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-          await connection.execute(sqlF1, [infoF1.phone,infoF1.code,infoF1.invite,rosesF1,'0','0','0','0','0',timeNow,]);
-          const [f2] = await connection.query(
-            "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
-            [infoF1.invite],
-          );
-          if (f2.length > 0) {
-            let infoF2 = f2[0];
-            let rosesF2 = (money / 100) * level[parseInt(infoF2.user_level)].f2;
-            await connection.query(
-              "UPDATE users SET money = money + ?, roses_f = roses_f + ?, roses_today = roses_today + ? WHERE phone = ? ",
-              [rosesF2, rosesF2, rosesF2, infoF2.phone],
-            );
-            const sqlF2 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-            await connection.execute(sqlF2, [infoF2.phone,infoF2.code,infoF2.invite,'0',rosesF2,'0','0','0','0',timeNow,]);  
-            const [f3] = await connection.query(
-              "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
-              [infoF2.invite],
-            );
-            if (f3.length > 0) {
-              let infoF3 = f3[0];
-              let rosesF3 = (money / 100) * level[parseInt(infoF3.user_level)].f3;
+    const rosesPlus = async (auth, money, fee) => {
+        const [level] = await connection.query("SELECT * FROM level ");
+      
+        const [user] = await connection.query(
+          "SELECT `phone`, `code`, `invite` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ",
+          [auth],
+        );
+        let timeNow = Date.now();
+        let userInfo = user[0];
+        const [f1] = await connection.query(
+          "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
+          [userInfo.invite],
+        );
+        if (money >= 100) {
+          if (f1.length > 0) {
+            let infoF1 = f1[0];
+              let rosesF1 = (money / 100) * level[parseInt(infoF1.user_level)].f1;
               await connection.query(
-                "UPDATE users SET money = money + ?, roses_f = roses_f + ?, roses_today = roses_today + ? WHERE phone = ? ",
-                [rosesF3, rosesF3, rosesF3, infoF3.phone],
+                "UPDATE users SET money = money + ?, roses_f1 = roses_f1 + ?, roses_f = roses_f + ?, roses_today = roses_today + ? WHERE phone = ? ",
+                [rosesF1, rosesF1, rosesF1, rosesF1, infoF1.phone],
               );
-              const sqlF3 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-              await connection.execute(sqlF3, [infoF3.phone,infoF3.code,infoF3.invite,'0','0',rosesF3,'0','0','0',timeNow,]);
-              const [f4] = await connection.query(
+    
+              const sqlTF1 = `
+              INSERT INTO turn_over (phone, code, invite, daily_turn_over, total_turn_over)
+              VALUES (?, ?, ?, ?, ?)
+              ON DUPLICATE KEY UPDATE
+              daily_turn_over = daily_turn_over + VALUES(daily_turn_over),
+              total_turn_over = total_turn_over + VALUES(total_turn_over)
+              `;
+              await connection.execute(sqlTF1, [infoF1.phone, infoF1.code, infoF1.invite, rosesF1, rosesF1]);
+              const sqlF1 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
+              await connection.execute(sqlF1, [infoF1.phone,infoF1.code,infoF1.invite,rosesF1,'0','0','0','0','0',timeNow,]);
+              const [f2] = await connection.query(
                 "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
-                [infoF3.invite],
+                [infoF1.invite],
               );
-              if (f4.length > 0) {
-                let infoF4 = f4[0];
-                let rosesF4 = (money / 100) * level[parseInt(infoF4.user_level)].f4;
+              if (f2.length > 0) {
+                let infoF2 = f2[0];
+                let rosesF2 = (money / 100) * level[parseInt(infoF2.user_level)].f2;
                 await connection.query(
                   "UPDATE users SET money = money + ?, roses_f = roses_f + ?, roses_today = roses_today + ? WHERE phone = ? ",
-                  [rosesF4, rosesF4, rosesF4, infoF4.phone],
+                  [rosesF2, rosesF2, rosesF2, infoF2.phone],
                 );
-                const sqlF4 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-                await connection.execute(sqlF4, [infoF4.phone,infoF4.code,infoF4.invite,'0','0','0',rosesF4,'0','0',timeNow,]);
-                const [f5] = await connection.query(
+                const sqlTF2 = `
+                INSERT INTO turn_over (phone, code, invite, daily_turn_over, total_turn_over)
+                VALUES (?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                daily_turn_over = daily_turn_over + VALUES(daily_turn_over),
+                total_turn_over = total_turn_over + VALUES(total_turn_over)
+                `;
+                await connection.execute(sqlTF2, [infoF2.phone, infoF2.code, infoF2.invite, rosesF2, rosesF2]);
+                const sqlF2 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
+                await connection.execute(sqlF2, [infoF2.phone,infoF2.code,infoF2.invite,'0',rosesF2,'0','0','0','0',timeNow,]);  
+                const [f3] = await connection.query(
                   "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
-                  [infoF4.invite],
+                  [infoF2.invite],
                 );
-                if (f5.length > 0) {
-                  let infoF5 = f5[0];
-                  let rosesF5 = (money / 100) * level[parseInt(infoF5.user_level)].f5;
+                if (f3.length > 0) {
+                  let infoF3 = f3[0];
+                  let rosesF3 = (money / 100) * level[parseInt(infoF3.user_level)].f3;
                   await connection.query(
                     "UPDATE users SET money = money + ?, roses_f = roses_f + ?, roses_today = roses_today + ? WHERE phone = ? ",
-                    [rosesF5, rosesF5, rosesF5, infoF5.phone],
+                    [rosesF3, rosesF3, rosesF3, infoF3.phone],
                   );
-                  const sqlF5 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-                  await connection.execute(sqlF5, [infoF5.phone,infoF5.code,infoF5.invite,'0','0','0','0',rosesF5,'0',timeNow,]);
-  
-                  const [f6] = await connection.query(
+                  const sqlTF3 = `
+                  INSERT INTO turn_over (phone, code, invite, daily_turn_over, total_turn_over)
+                  VALUES (?, ?, ?, ?, ?)
+                  ON DUPLICATE KEY UPDATE
+                  daily_turn_over = daily_turn_over + VALUES(daily_turn_over),
+                  total_turn_over = total_turn_over + VALUES(total_turn_over)
+                  `;
+                  await connection.execute(sqlTF3, [infoF3.phone, infoF3.code, infoF3.invite, rosesF3, rosesF3]);
+                  const sqlF3 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
+                  await connection.execute(sqlF3, [infoF3.phone,infoF3.code,infoF3.invite,'0','0',rosesF3,'0','0','0',timeNow,]);
+                  const [f4] = await connection.query(
                     "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
-                    [infoF5.invite],
+                    [infoF3.invite],
                   );
-                  if (f6.length > 0) {
-                    let infoF6 = f6[0];
-                    let rosesF6 = (money / 100) * level[parseInt(infoF6.user_level)].f6;
+                  if (f4.length > 0) {
+                    let infoF4 = f4[0];
+                    let rosesF4 = (money / 100) * level[parseInt(infoF4.user_level)].f4;
                     await connection.query(
                       "UPDATE users SET money = money + ?, roses_f = roses_f + ?, roses_today = roses_today + ? WHERE phone = ? ",
-                      [rosesF6, rosesF6, rosesF6, infoF6.phone],
+                      [rosesF4, rosesF4, rosesF4, infoF4.phone],
                     );
-                    const sqlF6 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-                    await connection.execute(sqlF6, [infoF6.phone,infoF6.code,infoF6.invite,'0','0','0','0','0',rosesF6,timeNow,]);
+                    const sqlTF4 = `
+                    INSERT INTO turn_over (phone, code, invite, daily_turn_over, total_turn_over)
+                    VALUES (?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                    daily_turn_over = daily_turn_over + VALUES(daily_turn_over),
+                    total_turn_over = total_turn_over + VALUES(total_turn_over)
+                    `;
+                    await connection.execute(sqlTF4, [infoF4.phone, infoF4.code, infoF4.invite, rosesF4, rosesF4]);
+                    const sqlF4 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
+                    await connection.execute(sqlF4, [infoF4.phone,infoF4.code,infoF4.invite,'0','0','0',rosesF4,'0','0',timeNow,]);
+                    const [f5] = await connection.query(
+                      "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
+                      [infoF4.invite],
+                    );
+                    if (f5.length > 0) {
+                      let infoF5 = f5[0];
+                      let rosesF5 = (money / 100) * level[parseInt(infoF5.user_level)].f5;
+                      await connection.query(
+                        "UPDATE users SET money = money + ?, roses_f = roses_f + ?, roses_today = roses_today + ? WHERE phone = ? ",
+                        [rosesF5, rosesF5, rosesF5, infoF5.phone],
+                      );
+                      const sqlTF5 = `
+                      INSERT INTO turn_over (phone, code, invite, daily_turn_over, total_turn_over)
+                      VALUES (?, ?, ?, ?, ?)
+                      ON DUPLICATE KEY UPDATE
+                      daily_turn_over = daily_turn_over + VALUES(daily_turn_over),
+                      total_turn_over = total_turn_over + VALUES(total_turn_over)
+                      `;
+                      await connection.execute(sqlTF5, [infoF5.phone, infoF5.code, infoF5.invite, rosesF5, rosesF5]);
+                      const sqlF5 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
+                      await connection.execute(sqlF5, [infoF5.phone,infoF5.code,infoF5.invite,'0','0','0','0',rosesF5,'0',timeNow,]);
+      
+                      const [f6] = await connection.query(
+                        "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
+                        [infoF5.invite],
+                      );
+                      if (f6.length > 0) {
+                        let infoF6 = f6[0];
+                        let rosesF6 = (money / 100) * level[parseInt(infoF6.user_level)].f6;
+                        await connection.query(
+                          "UPDATE users SET money = money + ?, roses_f = roses_f + ?, roses_today = roses_today + ? WHERE phone = ? ",
+                          [rosesF6, rosesF6, rosesF6, infoF6.phone],
+                        );
+                        const sqlTF6 = `
+                        INSERT INTO turn_over (phone, code, invite, daily_turn_over, total_turn_over)
+                        VALUES (?, ?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE
+                        daily_turn_over = daily_turn_over + VALUES(daily_turn_over),
+                        total_turn_over = total_turn_over + VALUES(total_turn_over)
+                        `;
+                        await connection.execute(sqlTF6, [infoF6.phone, infoF6.code, infoF6.invite, rosesF6, rosesF6]);
+                        const sqlF6 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
+                        await connection.execute(sqlF6, [infoF6.phone,infoF6.code,infoF6.invite,'0','0','0','0','0',rosesF6,timeNow,]);
+                      }
+                    }
                   }
                 }
               }
-            }
+              
           }
-          
-      }
-    }
-  };
-  
+        }
+      };
+      
 
 const validateBet = async (join, list_join, x, money, game) => {
     let checkJoin = isNumber(list_join);

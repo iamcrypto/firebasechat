@@ -316,7 +316,7 @@
                             <div data-v-0ff6946a="" class="bdshow" style="display: none;">
                                 <div data-v-0ff6946a="" class="c-row c-row-between">
                                     <div data-v-0ff6946a="">Today TTO: ${data.daily_turn_over}</div>
-                                    <div data-v-0ff6946a="">Self RC:${data.total_money}</div>
+                                    <div data-v-0ff6946a="">Self RC:${data.recharge_data}</div>
                                 </div>
                                <div data-v-0ff6946a="">REG time: ${timerJoin(data.time)}</div>
                                <div data-v-0ff6946a="" id="subordinateList">Subordinate: ${data.invite_count}</div>
@@ -360,6 +360,7 @@ async function auth() {
                     item.daily_turn_over = item.daily_turn_over || 0;
                     item.invite_count = Array.isArray(item.invite_count) ? item.invite_count.join(', ') : '';
                     item.total_turn_over = item.total_turn_over || 0;
+                    item.recharge_data = item.deposit_amt || 0;
                     return item;
                 });
                 const totalTurnover = f1Data.reduce((total, item) => {
@@ -414,7 +415,7 @@ async function auth() {
                                 <div data-v-0ff6946a="" class="bdshow" style="display: none;">
                                     <div data-v-0ff6946a="" class="c-row c-row-between">
                                         <div data-v-0ff6946a="">Today TO: ${data.daily_turn_over}</div>
-                                        <div data-v-0ff6946a="">Self RC: ${data.total_money}</div>
+                                        <div data-v-0ff6946a="">Self RC: ${data.deposit_amt}</div>
                                     </div>
                                    
         <div data-v-0ff6946a="" id="subordinateList">Subordinate: ${data.invite_count}</div>

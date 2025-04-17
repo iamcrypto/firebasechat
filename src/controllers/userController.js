@@ -696,7 +696,7 @@ const listMyTeam = async (req, res) => {
     let userInfo = user[0];
     const [f1] = await connection.query('SELECT `id_user`, `phone`, `code`, `invite`,`roses_f`, `rank`, `name_user`,`status`,`total_money`, `time` FROM users WHERE `invite` = ? ORDER BY id DESC', [userInfo.code]);
     const [mem] = await connection.query('SELECT `id_user`, `phone`, `time` FROM users WHERE `invite` = ? ORDER BY id DESC LIMIT 100', [userInfo.code]);
-    const [total_roses] = await connection.query('SELECT `f1`,`invite`, `code`,`phone`,`time` FROM roses WHERE `invite` = ? ORDER BY id DESC LIMIT 100', [userInfo.code]);
+    const total_roses = [];
 
     const selectedData = [];
 
@@ -709,6 +709,8 @@ const listMyTeam = async (req, res) => {
         if (userData.length > 0) {
             for (const user of userData) {
                 const [turnoverData] = await connection.query('SELECT `phone`, `daily_turn_over`, `total_turn_over` FROM turn_over WHERE `phone` = ?', [user.phone]);
+                const [rechargeData] = await connection.query('SELECT `phone`, `money` FROM recharge WHERE `phone` = ? AND `status` = 1;', [user.phone]);
+                const [CommiData] = await connection.query('SELECT `invite`, `code`,`phone`,`time`,DATE_FORMAT(FROM_UNIXTIME(t.time), "%Y-%m") AS "_Month",  SUM(f1 + f2 + f3 + f4 + f5 + f6) as `sum` FROM roses as t where `phone` = ? GROUP BY _Month;', [user.phone]);
                 const [inviteCountData] = await connection.query('SELECT COUNT(*) as invite_count FROM users WHERE `invite` = ?', [user.code]);
                 const inviteCount = inviteCountData[0].invite_count;
 
@@ -718,9 +720,20 @@ const listMyTeam = async (req, res) => {
                     user_level: depth,
                     daily_turn_over: turnoverData[0]?.daily_turn_over || 0,
                     total_turn_over: turnoverData[0]?.total_turn_over || 0,
+                    deposit_amt: rechargeData[0]?.money || 0,
                 };
 
                 selectedData.push(userObject);
+                if(CommiData.length > 0)
+                    {
+                        total_roses.push( {
+                            invite: CommiData[0].invite,
+                            code: CommiData[0].code,
+                            phone:CommiData[0].phone,
+                            time:CommiData[0].time,
+                            f1: CommiData[0]?.sum || 0,
+                        });
+                    }  
                 await fetchUserDataByCode(user.code, depth + 1);
             }
         }
