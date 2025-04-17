@@ -2396,10 +2396,13 @@ const getdashboardInfo = async (req, res) => {
         const inviter_money = (parseInt(list_recharge_users[i].money) / 100) * 5;
         bonus_amt = bonus_amt + user_money;
         const [list_mem] = await connection.query('SELECT * FROM users WHERE phone = ? ', [list_recharge_users[i].phone]);
-        const [list_mem_in] = await connection.query('SELECT * FROM users WHERE code = ? ', [list_mem[0].invite]);
-        if(list_mem_in.length != 0)
+        if(list_mem.length != 0)
         {
-            bonus_amt = bonus_amt + inviter_money;
+            const [list_mem_in] = await connection.query('SELECT * FROM users WHERE code = ? ', [list_mem[0].invite]);
+            if(list_mem_in.length != 0)
+            {
+                bonus_amt = bonus_amt + inviter_money;
+            }
         }
     }
     monthrechagebonus =  parseInt(monthrecharge_23) + parseInt(bonus_amt);

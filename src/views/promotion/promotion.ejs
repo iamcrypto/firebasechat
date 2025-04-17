@@ -809,9 +809,6 @@
                                   $("#totalCommissionsThisWeek").text(response.data.totalCommissionsThisWeek);
                                   $("#totalCommissions").text(response.data.totalCommissions);
                                   $("#yesterdayCommissionAmount").text(response.data.totalCommissionsYesterday);
-                                  $('#roses_all').text(response.data.totalCommissions);
-                                  $('#week_comm').text(response.data.totalCommissions);
-                                  $('#roses_today').text(response.data.totalCommissionsYesterday);
                               }
                             });
                                } catch (error) {
@@ -862,10 +859,12 @@
                                     $('#f_all_today').text(response.invite.f_all_today);
                                     $('#f_total').text(response.invite.total_f);
                                     $('#span_level').text(response.info[0].user_level);
-                                    //$('#roses_f1').text("Direct Commission: " + response.invite.roses_f1);
-                                   // $('#roses_f').text("Team Commission: " + response.invite.roses_f);
-                                    //$('#roses_all').text(response.invite.roses_all);
-                                   // $('#roses_today').text(response.invite.roses_today);
+                                    
+                                    $('#yesterdayCommissionAmount').text(response.invite.totalCommissionsToday);
+                                    $('#roses_all').text(response.invite.totalCommissions);
+                                    $('#week_comm').text(response.invite.weekCommissions);
+                                    $('#roses_today').text(response.invite.totalCommissionsToday);
+
                                     $('#invite_code').text(window.location.hostname + `/register?r_code=${response.info[0].code}`);
                     
                                     if (response.status === false) return location.href = '/home';

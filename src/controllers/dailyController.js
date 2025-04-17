@@ -15,6 +15,7 @@ import {
   } from "../helpers/games.js";
 
 let timeNow = Date.now();
+import moment from "moment";
 
 const dailyPage = async(req, res) => {
     var sandbox = process.env.SANDBOX_MODE;
@@ -541,6 +542,36 @@ const infoCtv = async(req, res) => {
         }
     }
 
+    const [list_mem_all] = await connection.query('SELECT * FROM users WHERE ctv = ? ', [phone]);
+    let totalCommissions = 0;
+    let totalCommissionsThisWeek = 0;
+    let totalCommissionsYesterday = 0;
+    const today = moment().startOf("day").valueOf();
+    for (let i = 0; i < list_mem_all.length; i++) {
+        try{
+            const [todayCommList] =  await connection.query('SELECT phone , SUM(f1 + f2 + f3 + f4 + f5 + f6) as `sum` FROM roses where `phone` = ? AND `time` >= ? GROUP BY phone;', [list_mem_all[i].phone, today]);
+            totalCommissionsYesterday += todayCommList[0].sum || 0;
+        }
+        catch
+        {
+
+        }
+        try{
+            const [weekCommList] =  await connection.query('SELECT WEEK(DATE_FORMAT(FROM_UNIXTIME(t.time), "%Y-%m")) AS "_Week", SUM(f1 + f2 + f3 + f4 + f5 + f6) as `sum` FROM roses as t where `phone` = ? GROUP BY _Week;', [list_mem_all[i].phone, today]);
+            totalCommissionsThisWeek += weekCommList[0].sum || 0;
+        }
+        catch{
+
+        }
+        try{
+            const [monthCommList] =  await connection.query('SELECT DATE_FORMAT(FROM_UNIXTIME(t.time), "%Y-%m") AS "_Month",  SUM(f1 + f2 + f3 + f4 + f5 + f6) as `sum` FROM roses as t where `phone` = ? GROUP BY _Month;',[list_mem_all[i].phone]);
+            totalCommissions += monthCommList[0].sum || 0;
+        }
+       catch{
+        
+       }
+    }
+
     let total_recharge_today = 0;
     let total_withdraw_today = 0;
     for (let i = 0; i < list_mem.length; i++) {
@@ -710,12 +741,6 @@ const infoCtv = async(req, res) => {
         }
     }
 
-    const startOfWeek = getStartOfWeekTimestamp();
-    const commissions = await getCommissionStatsByTime(startOfWeek, phone);
-
-    const totalCommissions = commissions?.total_commission || 0;
-    const totalCommissionsThisWeek = commissions?.last_week_commission || 0;
-    const totalCommissionsYesterday = commissions?.yesterday_commission || 0;
 
     return res.status(200).json({
         message: 'Success',

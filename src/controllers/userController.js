@@ -486,6 +486,32 @@ const promotion = async (req, res) => {
 
     let userInfo = user[0];
 
+    const today = moment().startOf("day").valueOf();
+    let totalCommissionsToday = 0;
+    let totalCommissionsWeek = 0;
+    let totalCommissionsMonth = 0;
+    try{
+    const [todayCommList] =  await connection.query('SELECT phone , SUM(f1 + f2 + f3 + f4 + f5 + f6) as "sum" FROM roses where `phone` = ? AND `time` >= ? GROUP BY phone;', [userInfo.phone, today]);
+    totalCommissionsToday = todayCommList[0].sum || 0;
+    }
+    catch{
+
+    }
+    try{
+        const [weekCommList] =  await connection.query('SELECT WEEK(DATE_FORMAT(FROM_UNIXTIME(t.time), "%Y-%m")) AS "_Week", SUM(f1 + f2 + f3 + f4 + f5 + f6) as `sum` FROM roses as t where `phone` = ? GROUP BY _Week;', [userInfo.phone, today]);
+        totalCommissionsWeek = weekCommList[0].sum || 0;
+    }
+    catch{
+
+    }
+    try{
+        const [monthCommList] =  await connection.query('SELECT DATE_FORMAT(FROM_UNIXTIME(t.time), "%Y-%m") AS "_Month",  SUM(f1 + f2 + f3 + f4 + f5 + f6) as `sum` FROM roses as t where `phone` = ? GROUP BY _Month;', [userInfo.phone]);
+        totalCommissionsMonth = monthCommList[0].sum || 0;
+    }
+    catch{
+        
+    }
+
     // Directly referred level-1 users
     const [f1s] = await connection.query('SELECT `phone`, `code`,`invite`, `time` FROM users WHERE `invite` = ? ', [userInfo.code]);
 
@@ -613,6 +639,9 @@ const promotion = async (req, res) => {
             roses_f: userInfo.roses_f,
             roses_all: rosesAdd,
             roses_today: userInfo.roses_today,
+            totalCommissionsToday:totalCommissionsToday,
+            totalCommissions:totalCommissionsMonth,
+            weekCommissions:totalCommissionsWeek,
         },
         timeStamp: timeNow,
     });
