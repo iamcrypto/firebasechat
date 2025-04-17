@@ -2679,10 +2679,14 @@ const ReqAcceptReject = async (req, res) => {
         {
             const [bank_recharge] = await connection.query(`SELECT * FROM bank_recharge WHERE phone = ? AND status = 1;`, [phone]);
             const deleteRechargeQueries = bank_recharge.map(async recharge => {
-                await s3Client.send(new DeleteObjectCommand({
-                    Bucket: process.env.AWS_BUCKET,
-                    Key: recharge.qr_code_image.toString().trim()
-                },function (err,data){}));
+                try{
+                    await s3Client.send(new DeleteObjectCommand({
+                        Bucket: process.env.AWS_BUCKET,
+                        Key: recharge.qr_code_image.toString().trim()
+                    },function (err,data){}));
+                }
+                catch(e){    
+                } 
                 return deleteBankRechargeById(recharge.id)
             });
             await Promise.all(deleteRechargeQueries);
@@ -2692,10 +2696,14 @@ const ReqAcceptReject = async (req, res) => {
         {
             const [bank_recharge] = await connection.query(`SELECT * FROM bank_recharge WHERE phone = ? AND status = 0;`, [phone]);
             const deleteRechargeQueries = bank_recharge.map(async recharge => {
-                await s3Client.send(new DeleteObjectCommand({
-                    Bucket: process.env.AWS_BUCKET,
-                    Key: recharge.qr_code_image.toString().trim()
-                },function (err,data){}));
+                try{
+                    await s3Client.send(new DeleteObjectCommand({
+                        Bucket: process.env.AWS_BUCKET,
+                        Key: recharge.qr_code_image.toString().trim()
+                    },function (err,data){}));
+                }
+                catch(e){    
+                } 
                 return deleteBankRechargeById(recharge.id)
             });
             await Promise.all(deleteRechargeQueries);

@@ -14314,7 +14314,7 @@ textarea {
             dataType: "json",
             success: function (response) {
                 $("#today_rebate").text(response.data[0].bonusAmount);
-                $("#today_rebate1").text(response.data[0].bonusAmount);
+                $("#today_rebate1").text(response.data[0].total_rebate);
                 $("#weekly_bet_val").text(response.data[0].weeklyBetAmount);
                 if(response.data[0].isClaimed == false)
                 {

@@ -1293,7 +1293,7 @@ const getDailyRebateReword = async (req, res) => {
   try {
     const authToken = req.body.authtoken;
     const [userRow] = await connection.execute(
-      "SELECT `phone` FROM `users` WHERE `token` = ? AND `veri` = 1",
+      "SELECT `phone`, `roses_f`  FROM `users` WHERE `token` = ? AND `veri` = 1",
       [md5(authToken)],
     );
     const user = userRow?.[0];
@@ -1303,13 +1303,13 @@ const getDailyRebateReword = async (req, res) => {
     }
 
     const today = moment().startOf("day").valueOf();
-    const [commissions] = await connection.query('SELECT SUM(`money`) as `sum` FROM commissions WHERE phone = ? AND `time` >= ? AND `level` <= 6;', [user.phone, today]);
+    const [commissions] =  await connection.query('SELECT phone , SUM(f1 + f2 + f3 + f4 + f5 + f6) as "sum" FROM roses where `phone` = ? AND `time` >= ? GROUP BY phone;', [user.phone, today]);
 	  let comm_amt = 0;
     comm_amt = commissions[0].sum || 0;
 	
     const todayRebateAmount = comm_amt;
 
-    const [week_commissions] = await connection.query('SELECT SUM(`money`) as `sum` FROM commissions WHERE phone = ? AND `level` <= 6;', [user.phone]);
+    const [week_commissions] = await connection.query('SELECT WEEK(DATE_FORMAT(FROM_UNIXTIME(t.time), "%Y-%m")) AS "_Week", SUM(f1 + f2 + f3 + f4 + f5 + f6) as `sum` FROM roses as t where `phone` = ? GROUP BY _Week;', [user.phone, today]);
 	  let w_comm_amt = 0;
     w_comm_amt = week_commissions[0].sum || 0;
 	
@@ -1324,6 +1324,7 @@ const getDailyRebateReword = async (req, res) => {
     const dailyRebateRewordList = DailyRebateBonusList.map((item) => {
       return {
         id: item.id,
+        total_rebate:user.roses_f,
         bettingAmount: Math.min(todayRebateAmount, item.rebetAmount),
         requiredBettingAmount: item.rebetAmount,
         bonusAmount: todayRebateAmount,
