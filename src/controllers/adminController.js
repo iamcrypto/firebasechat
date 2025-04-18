@@ -1340,7 +1340,6 @@ const profileUser = async (req, res) => {
 
 const infoCtv = async (req, res) => {
     const phone = req.body.phone;
-
     const [user] = await connection.query('SELECT * FROM users WHERE phone = ? ', [phone]);
 
     if (user.length == 0) {
@@ -1353,12 +1352,12 @@ const infoCtv = async (req, res) => {
     // cấp dưới trực tiếp all
     const [f1s] = await connection.query('SELECT `phone`, `code`,`invite`, `time` FROM users WHERE `invite` = ? ', [userInfo.code]);
 
-    // cấp dưới trực tiếp hôm nay 
+    // cấp dưới trực tiếp hôm nay  
     let f1_today = 0;
     for (let i = 0; i < f1s.length; i++) {
         const f1_time = f1s[i].time; // Mã giới thiệu f1
-        let check = (timerJoin(f1_time) == timerJoin()) ? true : false;
-        if (check) {
+        let check = (timerJoin1(f1_time) == timerJoin1()) ? true : false;
+        if(check) {
             f1_today += 1;
         }
     }
@@ -1368,35 +1367,35 @@ const infoCtv = async (req, res) => {
     for (let i = 0; i < f1s.length; i++) {
         const f1_code = f1s[i].code; // Mã giới thiệu f1
         const f1_time = f1s[i].time; // time f1
-        let check_f1 = (timerJoin(f1_time) == timerJoin()) ? true : false;
-        if (check_f1) f_all_today += 1;
+        let check_f1 = (timerJoin1(f1_time) == timerJoin1()) ? true : false;
+        if(check_f1) f_all_today += 1;
         // tổng f1 mời đc hôm nay
         const [f2s] = await connection.query('SELECT `phone`, `code`,`invite`, `time` FROM users WHERE `invite` = ? ', [f1_code]);
         for (let i = 0; i < f2s.length; i++) {
             const f2_code = f2s[i].code; // Mã giới thiệu f2
             const f2_time = f2s[i].time; // time f2
-            let check_f2 = (timerJoin(f2_time) == timerJoin()) ? true : false;
-            if (check_f2) f_all_today += 1;
+            let check_f2 = (timerJoin1(f2_time) == timerJoin1()) ? true : false;
+            if(check_f2) f_all_today += 1;
             // tổng f2 mời đc hôm nay
             const [f3s] = await connection.query('SELECT `phone`, `code`,`invite`, `time` FROM users WHERE `invite` = ? ', [f2_code]);
             for (let i = 0; i < f3s.length; i++) {
                 const f3_code = f3s[i].code; // Mã giới thiệu f3
                 const f3_time = f3s[i].time; // time f3
-                let check_f3 = (timerJoin(f3_time) == timerJoin()) ? true : false;
-                if (check_f3) f_all_today += 1;
+                let check_f3 = (timerJoin1(f3_time) == timerJoin1()) ? true : false;
+                if(check_f3) f_all_today += 1;
                 const [f4s] = await connection.query('SELECT `phone`, `code`,`invite`, `time` FROM users WHERE `invite` = ? ', [f3_code]);
                 // tổng f3 mời đc hôm nay
                 for (let i = 0; i < f4s.length; i++) {
                     const f4_code = f4s[i].code; // Mã giới thiệu f4
                     const f4_time = f4s[i].time; // time f4
-                    let check_f4 = (timerJoin(f4_time) == timerJoin()) ? true : false;
-                    if (check_f4) f_all_today += 1;
+                    let check_f4 = (timerJoin1(f4_time) == timerJoin1()) ? true : false;
+                    if(check_f4) f_all_today += 1;
                     // tổng f3 mời đc hôm nay
                 }
             }
         }
     }
-
+    
     // Tổng số f2
     let f2 = 0;
     for (let i = 0; i < f1s.length; i++) {
@@ -1404,7 +1403,7 @@ const infoCtv = async (req, res) => {
         const [f2s] = await connection.query('SELECT `phone`, `code`,`invite` FROM users WHERE `invite` = ? ', [f1_code]);
         f2 += f2s.length;
     }
-
+    
     // Tổng số f3
     let f3 = 0;
     for (let i = 0; i < f1s.length; i++) {
@@ -1413,10 +1412,10 @@ const infoCtv = async (req, res) => {
         for (let i = 0; i < f2s.length; i++) {
             const f2_code = f2s[i].code;
             const [f3s] = await connection.query('SELECT `phone`, `code`,`invite` FROM users WHERE `invite` = ? ', [f2_code]);
-            if (f3s.length > 0) f3 += f3s.length;
+            if(f3s.length > 0) f3 += f3s.length;
         }
     }
-
+    
     // Tổng số f4
     let f4 = 0;
     for (let i = 0; i < f1s.length; i++) {
@@ -1428,7 +1427,7 @@ const infoCtv = async (req, res) => {
             for (let i = 0; i < f3s.length; i++) {
                 const f3_code = f3s[i].code;
                 const [f4s] = await connection.query('SELECT `phone`, `code`,`invite` FROM users WHERE `invite` = ? ', [f3_code]);
-                if (f4s.length > 0) f4 += f4s.length;
+                if(f4s.length > 0) f4 += f4s.length;
             }
         }
     }
@@ -1449,22 +1448,53 @@ const infoCtv = async (req, res) => {
         }
     }
 
+    const [list_mem_all] = await connection.query('SELECT * FROM users WHERE ctv = ? ', [phone]);
+    let totalCommissions = 0;
+    let totalCommissionsThisWeek = 0;
+    let totalCommissionsYesterday = 0;
+    const today = moment().startOf("day").valueOf();
+    for (let i = 0; i < list_mem_all.length; i++) {
+        try{
+            const [todayCommList] =  await connection.query('SELECT phone , SUM(f1 + f2 + f3 + f4 + f5 + f6) as `sum` FROM roses where `phone` = ? AND `time` >= ? GROUP BY phone;', [list_mem_all[i].phone, today]);
+            totalCommissionsYesterday += todayCommList[0].sum || 0;
+        }
+        catch
+        {
+
+        }
+        try{
+            const [weekCommList] =  await connection.query('SELECT WEEK(DATE_FORMAT(FROM_UNIXTIME(t.time), "%Y-%m")) AS "_Week", SUM(f1 + f2 + f3 + f4 + f5 + f6) as `sum` FROM roses as t where `phone` = ? GROUP BY _Week;', [list_mem_all[i].phone, today]);
+            totalCommissionsThisWeek += weekCommList[0].sum || 0;
+        }
+        catch{
+
+        }
+        try{
+            const [monthCommList] =  await connection.query('SELECT DATE_FORMAT(FROM_UNIXTIME(t.time), "%Y-%m") AS "_Month",  SUM(f1 + f2 + f3 + f4 + f5 + f6) as `sum` FROM roses as t where `phone` = ? GROUP BY _Month;',[list_mem_all[i].phone]);
+            totalCommissions += monthCommList[0].sum || 0;
+        }
+       catch{
+        
+       }
+    }
+
     let total_recharge_today = 0;
     let total_withdraw_today = 0;
     for (let i = 0; i < list_mem.length; i++) {
         let phone = list_mem[i].phone;
+
         const [recharge_today] = await connection.query('SELECT `money`, `time` FROM recharge WHERE phone = ? AND status = 1 ', [phone]);
         const [withdraw_today] = await connection.query('SELECT `money`, `time` FROM withdraw WHERE phone = ? AND status = 1 ', [phone]);
         for (let i = 0; i < recharge_today.length; i++) {
-            let today = timerJoin();
-            let time = timerJoin(recharge_today[i].time);
+            let today = timerJoin1();
+            let time = timerJoin1(recharge_today[i].time);
             if (time == today) {
                 total_recharge_today += recharge_today[i].money;
             }
         }
         for (let i = 0; i < withdraw_today.length; i++) {
-            let today = timerJoin();
-            let time = timerJoin(withdraw_today[i].time);
+            let today = timerJoin1();
+            let time = timerJoin1(withdraw_today[i].time);
             if (time == today) {
                 total_withdraw_today += withdraw_today[i].money;
             }
@@ -1473,37 +1503,108 @@ const infoCtv = async (req, res) => {
 
     let win = 0;
     let loss = 0;
+    let wingowin= 0;
+    let wingoloss= 0;
+    let k3win= 0;
+    let k3loss= 0;
+    let d5win= 0;
+    let d5loss= 0;
+    let trxwin= 0;
+    let trxloss= 0;
     for (let i = 0; i < list_mem.length; i++) {
         let phone = list_mem[i].phone;
-        const [wins] = await connection.query('SELECT `money`, `time` FROM minutes_1 WHERE phone = ? AND status = 1 ', [phone]);
-        const [losses] = await connection.query('SELECT `money`, `time` FROM minutes_1 WHERE phone = ? AND status = 2 ', [phone]);
-        for (let i = 0; i < wins.length; i++) {
-            let today = timerJoin();
-            let time = timerJoin(wins[i].time);
+        const [wingo_wins] = await connection.query('SELECT `get`, `time` FROM minutes_1 WHERE phone = ? AND status = 1 ', [phone]);
+        const [wingo_losses] = await connection.query('SELECT `money`, `time` FROM minutes_1 WHERE phone = ? AND status = 2 ', [phone]);
+        for (let i = 0; i < wingo_wins.length; i++) {
+            let today = timerJoin1();
+            let time = timerJoin1(wingo_wins[i].time);
             if (time == today) {
-                win += wins[i].money;
+                wingowin += wingo_wins[i].get;
             }
         }
-        for (let i = 0; i < losses.length; i++) {
-            let today = timerJoin();
-            let time = timerJoin(losses[i].time);
+        for (let i = 0; i < wingo_losses.length; i++) {
+            let today = timerJoin1();
+            let time = timerJoin1(wingo_losses[i].time);
             if (time == today) {
-                loss += losses[i].money;
+                wingoloss += wingo_losses[i].money;
+            }
+        }
+
+        const [k3_wins] = await connection.query('SELECT `get`, `time` FROM result_k3 WHERE phone = ? AND status = 1 ', [phone]);
+        const [k3_losses] = await connection.query('SELECT `money`, `time` FROM result_k3 WHERE phone = ? AND status = 2 ', [phone]);
+        for (let i = 0; i < k3_wins.length; i++) {
+            let today = timerJoin1();
+            let time = timerJoin1(k3_wins[i].time);
+            if (time == today) {
+                k3win += k3_wins[i].get;
+            }
+        }
+        for (let i = 0; i < k3_losses.length; i++) {
+            let today = timerJoin1();
+            let time = timerJoin1(k3_losses[i].time);
+            if (time == today) {
+                k3loss += k3_losses[i].money;
+            }
+        }
+
+        const [d5_wins] = await connection.query('SELECT `get`, `time` FROM result_5d WHERE phone = ? AND status = 1 ', [phone]);
+        const [d5_losses] = await connection.query('SELECT `money`, `time` FROM result_5d WHERE phone = ? AND status = 2 ', [phone]);
+        for (let i = 0; i < d5_wins.length; i++) {
+            let today = timerJoin1();
+            let time = timerJoin1(d5_wins[i].time);
+            if (time == today) {
+                d5win += d5_wins[i].get;
+            }
+        }
+        for (let i = 0; i < d5_losses.length; i++) {
+            let today = timerJoin1();
+            let time = timerJoin1(d5_losses[i].time);
+            if (time == today) {
+                d5loss += d5_losses[i].money;
+            }
+        }
+
+        const [trx_wins] = await connection.query('SELECT `get`, `time` FROM trx_wingo_bets WHERE phone = ? AND status = 1 ', [phone]);
+        const [trx_losses] = await connection.query('SELECT `money`, `time` FROM trx_wingo_bets WHERE phone = ? AND status = 2 ', [phone]);
+        for (let i = 0; i < trx_wins.length; i++) {
+            let today = timerJoin1();
+            let time = timerJoin1(trx_wins[i].time);
+            if (time == today) {
+                trxwin += trx_wins[i].get;
+            }
+        }
+        for (let i = 0; i < trx_losses.length; i++) {
+            let today = timerJoin1();
+            let time = timerJoin1(trx_losses[i].time);
+            if (time == today) {
+                trxloss += trx_losses[i].money;
             }
         }
     }
+
+    win =  parseInt(wingowin) + parseInt(k3win) + parseInt(d5win) + parseInt(trxwin);
+    loss =  parseInt(wingoloss) + parseInt(k3loss) + parseInt(d5loss) + parseInt(trxloss);
+
+    
     let list_mems = [];
     const [list_mem_today] = await connection.query('SELECT * FROM users WHERE ctv = ? AND status = 1 AND veri = 1 ', [phone]);
     for (let i = 0; i < list_mem_today.length; i++) {
-        let today = timerJoin();
-        let time = timerJoin(list_mem_today[i].time);
+        let today = timerJoin1();
+        let time = timerJoin1(list_mem_today[i].time);
         if (time == today) {
-            list_mems.push(list_mem_today[i]);
+            const [phone_invites] = await connection.query('SELECT `phone` FROM users WHERE code = ? ', [list_mem_today[i].invite]);
+            let phone_invite = phone_invites[0].phone;
+            let data = {
+                ...list_mem_today[i],
+                phone_invite: phone_invite,
+            };
+            list_mems.push(data);
         }
     }
 
     const [point_list] = await connection.query('SELECT * FROM point_list WHERE phone = ? ', [phone]);
     let moneyCTV = point_list[0].money;
+    let moneyRecharge = point_list[0].recharge;
 
     let list_recharge_news = [];
     let list_withdraw_news = [];
@@ -1512,15 +1613,15 @@ const infoCtv = async (req, res) => {
         const [recharge_today] = await connection.query('SELECT `id`, `status`, `type`,`phone`, `money`, `time` FROM recharge WHERE phone = ? AND status = 1 ', [phone]);
         const [withdraw_today] = await connection.query('SELECT `id`, `status`,`phone`, `money`, `time` FROM withdraw WHERE phone = ? AND status = 1 ', [phone]);
         for (let i = 0; i < recharge_today.length; i++) {
-            let today = timerJoin();
-            let time = timerJoin(recharge_today[i].time);
+            let today = timerJoin1();
+            let time = timerJoin1(recharge_today[i].time);
             if (time == today) {
                 list_recharge_news.push(recharge_today[i]);
             }
         }
         for (let i = 0; i < withdraw_today.length; i++) {
-            let today = timerJoin();
-            let time = timerJoin(withdraw_today[i].time);
+            let today = timerJoin1();
+            let time = timerJoin1(withdraw_today[i].time);
             if (time == today) {
                 list_withdraw_news.push(withdraw_today[i]);
             }
@@ -1530,8 +1631,8 @@ const infoCtv = async (req, res) => {
     const [redenvelopes_used] = await connection.query('SELECT * FROM redenvelopes_used WHERE phone = ? ', [phone]);
     let redenvelopes_used_today = [];
     for (let i = 0; i < redenvelopes_used.length; i++) {
-        let today = timerJoin();
-        let time = timerJoin(redenvelopes_used[i].time);
+        let today = timerJoin1();
+        let time = timerJoin1(redenvelopes_used[i].time);
         if (time == today) {
             redenvelopes_used_today.push(redenvelopes_used[i]);
         }
@@ -1540,18 +1641,21 @@ const infoCtv = async (req, res) => {
     const [financial_details] = await connection.query('SELECT * FROM financial_details WHERE phone = ? ', [phone]);
     let financial_details_today = [];
     for (let i = 0; i < financial_details.length; i++) {
-        let today = timerJoin();
-        let time = timerJoin(financial_details[i].time);
+        let today = timerJoin1();
+        let time = timerJoin1(financial_details[i].time);
         if (time == today) {
             financial_details_today.push(financial_details[i]);
         }
     }
 
-
+    
     return res.status(200).json({
         message: 'Success',
         status: true,
         datas: user,
+        comm_total:totalCommissions, 
+        comm_week:totalCommissionsThisWeek, 
+        comm_today:totalCommissionsYesterday, 
         f1: f1s.length,
         f2: f2,
         f3: f3,
@@ -1565,8 +1669,9 @@ const infoCtv = async (req, res) => {
         win: win,
         loss: loss,
         list_recharge_news: list_recharge_news,
-        list_withdraw_news: list_withdraw_news,
+        list_withdraw_news: list_withdraw_news, 
         moneyCTV: moneyCTV,
+        moneyRecharge:moneyRecharge,
         redenvelopes_used: redenvelopes_used_today,
         financial_details_today: financial_details_today,
     });
@@ -1575,7 +1680,12 @@ const infoCtv = async (req, res) => {
 const infoCtv2 = async (req, res) => {
     const phone = req.body.phone;
     const timeDate = req.body.timeDate;
-
+     
+    function formateT(params) {
+    let result = (params < 10) ? "0" + params : params;
+    return result;
+    }
+    
     function timerJoin(params = '', addHours = 0) {
         let date = '';
         if (params) {
@@ -1583,23 +1693,24 @@ const infoCtv2 = async (req, res) => {
         } else {
             date = new Date();
         }
-
+    
         date.setHours(date.getHours() + addHours);
-
+    
         let years = formateT(date.getFullYear());
         let months = formateT(date.getMonth() + 1);
         let days = formateT(date.getDate());
-
+    
         let hours = date.getHours() % 12;
         hours = hours === 0 ? 12 : hours;
         let ampm = date.getHours() < 12 ? "AM" : "PM";
-
+    
         let minutes = formateT(date.getMinutes());
         let seconds = formateT(date.getSeconds());
-
+    
         return years + '-' + months + '-' + days + ' ' + hours + ':' + minutes + ':' + seconds + ' ' + ampm;
     }
 
+    
     const [user] = await connection.query('SELECT * FROM users WHERE phone = ? ', [phone]);
 
     if (user.length == 0) {
@@ -1609,6 +1720,7 @@ const infoCtv2 = async (req, res) => {
         });
     }
     let userInfo = user[0];
+
     const [list_mem] = await connection.query('SELECT * FROM users WHERE ctv = ? AND status = 1 AND veri = 1 ', [phone]);
 
     let list_mems = [];
@@ -1617,7 +1729,13 @@ const infoCtv2 = async (req, res) => {
         let today = timeDate;
         let time = timerJoin(list_mem_today[i].time);
         if (time == today) {
-            list_mems.push(list_mem_today[i]);
+            const [phone_invites] = await connection.query('SELECT `phone` FROM users WHERE code = ? ', [list_mem_today[i].invite]);
+            let phone_invite = phone_invites[0].phone;
+            let data = {
+                ...list_mem_today[i],
+                phone_invite: phone_invite,
+            };
+            list_mems.push(data);
         }
     }
 
@@ -1652,7 +1770,6 @@ const infoCtv2 = async (req, res) => {
             redenvelopes_used_today.push(redenvelopes_used[i]);
         }
     }
-
     const [financial_details] = await connection.query('SELECT * FROM financial_details WHERE phone = ? ', [phone]);
     let financial_details_today = [];
     for (let i = 0; i < financial_details.length; i++) {
