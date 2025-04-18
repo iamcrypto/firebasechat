@@ -95,7 +95,7 @@ const rosesPlus = async (auth, money, fee) => {
           `;
           await connection.execute(sqlTF1, [infoF1.phone, infoF1.code, infoF1.invite, rosesF1, rosesF1]);
           const sqlF1 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-          await connection.execute(sqlF1, [infoF1.phone,infoF1.code,infoF1.invite,rosesF1,'0','0','0','0','0',timeNow,]);
+          await connection.execute(sqlF1, [infoF1.phone,'1',userInfo.phone,rosesF1,'0','0','0','0','0',timeNow,]);
           const [f2] = await connection.query(
             "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
             [infoF1.invite],
@@ -116,7 +116,7 @@ const rosesPlus = async (auth, money, fee) => {
             `;
             await connection.execute(sqlTF2, [infoF2.phone, infoF2.code, infoF2.invite, rosesF2, rosesF2]);
             const sqlF2 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-            await connection.execute(sqlF2, [infoF2.phone,infoF2.code,infoF2.invite,'0',rosesF2,'0','0','0','0',timeNow,]);  
+            await connection.execute(sqlF2, [infoF2.phone,'2',userInfo.phone,'0',rosesF2,'0','0','0','0',timeNow,]);  
             const [f3] = await connection.query(
               "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
               [infoF2.invite],
@@ -137,7 +137,7 @@ const rosesPlus = async (auth, money, fee) => {
               `;
               await connection.execute(sqlTF3, [infoF3.phone, infoF3.code, infoF3.invite, rosesF3, rosesF3]);
               const sqlF3 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-              await connection.execute(sqlF3, [infoF3.phone,infoF3.code,infoF3.invite,'0','0',rosesF3,'0','0','0',timeNow,]);
+              await connection.execute(sqlF3, [infoF3.phone,'3',userInfo.phone,'0','0',rosesF3,'0','0','0',timeNow,]);
               const [f4] = await connection.query(
                 "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
                 [infoF3.invite],
@@ -158,7 +158,7 @@ const rosesPlus = async (auth, money, fee) => {
                 `;
                 await connection.execute(sqlTF4, [infoF4.phone, infoF4.code, infoF4.invite, rosesF4, rosesF4]);
                 const sqlF4 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-                await connection.execute(sqlF4, [infoF4.phone,infoF4.code,infoF4.invite,'0','0','0',rosesF4,'0','0',timeNow,]);
+                await connection.execute(sqlF4, [infoF4.phone,'4',userInfo.phone,'0','0','0',rosesF4,'0','0',timeNow,]);
                 const [f5] = await connection.query(
                   "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
                   [infoF4.invite],
@@ -179,7 +179,7 @@ const rosesPlus = async (auth, money, fee) => {
                   `;
                   await connection.execute(sqlTF5, [infoF5.phone, infoF5.code, infoF5.invite, rosesF5, rosesF5]);
                   const sqlF5 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-                  await connection.execute(sqlF5, [infoF5.phone,infoF5.code,infoF5.invite,'0','0','0','0',rosesF5,'0',timeNow,]);
+                  await connection.execute(sqlF5, [infoF5.phone,'5',userInfo.phone,'0','0','0','0',rosesF5,'0',timeNow,]);
   
                   const [f6] = await connection.query(
                     "SELECT `phone`, `code`, `invite`, `rank`, `user_level` FROM users WHERE code = ? AND veri = 1  LIMIT 1 ",
@@ -201,7 +201,7 @@ const rosesPlus = async (auth, money, fee) => {
                     `;
                     await connection.execute(sqlTF6, [infoF6.phone, infoF6.code, infoF6.invite, rosesF6, rosesF6]);
                     const sqlF6 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,f5 = ?,f6 = ?,time = ?`;
-                    await connection.execute(sqlF6, [infoF6.phone,infoF6.code,infoF6.invite,'0','0','0','0','0',rosesF6,timeNow,]);
+                    await connection.execute(sqlF6, [infoF6.phone,'6',userInfo.phone,'0','0','0','0','0',rosesF6,timeNow,]);
                   }
                 }
               }
@@ -211,7 +211,6 @@ const rosesPlus = async (auth, money, fee) => {
       }
     }
   };
-
 
 
 const betWinGo = async (req, res) => {
