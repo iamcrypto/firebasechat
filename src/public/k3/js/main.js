@@ -146,7 +146,7 @@ function GetMyEmerdList(list_orders) {
                         </div>
                         <div data-v-03b808c2="" class="money ${(list_order.status == 0) ? 'd-none' : ''}">
                             <!---->
-                            <span data-v-03b808c2="" class="${(list_order.status == 1) ? 'success' : 'fail'}"> ${(list_order.status == 1) ? '+' : '-'}${(list_order.status == 1) ? list_order.get : list_order.price}.00 </span>
+                            <span data-v-03b808c2="" class="${(list_order.status == 1) ? 'success' : 'fail'}"> ${(list_order.status == 1) ? '+' : '-'}${(list_order.status == 1) ? list_order.get : list_order.price} </span>
                         </div>
                     </div>
                     
@@ -167,7 +167,7 @@ function GetMyEmerdList(list_orders) {
    </div>
    <div data-v-42f27458="" class="detailLi c-row c-row-between c-row-middle">
       <div data-v-42f27458="">Spent Amount</div>
-      <div data-v-42f27458="">${list_order.money}.00</div>
+      <div data-v-42f27458="">${list_order.money}</div>
    </div>
    <div data-v-42f27458="" class="detailLi c-row c-row-between c-row-middle">
       <div data-v-42f27458="">Quantity Purchased</div>
@@ -175,11 +175,11 @@ function GetMyEmerdList(list_orders) {
    </div>
    <div data-v-42f27458="" class="detailLi c-row c-row-between c-row-middle">
       <div data-v-42f27458="">After Tax Amount</div>
-      <div data-v-42f27458="" class="red">${list_order.price}.00</div>
+      <div data-v-42f27458="" class="red">${list_order.price}</div>
    </div>
    <div data-v-42f27458="" class="detailLi c-row c-row-between c-row-middle">
       <div data-v-42f27458="">Tax</div>
-      <div data-v-42f27458="">${list_order.fee}.00</div>
+      <div data-v-42f27458="">${list_order.fee}</div>
    </div>
    <div data-v-42f27458="" class="detailLi c-row c-row-between c-row-middle">
       <div data-v-42f27458="">Opening Price</div>
@@ -207,7 +207,7 @@ function GetMyEmerdList(list_orders) {
    </div>
    <div data-v-42f27458="" class="detailLi c-row c-row-between c-row-middle">
       <div data-v-42f27458="">Win Or Loss</div>
-      <div data-v-42f27458="" class="${(list_order.status == 1) ? 'green' : 'red'}" style="display: ${(list_order.status == 0) ? 'none' : ''};">${(list_order.status == 1) ? '+' : '-'} ${(list_order.status == 1) ? list_order.get : list_order.price}.00</div>
+      <div data-v-42f27458="" class="${(list_order.status == 1) ? 'green' : 'red'}" style="display: ${(list_order.status == 0) ? 'none' : ''};">${(list_order.status == 1) ? '+' : '-'} ${(list_order.status == 1) ? list_order.get : list_order.price}</div>
                   <!---->
    </div>
    <div data-v-42f27458="" class="detailLi c-row c-row-between c-row-middle">

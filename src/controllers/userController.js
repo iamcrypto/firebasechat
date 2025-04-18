@@ -685,7 +685,7 @@ const listMyTeam = async (req, res) => {
             timeStamp: timeNow,
         })
     }
-    const [user] = await connection.query('SELECT `phone`, `code`,`invite` FROM users WHERE `token` = ? ', [md5(auth)]);
+    const [user] = await connection.query('SELECT `phone`, `code`,`invite`,`user_level` FROM users WHERE `token` = ? ', [md5(auth)]);
     if (!user) {
         return res.status(200).json({
             message: 'Failed',
@@ -705,7 +705,7 @@ const listMyTeam = async (req, res) => {
             return;
         }
 
-        const [userData] = await connection.query('SELECT `id_user`, `name_user`, `phone`, `code`, `invite`, `rank`, `total_money` FROM users WHERE `invite` = ?', [code]);
+        const [userData] = await connection.query('SELECT `id_user`,`user_level`, `name_user`, `phone`, `code`, `invite`, `rank`, `total_money` FROM users WHERE `invite` = ?', [code]);
         if (userData.length > 0) {
             for (const user of userData) {
                 const [turnoverData] = await connection.query('SELECT `phone`, `daily_turn_over`, `total_turn_over` FROM turn_over WHERE `phone` = ?', [user.phone]);
@@ -727,6 +727,7 @@ const listMyTeam = async (req, res) => {
                 if(CommiData.length > 0)
                     {
                         total_roses.push( {
+                            user_level:user.user_level,
                             invite: CommiData[0].invite,
                             code: CommiData[0].code,
                             phone:CommiData[0].phone,
