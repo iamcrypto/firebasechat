@@ -727,7 +727,7 @@ const listMyTeam = async (req, res) => {
                 if(CommiData.length > 0)
                     {
                         total_roses.push( {
-                            user_level:user.user_level,
+                            user_level:depth,
                             invite: CommiData[0].invite,
                             code: CommiData[0].code,
                             phone:CommiData[0].phone,
